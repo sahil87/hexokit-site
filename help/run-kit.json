@@ -1,7 +1,7 @@
 {
   "tool": "run-kit",
-  "version": "v3.19.23",
-  "captured_at": "2026-09-07T13:29:10Z",
+  "version": "v3.19.37",
+  "captured_at": "2026-09-09T12:19:11Z",
   "schema_version": 1,
   "root": {
     "name": "run-kit",
@@ -22,7 +22,7 @@
             "path": "run-kit agent hook",
             "short": "Report an agent's lifecycle state to run-kit (invoked by installed hooks)",
             "usage": "run-kit agent hook <state> [flags]",
-            "text": "Usage:\n  run-kit agent hook <state> [flags]\n\nFlags:\n      --agent string   Agent harness whose comm literal drives pid resolution (v1: claude) (default \"claude\")\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "text": "Usage:\n  run-kit agent hook <state> [flags]\n\nFlags:\n      --agent string   Agent harness provider whose registry entry drives payload parsing and pid resolution (claude, codex, gemini, copilot, kimi, opencode, agy) (default \"claude\")\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
             "commands": []
           },
           {
@@ -106,14 +106,14 @@
         "path": "run-kit cron",
         "short": "Scheduled agent prompts (add, list, rm, mute, pin, tick)",
         "usage": "run-kit cron",
-        "text": "Usage:\n  run-kit cron [command]\n\nAvailable Commands:\n  add         Add a cron entry to the server's intent file\n  list        List the server's cron entries (disk-derived; no tmux probes)\n  mute        Mute a cron entry (skip its fires) — --off unmutes\n  pin         Pin a cron entry (exempt from orphan expiry) — --off unpins\n  rm          Remove a cron entry by id\n  tick        Run one cron evaluation sweep across every live server\n\nFlags:\n  -L, --server string   tmux server name (entry-file-scoped verbs: add/list/rm/mute/pin; default: the caller's own server from $TMUX, else the default server)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"run-kit cron [command] --help\" for more information about a command.\n",
+        "text": "Usage:\n  run-kit cron [command]\n\nAvailable Commands:\n  add         Add a cron entry to the server's intent file\n  list        List the server's cron entries (disk-derived; no tmux probes)\n  mute        Mute a cron entry (skip its fires) — --for leases the mute, --off unmutes\n  pin         Pin a cron entry (exempt from orphan expiry) — --off unpins\n  rm          Remove a cron entry by id\n  tick        Run one cron evaluation sweep across every live server\n\nFlags:\n  -L, --server string   tmux server name (entry-file-scoped verbs: add/list/rm/mute/pin; default: the caller's own server from $TMUX, else the default server)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"run-kit cron [command] --help\" for more information about a command.\n",
         "commands": [
           {
             "name": "add",
             "path": "run-kit cron add",
             "short": "Add a cron entry to the server's intent file",
             "usage": "run-kit cron add <payload> --every <dur> | --backoff | --cron \"<expr>\" [flags]",
-            "text": "Usage:\n  run-kit cron add <payload> --every <dur> | --backoff | --cron \"<expr>\" [flags]\n\nExamples:\n  rk cron add \"check PRs\" --every 1h\n  rk cron add \"tick\" --backoff --min 2m --max 30m\n  rk cron add \"nightly\" --cron \"0 3 * * *\" --role operator\n\nFlags:\n      --backoff            Fire on an operator-idle backoff ladder (default 60s→30m)\n      --cron string        Store a 5-field cron expression as intent (not evaluated yet)\n      --deliver string     Delivery policy: immediate|when-idle (default \"immediate\")\n      --every duration     Fire on a fixed interval (Go duration, e.g. 1h, 90s)\n      --if-absent string   Absent-target policy: skip|notify|respawn (default \"skip\")\n      --max duration       Backoff ladder maximum gap (with --backoff) (default 30m0s)\n      --min duration       Backoff ladder minimum gap (with --backoff) (default 1m0s)\n      --name string        Display name (default: a payload prefix)\n      --pane string        Target a pane id (%N)\n      --pinned             Pin the entry (exempt from orphan expiry)\n      --role string        Target a server role (only: operator)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (entry-file-scoped verbs: add/list/rm/mute/pin; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  run-kit cron add <payload> --every <dur> | --backoff | --cron \"<expr>\" [flags]\n\nExamples:\n  rk cron add \"check PRs\" --every 1h\n  rk cron add \"tick\" --backoff --min 2m --max 30m\n  rk cron add \"nightly\" --cron \"0 3 * * *\" --role operator\n  rk cron add \"operator tick\" --backoff --role operator --if-absent respawn --respawn rk --respawn operator --respawn -L --respawn '{server}'\n  rk cron add \"follow up\" --every 2h --session 4fe2abc-1c3b-4f7e-9a2d-8b5c4e1f0a37\n\nFlags:\n      --backoff               Fire on a backoff ladder keyed on the target pane's idle epoch — resets on genuine activity, continues otherwise (60s→30m by default; refine with --min/--max)\n      --catch-up string       With --cron: fire once late after a gap (only: once)\n      --cron string           Fire on a 5-field cron expression (daemon local time, validated at add time)\n      --deliver string        Delivery policy: immediate|when-idle (default \"immediate\")\n      --every duration        Fire on a fixed interval (Go duration, e.g. 1h, 90s)\n      --if-absent string      Absent-target policy: skip|notify|respawn (default \"skip\")\n      --max duration          Backoff ladder maximum gap (with --backoff) (default 30m0s)\n      --min duration          Backoff ladder minimum gap (with --backoff) (default 1m0s)\n      --name string           Display name (default: a payload prefix)\n      --pane string           Target a pane id (%N)\n      --pinned                Pin the entry (exempt from orphan expiry)\n      --respawn stringArray   With --if-absent respawn: one argv element of the respawn command per occurrence (repeatable; {server} resolves to the entry's server at fire time)\n      --role string           Target a server role (the @rk_win_role value, e.g. operator)\n      --session string        Target an agent session ref (e.g. 4fe2abc-…)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (entry-file-scoped verbs: add/list/rm/mute/pin; default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -127,9 +127,9 @@
           {
             "name": "mute",
             "path": "run-kit cron mute",
-            "short": "Mute a cron entry (skip its fires) — --off unmutes",
-            "usage": "run-kit cron mute <id> [--off] [flags]",
-            "text": "Usage:\n  run-kit cron mute <id> [--off] [flags]\n\nExamples:\n  rk cron mute a3f9\n  rk cron mute a3f9 --off\n\nFlags:\n      --off   Unmute instead of mute\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (entry-file-scoped verbs: add/list/rm/mute/pin; default: the caller's own server from $TMUX, else the default server)\n",
+            "short": "Mute a cron entry (skip its fires) — --for leases the mute, --off unmutes",
+            "usage": "run-kit cron mute <id> [--for <dur>] [--off] [flags]",
+            "text": "Usage:\n  run-kit cron mute <id> [--for <dur>] [--off] [flags]\n\nExamples:\n  rk cron mute a3f9\n  rk cron mute a3f9 --for 30m\n  rk cron mute a3f9 --off\n\nFlags:\n      --for duration   Mute until now+<dur> (a self-expiring lease; positive Go duration; mutually exclusive with --off)\n      --off            Unmute instead of mute\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (entry-file-scoped verbs: add/list/rm/mute/pin; default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -398,8 +398,8 @@
         "name": "operator",
         "path": "run-kit operator",
         "short": "Open the operator — the server-wide orchestrator agent tab (singleton)",
-        "usage": "run-kit operator [--workers <provider>] [flags]",
-        "text": "Usage:\n  run-kit operator [--workers <provider>] [flags]\n\nFlags:\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+        "usage": "run-kit operator [--workers <provider>] [-L <server>] [flags]",
+        "text": "Usage:\n  run-kit operator [--workers <provider>] [-L <server>] [flags]\n\nFlags:\n  -L, --server string    address the named tmux server (no $TMUX required; the window opens in the home directory; an existing operator tab is reported, not switched to)\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
         "commands": []
       },
       {
