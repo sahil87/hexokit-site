@@ -134,9 +134,9 @@ shll setup agent            # places the shll toolkit skill + installs run-kit's
 
 It delegates the hook install to `rk agent setup`, which shows the settings diff and asks before writing; `rk agent setup --uninstall` removes exactly the run-kit-owned entries.
 
-The setup installs agent-harness hooks into your user-global agent config (v1: Claude Code, `~/.claude/settings.json`) that stamp a `@rk_pane_agent_state` tmux pane option on lifecycle events. Each hook is a thin wrapper delegating to `rk agent hook`, so hook fixes ship in the binary and track `rk update` — no settings changes, no session restarts. Hooks work for any session, in any repo, under any workflow; re-running the setup is idempotent and never touches your other hooks. Until it's run (and agent sessions are restarted), agent state shows `—`.
+The setup installs agent-harness hooks into your user-global agent configs — Claude Code, Codex, Gemini CLI, GitHub Copilot CLI, Kimi Code, OpenCode, and Antigravity CLI, each wired when its binary is on `PATH` — that stamp a `@rk_pane_agent_state` tmux pane option on lifecycle events. Each hook is a thin wrapper delegating to `rk agent hook`, so hook fixes ship in the binary and track `rk update` — no settings changes, no session restarts. Hooks work for any session, in any repo, under any workflow; re-running the setup is idempotent and never touches your other hooks. Until it's run (and agent sessions are restarted), agent state shows `—`. Codex additionally needs its native trust review: open `codex` and trust the run-kit entries via `/hooks`.
 
-The cross-repo convention is documented in [`docs/specs/agent-state.md`](https://github.com/sahil87/run-kit/blob/main/docs/specs/agent-state.md); upgrading from an older hook generation is covered in the [install & access guide](docs/site/install.md#upgrade).
+The per-harness capability matrix (verified versions, event mappings, transcript support, honest gaps) lives in the [agent hook integrations guide](docs/site/agent-hooks.md); the cross-repo convention is documented in [`docs/specs/agent-state.md`](https://github.com/sahil87/run-kit/blob/main/docs/specs/agent-state.md); upgrading from an older hook generation is covered in the [install & access guide](docs/site/install.md#upgrade).
 
 ## The operator — one agent to run the server
 
@@ -222,4 +222,5 @@ Run `rk <command> --help` for full flag details, or see the [full command refere
 - **`rk riff` fails with "not in a tmux session"** — riff requires `$TMUX` to be set. Start tmux first (`tmux new -s work`), then run `rk riff` inside it.
 - **`rk riff` fails with "wt not found"** — install `wt` via `shll install wt`, or install the full toolkit from [https://shll.ai](https://shll.ai).
 - **Agent state shows `—` for every window** — run `shll setup agent` once on the machine, then start a fresh agent session (hooks apply to new sessions, not already-running ones). A pane sitting at a plain shell also reads `—` by design.
+- **Daemon misbehaving and a plain restart doesn't help** — `rk daemon restart --full` kills the entire rk-daemon tmux server (including the `rk-jobs`, `rk-code-server`, and `rk-remotes` sibling sessions) so the start births a genuinely fresh server, then reconnects any remote tunnels that were up. It refuses to run from a pane inside the rk-daemon server itself, where the kill would take down the invoking pane mid-restart.
 - **Anything else broken** — run `rk doctor`. It checks tmux, `wt`, the launcher binary, port availability, and prints per-dependency status.
