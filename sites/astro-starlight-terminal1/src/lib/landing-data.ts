@@ -13,12 +13,12 @@
  *      (`mountFor`), never hardcoded — HexoKit's mount (`docs`) already differs
  *      from its slug, so hardcoded `/<slug>/` paths are a known bug class.
  *
- * HAND-COPY DRIFT SURFACE: `TOOLKIT_EDGES[].blurb` is a second copy of the
- * companion one-liners in `src/content/docs/toolkit/index.mdx` § The six
- * companions. The five TOOL blurbs are VERBATIM; the `desktop` blurb is that
- * source sentence with its trailing clause dropped ("…around the HexoKit
- * dashboard." vs. "…, for when the browser tab isn't enough") — intentional,
- * not upstream drift. Those are the only two copies on the site; edit together.
+ * THE BLURBS ARE LANDING COPY, NOT A COPY: `TOOLKIT_EDGES[].blurb` is the
+ * landing's own, deliberately short (6–7 word) line per companion (copy study 2,
+ * change a9xx). `src/content/docs/toolkit/index.mdx` § The six companions keeps
+ * the long form for the directory page. The two sets describe the same job per
+ * tool but are NOT expected to match word for word — when a tool's job changes,
+ * edit both on purpose.
  *
  * Image `width`/`height` are the REAL pixel dimensions of the committed webps
  * (see `scripts/build-landing-screenshots.mjs`). They are required, not
@@ -65,9 +65,8 @@ export interface ToolkitEdge {
   /** Site-absolute target — a roster mount, or `/desktop/`. */
   href: string;
   /**
-   * One-line "what it's for", copied from `toolkit/index.mdx` § The six
-   * companions — verbatim for the five tools; the `desktop` entry drops the
-   * source's trailing "for when the browser tab isn't enough" clause on purpose.
+   * One short line — the landing's own "what it's for" (6–7 words), not a copy
+   * of the longer `toolkit/index.mdx` blurb for the same tool.
    */
   blurb: string;
 }
@@ -100,7 +99,7 @@ export const HERO = {
   tagline: 'Your tmux, in the browser and on your phone.',
   subline: 'Cockpit for the agent era.',
   lead:
-    'HexoKit is a remote console for the machine you actually work on — every tmux session and pane as a live terminal, from your desk or your couch. Nothing to configure, no database, state read straight from tmux.',
+    'A remote console for the machine you actually work on. Every tmux session and pane is a live terminal, at your desk or on the couch. Nothing to configure, no database.',
   desktopImage: {
     src: '/screenshots/hexokit-hero-desktop.webp',
     alt: 'The HexoKit desktop app: a sidebar of tmux sessions beside two live agent panes running a build and a review.',
@@ -137,8 +136,8 @@ export const DESKTOP_COMMANDS = ['rk desktop install', 'rk desktop update'] as c
 /** The feature cards, in render order (the last one is the full-width card). */
 export const FEATURES: readonly FeatureCard[] = [
   {
-    title: 'Every pane, a live terminal — from any device',
-    copy: 'Every tmux session and pane shows up in a sidebar. Tap one on your phone, type, and it is the same shell you left at your desk. HTTPS over Tailscale for the couch.',
+    title: 'Every pane, on every device',
+    copy: 'Tap a session on your phone and you are in the shell you left at your desk. Over Tailscale from anywhere.',
     image: {
       src: '/screenshots/hexokit-phone-terminal.webp',
       alt: 'A live tmux pane on a phone, with an on-screen key bar for tab, ctrl and arrow keys.',
@@ -149,7 +148,7 @@ export const FEATURES: readonly FeatureCard[] = [
   },
   {
     title: 'Waiting, working, idle — at a glance',
-    copy: 'Windows running an agent show active, waiting or idle — a hook stamps a tmux pane option, and Claude Code, Codex, Gemini CLI and Copilot CLI are wired by a one-time setup. HexoKit never speaks an agent’s protocol.',
+    copy: 'Every window running an agent says which. Claude Code, Codex, Gemini CLI and Copilot CLI report in after a one-time setup.',
     image: {
       src: '/screenshots/hexokit-agent-state.webp',
       alt: 'The lower session sidebar with per-window status dots beside an agent pane; the status bar reads agt idle 43s.',
@@ -160,7 +159,7 @@ export const FEATURES: readonly FeatureCard[] = [
   },
   {
     title: 'One command per parallel agent',
-    copy: '`rk riff` creates a git worktree, opens a tmux window in it and launches your agent. `rk riff -N 3` spawns three at once. The sidebar becomes the fleet view.',
+    copy: '`rk riff` gives an agent its own git worktree and tmux window. `rk riff -N 3` starts three.',
     image: {
       src: '/screenshots/hexokit-fleet.webp',
       alt: 'The fleet view: the server grid and a sidebar list of riff worktree windows, each with its status dot.',
@@ -171,7 +170,7 @@ export const FEATURES: readonly FeatureCard[] = [
   },
   {
     title: 'Watch three agents and the dev server at once',
-    copy: 'Pin panes from any server into a named board and they render side by side. Every window carries one status dot: hue = journey, shape = liveness, overlays = flags.',
+    copy: 'Pin panes from any machine into a board and they sit side by side. One dot per window tells you where it stands.',
     image: {
       src: '/screenshots/hexokit-board.webp',
       alt: 'A HexoKit board: two pinned agent panes from the same server rendered side by side.',
@@ -182,7 +181,7 @@ export const FEATURES: readonly FeatureCard[] = [
   },
   {
     title: 'Work that starts without you',
-    copy: '`rk cron` wakes an agent on a schedule. `rk operator` is the one agent that runs the server — it watches the fleet, unblocks changes and pings your phone.',
+    copy: '`rk cron` wakes an agent on a schedule. `rk operator` keeps watch and pings your phone.',
     image: {
       src: '/screenshots/hexokit-operator.webp',
       alt: 'The operator popover reporting on tracked changes and asking whether to start the next wave of work.',
@@ -193,7 +192,7 @@ export const FEATURES: readonly FeatureCard[] = [
   },
   {
     title: 'A window is not only a terminal',
-    copy: 'Split in an editor at the git root with `rk code`, a web tile your agent fills with `rk present`, or the host’s GUI display.',
+    copy: 'Open an editor with `rk code`, a web page your agent writes with `rk present`, or the machine’s own screen.',
     image: {
       src: '/screenshots/hexokit-web-tile.webp',
       alt: 'A HexoKit window split between a terminal pane and a web tile rendering a formatted change plan.',
@@ -204,7 +203,7 @@ export const FEATURES: readonly FeatureCard[] = [
   },
   {
     title: 'The operator drops in from any tab',
-    copy: 'The operator is the agent that runs the server, and its console is a Quake-style drawer: one shortcut and it slides down over whatever you are looking at. Ask, answer, resize it, send it back up — your pane never moves.',
+    copy: 'One shortcut and the operator’s console slides down over whatever you are looking at, Quake-style. Ask, get an answer, send it back up. Your pane never moves.',
     image: {
       src: '/screenshots/hexokit-operator-console.webp',
       alt: 'The operator console slid down as a drawer over a dashboard tab, with the tab’s Ask box above it and the operator’s transcript inside.',
@@ -219,44 +218,44 @@ export const FEATURES: readonly FeatureCard[] = [
 /**
  * The six hexagon edges, clockwise from the top edge. Five are roster tools
  * resolved through `mountFor`; `desktop` is S3's thin app page, not a tool.
- * Blurbs are verbatim from `src/content/docs/toolkit/index.mdx`.
+ * Blurbs are the landing's own short lines (see the header note).
  */
 export const TOOLKIT_EDGES: readonly ToolkitEdge[] = [
   {
     slug: 'fab-kit',
     label: 'fab-kit',
     href: mountHref('fab-kit'),
-    blurb: 'the planning harness: a constitution and a plan before any agent writes code.',
+    blurb: 'a plan before any agent writes code.',
   },
   {
     slug: 'wt',
     label: 'wt',
     href: mountHref('wt'),
-    blurb: 'disposable git worktrees so each change works in isolation.',
+    blurb: 'throwaway git worktrees, one per change.',
   },
   {
     slug: 'idea',
     label: 'idea',
     href: mountHref('idea'),
-    blurb: 'capture ideas and feed a backlog without breaking flow.',
+    blurb: 'catch an idea without breaking flow.',
   },
   {
     slug: 'tu',
     label: 'tu',
     href: mountHref('tu'),
-    blurb: 'track what your AI coding sessions cost.',
+    blurb: 'what your AI coding sessions cost.',
   },
   {
     slug: 'hop',
     label: 'hop',
     href: mountHref('hop'),
-    blurb: 'a personal directory of your git repos; jump anywhere, batch-update from anywhere.',
+    blurb: 'jump to any of your repos.',
   },
   {
     slug: 'desktop',
     label: 'desktop',
     href: '/desktop/',
-    blurb: 'the native macOS shell around the HexoKit dashboard.',
+    blurb: 'the Mac app around the dashboard.',
   },
 ];
 

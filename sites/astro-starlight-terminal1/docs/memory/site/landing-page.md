@@ -8,7 +8,7 @@ description: 'The `/` HexoKit product landing page: `src/pages/index.astro` wrap
 
 ## Overview
 
-`/` is the HexoKit product landing page for the live build (`sites/astro-starlight-terminal1`). It is a single-product marketing page — hero, install, seven feature cards (six in a grid plus one full-width), the agent-agnostic differentiator, the toolkit hexagon, the desktop-app card and a link footer — hand-written on the site, not synced from any producer repo. It is the only page on the site whose depth is site-authored copy rather than a pulled README slice or generated command reference; the constitution's Tool-Page Depth mechanical-sync rule governs *tool docs*, and its third content class (site-owned curated screenshots, v2.1.3) is what the page's imagery rides.
+`/` is the HexoKit product landing page for the live build (`sites/astro-starlight-terminal1`). It is a single-product marketing page — hero, install, seven feature cards (six in a grid plus one full-width), the agent-agnostic differentiator, the toolkit hexagon, the desktop-app card and a link footer — hand-written on the site, not synced from any producer repo. Its copy follows the site's copy rule (`fab/project/context.md` § Copy on this site: minimal, natural, said-aloud register). It is the only page on the site whose depth is site-authored copy rather than a pulled README slice or generated command reference; the constitution's Tool-Page Depth mechanical-sync rule governs *tool docs*, and its third content class (site-owned curated screenshots, v2.1.3) is what the page's imagery rides.
 
 Every string, link and image reference lives in `src/lib/landing-data.ts`; the page templates only lay that data out. The page ships **no client JavaScript of its own** (Constitution I) — the only scripts on it are Starlight's theme/Pagefind and Expressive Code's copy button, both already carried by every page.
 
@@ -32,7 +32,7 @@ In render order:
 
 | Section | Source of copy |
 |---|---|
-| `#top` hero | `HERO` (tagline and sub-line are verbatim brand strings; the lead is the product README's opening framing). Three CTAs: Install → `#install`, Read the docs → `/docs/`, GitHub → `GITHUB_URL` built from `repoFor('hexokit')`. Two eager `<img>`s with explicit dimensions. |
+| `#top` hero | `HERO` (tagline and sub-line are verbatim brand strings; the lead is a three-sentence, 31-word version of the README's opening framing — copy study 2). Three CTAs: Install → `#install`, Read the docs → `/docs/`, GitHub → `GITHUB_URL` built from `repoFor('hexokit')`. Two eager `<img>`s with explicit dimensions. |
 | `#install` | `INSTALL_LINES` — two Expressive Code `<Code>` blocks (`curl -fsSL hexokit.com/install \| sh`, `brew install sahil87/tap/hexokit`), then two note lines authored in the template. `InstallOneLiner.astro` is deliberately not used: it carries the `shll.ai/install` whole-toolkit form, and the landing's is the product-first line. |
 | `#features` | `FEATURES` — seven cards, each an image + title + copy + a `/docs/…` link; the last carries `wide: true` and spans the grid with its screenshot beside the copy (the operator console's Quake-style drawer). |
 | `#agnostic` | The differentiator paragraph and the *It is / It isn't* rows, authored in the template from the product README's agent-agnostic passage. |
@@ -102,7 +102,7 @@ The `#toolkit` section: the cube-in-hexagon brand mark with the six companions o
 
 The landing carries site-authored copy, so the hard `vn39` rule binds it (mechanized by the contract test above) and two hand-copy surfaces need naming:
 
-1. **The six hexagon blurbs** (`TOOLKIT_EDGES[].blurb`) are a second copy of the companion one-liners in `src/content/docs/toolkit/index.mdx` § The six companions. The five tool blurbs are verbatim; the `desktop` blurb is the source sentence with its trailing clause dropped ("…around the HexoKit dashboard." vs. "…around the HexoKit dashboard, for when the browser tab isn't enough"). Those are the only two copies on the site — edit both together, and read the shortened desktop line as intentional, not as upstream drift.
+1. **The six hexagon blurbs** (`TOOLKIT_EDGES[].blurb`) are the landing's own short lines (6–7 words each: "a plan before any agent writes code.", "throwaway git worktrees, one per change.", "catch an idea without breaking flow.", "what your AI coding sessions cost.", "jump to any of your repos.", "the Mac app around the dashboard."). They are NOT a copy of the longer one-liners in `src/content/docs/toolkit/index.mdx` § The six companions and are not expected to match them word for word; the only cross-file discipline is that both describe the same job for each tool, so when a tool's job changes, edit both on purpose (a9xx).
 2. **The author links** (GitHub / LinkedIn `ahujasahil` / noon.design) exist in exactly two carriers: `Footer.astro` (LinkedIn + noon.design on the copyright row) and the `TerminalPrompt` `whoami` egg (all three). The landing adds no third copy. See [tool-page-rubric](../../../../../docs/memory/conventions/tool-page-rubric.md).
 
 ## Shared surfaces the landing inherits but does not edit
@@ -205,6 +205,18 @@ On `/`, the theme select and the header nav MUST remain visible and clickable at
 **Rejected**: Deleting them with the homepage (irreversible in practice — the island is the largest single body of work on the site).
 *Follow-up*: this change's `## Deletion Candidates` enumerates the resulting unmounted surface — the terminal modules and tests, `VersionTable.astro`, and `terminal.css`'s `.home-prose` / `.tools-listing` selector groups, which now style markup no page emits. If the `/toolkit/` mount is abandoned, that list is the cleanup.
 *Introduced by*: 260910-lvnp-hexokit-landing
+
+### The landing's blurbs are their own, shorter set
+**Decision**: `TOOLKIT_EDGES[].blurb` is landing copy — one 6–7-word line per companion; `src/content/docs/toolkit/index.mdx` keeps the long one-liners for the directory page, and the two sets are not a copy of each other.
+**Why**: A landing blurb and a directory-page blurb do different jobs, and the verbatim coupling cost about 30 words in the page's densest section for no reader benefit; Sahil chose decoupling explicitly after copy study 2.
+**Rejected**: Keeping the verbatim copy and taking the word cut elsewhere — the blurbs were the least natural strings left on the page.
+*Introduced by*: 260910-a9xx-landing-copy-minimal
+
+### Copy follows the minimal, natural register
+**Decision**: Every string on the landing is written to be said aloud — short sentences with one claim each, outcome over mechanism, plain punctuation, the reader's own words bare, no insider terms — per `fab/project/context.md` § Copy on this site, which points at the two studies in `docs/findings/` (`landing-copy-study.md` for structure and claims, `landing-copy-study-2-minimal.md` for volume and register). Two user-decided exceptions to study 2's shortest versions: card 7 keeps "Quake-style" once and card 6 keeps the GUI display as a third short item.
+**Why**: Measured against eight minimal developer-tool landings, the page's card bodies ran twice the genre's median length and 43 % of its sentences carried an em-dash; the rewrite (712 → ~525 words) keeps every claim the competitive-landscape doc calls defensible.
+**Rejected**: Leaving the README's register on the landing — a README reader has opted in to the length, a landing reader has not.
+*Introduced by*: 260910-a9xx-landing-copy-minimal
 
 ## Key Files
 

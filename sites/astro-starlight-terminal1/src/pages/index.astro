@@ -158,11 +158,11 @@ const pageDescription =
         {INSTALL_LINES.map((line) => <Code code={line} lang="bash" />)}
       </div>
       <p class="landing-note">
-        Installs <code>shll</code> (the toolkit manager) and HexoKit — nothing else. The{' '}
+        Installs <code>shll</code> and HexoKit. Nothing else. The{' '}
         <a href="/toolkit/">six companions</a> are one more command away.
       </p>
       <p class="landing-note">
-        Requires tmux ≥ 3.4. Run <code>rk doctor</code> if anything looks wrong.
+        Needs tmux 3.4 or newer. Run <code>rk doctor</code> if anything looks wrong.
       </p>
     </section>
 
@@ -202,27 +202,24 @@ const pageDescription =
       <p class="landing-label"><span class="landing-label-text">the difference</span></p>
       <h2 id="agnostic-heading" class="landing-section-heading">Use any agent, untouched</h2>
       <p>
-        <strong>AI coding agents, many at once</strong> — that is what tends to run in those panes.{' '}
-        <code>rk riff</code> spawns each one in its own git worktree, and the dashboard lets you
-        watch the whole fleet. But HexoKit never wraps the agent: a pane is just a pane. It&rsquo;s
-        equally a build, a REPL, an ssh session, <code>htop</code>.{' '}
+        Mostly what runs in those panes is <strong>coding agents, several at once</strong>. But
+        HexoKit never wraps them. A pane is just as happily a build, a REPL, an ssh session,{' '}
+        <code>htop</code>.{' '}
         <strong>The agent is one of the things you run, not the thing HexoKit is.</strong>
       </p>
       <div class="landing-contrast">
         <div class="landing-contrast-row">
           <h3>It is</h3>
           <p>
-            A remote, phone-first console for your tmux: agent-agnostic, no database, state derived
-            from tmux + the filesystem. A spawner (<code>rk riff</code>) and a dashboard (
-            <code>rk serve</code>) that compose.
+            A console for your tmux, built for the phone. Any agent, no database, nothing to keep in
+            sync.
           </p>
         </div>
         <div class="landing-contrast-row is-not">
           <h3>It isn&rsquo;t</h3>
           <p>
-            An agent wrapper: it doesn&rsquo;t speak any agent&rsquo;s protocol, parse any
-            agent&rsquo;s output, or care what&rsquo;s in the pane. When the agent tooling churns
-            underneath you, the terminal layer stays put.
+            An agent wrapper. It reads no agent&rsquo;s output and speaks no agent&rsquo;s protocol.
+            When the agent tools change again, this layer stays put.
           </p>
         </div>
       </div>
@@ -239,16 +236,13 @@ const pageDescription =
         <div class="landing-desktop-copy">
           <p>
             The dashboard in a window of its own, with the same keyboard shortcuts you are used to
-            in a terminal — none of them swallowed by a browser tab. The app — macOS today —
-            connects three ways — <strong>This Mac</strong> (one-click daemon start),{' '}
-            <strong>over SSH</strong> (<code>rk remote</code>), or <strong>a URL</strong> — and never
-            starts, stops or updates anything on its own. Your tmux sessions survive every daemon
-            action.
+            in a terminal — none of them swallowed by a browser tab. It connects to this Mac, to
+            another over SSH, or to any URL, and it starts and stops nothing on its own. Your tmux
+            sessions outlive it.
           </p>
           <Code code={DESKTOP_COMMANDS.join('\n')} lang="bash" />
           <p class="landing-note">
-            Install through the CLI: it produces a quarantine-free, digest-verified app, where a
-            browser-downloaded DMG trips Gatekeeper.
+            Install from the CLI. A downloaded DMG trips Gatekeeper; this one does not.
           </p>
           <p>
             <a class="landing-card-link" href="/docs/install/">→ Install guide</a>
