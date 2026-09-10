@@ -1,12 +1,12 @@
 ---
 type: memory
-description: "GitHub Pages workflow, pnpm/Node versions, custom-domain CNAME, permissions, the build step's step-scoped GITHUB_TOKEN + tolerant build-time GitHub star-count fetch (7 repo calls, fail-soft to count-omission, never fails the build — d9qb), the PR+main CI validation workflow (ci.yml — validate-help + full node --test unit suite + astro build; runs on scheduled-puller commits to main too), the two inbound scheduled pull paths (help refresh — gated commit; README refresh — divergence-ungated / report-only, fetch-failure-only isolation), the refresh→deploy cascade fix (each refresh explicitly dispatches deploy.yml via workflow_dispatch after a real commit, since a default-GITHUB_TOKEN push is suppressed from on:push by GitHub's recursion guard — xs1j), the corrected daily-deploy freshness model (neither pull literally always-commits; the help refresh's captured_at churn commits daily and now drives the daily deploy via that dispatch), the site-wide Cloudflare Web Analytics beacon (cookieless, public token, Head-override injection, deliberate Constitution I exception), and the versions.json build output that rides the same refresh→deploy cascade (2lgz — a build-time static manifest reading help/*.json versions, no new dep, no workflow change)"
+description: "GitHub Pages deployment of the live site to hexokit.com: deploy.yml (pnpm 10 / Node 22, build + deploy jobs, minimal permissions, step-scoped GITHUB_TOKEN for the fail-soft star-count fetch), Pages/custom-domain setup on sahil87/hexokit-site (Actions build type, cname, HTTPS gated on the certificate, DNS shape), ci.yml PR validation, two scheduled pulls with explicit refresh→deploy dispatch, the daily-freshness model, versions.json as a ride-along output, and the Cloudflare Web Analytics beacon"
 ---
 # Deployment
 
 ## Overview
 
-The site deploys to GitHub Pages via a single workflow at `.github/workflows/deploy.yml`. Every push to `main` triggers a build-and-deploy pipeline. The custom domain `shll.ai` is configured via `public/CNAME`, which Astro copies into the output `dist/` as-is.
+The site deploys to GitHub Pages from the `sahil87/hexokit-site` repo via a single workflow at `.github/workflows/deploy.yml`. Every push to `main` triggers a build-and-deploy pipeline. The custom domain `hexokit.com` is configured via `public/CNAME`, which Astro copies into the output `dist/` as-is, and bound on the repo's Pages settings (see [Custom domain and Pages configuration](#custom-domain-and-pages-configuration)).
 
 There is no preview/staging environment. There is no manual deploy path — `dist/` is gitignored and never committed.
 
@@ -18,7 +18,20 @@ There is no preview/staging environment. There is no manual deploy path — `dis
 - Node version MUST be 22 (matching `package.json` engines `>=22.12.0`).
 - The workflow MUST have two jobs: `build` (uploads pages artifact) and `deploy` (uses `actions/deploy-pages@v4`). The split exists so artifact upload completes before deploy permissions activate.
 - The `pages` concurrency group MUST have `cancel-in-progress: false` — letting in-flight deploys complete prevents partial state.
-- `public/CNAME` MUST contain `shll.ai` (no protocol, no path). GitHub Pages reads this to configure the custom domain.
+- `public/CNAME` MUST contain `hexokit.com` (no protocol, no path). GitHub Pages reads this to configure the custom domain, and it MUST match the `cname` set on the repo's Pages settings.
+- `astro.config.mjs` `site:` MUST be `https://hexokit.com` — it is the single origin source for every build-time absolute URL (canonical, og:image, sitemap, JSON-LD, `llms.txt`, `security.txt`, `versions.json`).
+- `public/robots.txt`'s `Sitemap:` line MUST name the same origin. It is a static file that does not follow `site:`, so it is edited by hand whenever the domain changes.
+- DNS for the domain is managed by the operator **out of band** from a private infrastructure repo. No DNS-provider name, account or zone identifier, or credential SHALL appear anywhere in this repo (this repo is public). The only DNS facts this repo states are GitHub's published Pages addresses.
+
+## Custom domain and Pages configuration
+
+Repo-level Pages settings live on `sahil87/hexokit-site` and are changed with the `sahil87` `gh` account (`gh auth switch --user sahil87`, then back to the default account when done). The repo is **public**: GitHub Pages on a private repository requires a paid plan, and the account is on the free tier.
+
+- **Build type**: `workflow` (GitHub Actions) — enabled via `POST /repos/sahil87/hexokit-site/pages -f build_type=workflow`. The `github-pages` environment is created with a deployment-branch policy restricted to `main`; deploying from any other branch needs a temporary policy entry on that environment, removed afterwards.
+- **Custom domain**: `cname: hexokit.com`, set via `PUT /repos/sahil87/hexokit-site/pages -f cname=hexokit.com`. Set the domain on its own — it does not depend on the certificate. The `*.github.io` URL 301s to the custom domain once bound.
+- **HTTPS**: `https_enforced=true` is the one setting gated on certificate issuance. GitHub issues the certificate asynchronously after the apex resolves to the Pages addresses; until it exists, any `PUT` that includes `https_enforced` is rejected, so enforce HTTPS in a separate call and retry it until it succeeds. Done state: `curl -sI https://hexokit.com` → 200 with `server: GitHub.com`, `http://` → 301 to https, `www` → 301 to the apex.
+- **DNS shape** (applied out of band): apex `A` ×4 `185.199.108.153`–`185.199.111.153`, apex `AAAA` ×4 `2606:50c0:8000::153`–`2606:50c0:8003::153`, `www CNAME sahil87.github.io`. These are GitHub's published Pages addresses.
+- **Account-level domain verification** (GitHub → Settings → Pages → Add a domain, then a `_github-pages-challenge-sahil87` TXT record) protects the domain from takeover if the Pages site is ever removed. It has no REST API for user accounts and is a UI step, independent of the repo-level `cname`.
 
 ## Permissions
 
@@ -48,6 +61,24 @@ The Astro build now makes **7 tolerant GitHub API calls** — one `GET https://a
 - **pnpm, not npm/yarn.** Matches the rest of the toolkit's tooling. Frozen lockfile in CI catches dependency drift early.
 - **No PR previews configured.** [INFERRED] Adding deploy-preview infrastructure would contradict [Constitution Principle IV](../../../fab/project/constitution.md) (minimal dependencies) for a site that rarely changes. Reviewers can `pnpm dev` locally.
 - **`workflow_dispatch` enabled.** Allows manual re-runs from the GitHub UI when needed (e.g., re-deploying without a code change to clear a Pages cache issue).
+
+### Bootstrap deploy from a change branch
+**Decision**: A brand-new Pages repo gets its first deploy by dispatching `deploy.yml` (`workflow_dispatch`) on the change branch, with a temporary `github-pages` deployment-branch policy that is removed afterwards; steady state stays push-to-`main`.
+**Why**: The Pages site must exist before the custom domain binds and the certificate issues, and the change that flips the domain should prove the deploy green itself. Merging re-deploys identical content minutes later.
+**Rejected**: Verifying only after merge (leaves the change unverifiable); adding a branch trigger to `deploy.yml` (a permanent change for a one-time need).
+*Introduced by*: 260910-1ha7-hexokit-domain-and-deploy
+
+### Public repository for Pages
+**Decision**: `sahil87/hexokit-site` is public.
+**Why**: Pages on a private repo requires a paid plan; the account is free-tier, and the content is a public site anyway.
+**Rejected**: Upgrading the account for a marketing site whose source has no confidentiality.
+*Introduced by*: 260910-1ha7-hexokit-domain-and-deploy
+
+### DNS managed out of band
+**Decision**: DNS records are owned by the operator's private infrastructure-as-code repo and never described beyond GitHub's public Pages addresses here.
+**Why**: This repo is public; provider, account, and zone details do not belong in it, and the records change on a different cadence from the site.
+**Rejected**: Documenting the provider setup here for convenience.
+*Introduced by*: 260910-1ha7-hexokit-domain-and-deploy
 
 ## CI validation (`ci.yml`, added 2026-07-06)
 
@@ -117,4 +148,5 @@ The live site (`sites/astro-starlight-terminal1`) carries the **Cloudflare Web A
 
 - A deploy that succeeds in `build` but fails in `deploy` typically indicates GitHub Pages is not enabled on the repo, or the source is not set to "GitHub Actions" in repo settings.
 - CNAME files inside `public/` are preserved verbatim in `dist/` by Astro — no special configuration needed.
+- Pages settings and workflow runs on this repo are only visible to the `sahil87` `gh` account while the default account lacks admin rights; switch accounts for `gh api repos/sahil87/hexokit-site/pages` and switch back afterwards.
 - The workflow uses `actions/upload-pages-artifact@v3` and `actions/deploy-pages@v4`. Both are official actions maintained by GitHub.
