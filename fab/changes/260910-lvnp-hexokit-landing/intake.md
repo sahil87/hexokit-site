@@ -124,7 +124,7 @@ Followed by the two-row *It is / It isn't* contrast: *It is* — a remote, phone
 
 **Differentiator H2 (2026-09-10, user's line).** "Nothing wraps your agent" → **"Use any agent, untouched"** — plainer than "wraps", and it carries both halves of the thesis (agent-agnostic + no wrapper). The paragraph and the It is / It isn't rows beneath it are unchanged.
 
-**Desktop H2 (2026-09-10, user feedback).** "A native window, and the ⌘ tier back" assumed the reader knew browsers reserve the ⌘ shortcuts. Now **"The desktop app"** (user's pick — a heading that survives the planned Linux build; the body says "macOS today"), and the body opens with the concrete problem before the fix: "In a browser tab, ⌘W closes the tab and ⌘T opens another — the browser keeps that whole tier of shortcuts for itself. In a window of its own, they all reach your terminal."
+**Desktop H2 (2026-09-10, user feedback).** "A native window, and the ⌘ tier back" assumed the reader knew browsers reserve the ⌘ shortcuts. Now **"The desktop app"** (user's pick — a heading that survives the planned Linux build; the body says "macOS today"), and the body leads with the benefit in plain words (user's steer): "The dashboard in a window of its own, with the same keyboard shortcuts you are used to in a terminal — none of them swallowed by a browser tab."
 
 ### 3. Assets
 
