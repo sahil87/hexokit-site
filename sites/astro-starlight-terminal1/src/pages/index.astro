@@ -158,18 +158,18 @@ const pageDescription =
         {INSTALL_LINES.map((line) => <Code code={line} lang="bash" />)}
       </div>
       <p class="landing-note">
-        Installs <code>shll</code> (the toolkit manager) and HexoKit. Want the six companions too? See
-        the <a href="/toolkit/">toolkit</a>.
+        Installs <code>shll</code> (the toolkit manager) and HexoKit — nothing else. The{' '}
+        <a href="/toolkit/">six companions</a> are one more command away.
       </p>
       <p class="landing-note">
-        Requires tmux ≥ 3.4 — <code>rk doctor</code> checks.
+        Requires tmux ≥ 3.4. Run <code>rk doctor</code> if anything looks wrong.
       </p>
     </section>
 
     {/* ── Features ─────────────────────────────────────────────────── */}
     <section id="features" aria-labelledby="features-heading">
       <p class="landing-label"><span class="landing-label-text">what it does</span></p>
-      <h2 id="features-heading" class="landing-section-heading">Features</h2>
+      <h2 id="features-heading" class="landing-section-heading">Everything is a live terminal</h2>
       <div class="landing-features">
         {
           FEATURES.map((feature) => (
@@ -202,13 +202,11 @@ const pageDescription =
       <p class="landing-label"><span class="landing-label-text">the difference</span></p>
       <h2 id="agnostic-heading" class="landing-section-heading">Nothing wraps your agent</h2>
       <p>
-        What makes HexoKit so good right now is what tends to run in those panes:{' '}
-        <strong>AI coding agents, many at once.</strong> <code>rk riff</code> spawns each one in its
-        own git worktree, and the dashboard lets you watch the whole fleet. But HexoKit never wraps
-        the agent — a pane is just a pane. It&rsquo;s equally a build, a REPL, an ssh session,{' '}
-        <code>htop</code>. <strong>The agent is one of the things you run, not the thing HexoKit
-        is.</strong> When the agent tooling churns underneath you (and it does, monthly), the
-        terminal layer stays put.
+        <strong>AI coding agents, many at once</strong> — that is what tends to run in those panes.{' '}
+        <code>rk riff</code> spawns each one in its own git worktree, and the dashboard lets you
+        watch the whole fleet. But HexoKit never wraps the agent: a pane is just a pane. It&rsquo;s
+        equally a build, a REPL, an ssh session, <code>htop</code>.{' '}
+        <strong>The agent is one of the things you run, not the thing HexoKit is.</strong>
       </p>
       <div class="landing-contrast">
         <div class="landing-contrast-row">
@@ -223,7 +221,8 @@ const pageDescription =
           <h3>It isn&rsquo;t</h3>
           <p>
             An agent wrapper: it doesn&rsquo;t speak any agent&rsquo;s protocol, parse any
-            agent&rsquo;s output, or care what&rsquo;s in the pane.
+            agent&rsquo;s output, or care what&rsquo;s in the pane. When the agent tooling churns
+            underneath you, the terminal layer stays put.
           </p>
         </div>
       </div>
@@ -235,7 +234,7 @@ const pageDescription =
     {/* ── Desktop app card ─────────────────────────────────────────── */}
     <section id="desktop" aria-labelledby="desktop-heading">
       <p class="landing-label"><span class="landing-label-text">desktop</span></p>
-      <h2 id="desktop-heading" class="landing-section-heading">The macOS app</h2>
+      <h2 id="desktop-heading" class="landing-section-heading">A native window, and the ⌘ tier back</h2>
       <div class="landing-desktop">
         <div class="landing-desktop-copy">
           <p>

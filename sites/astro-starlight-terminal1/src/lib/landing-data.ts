@@ -94,7 +94,7 @@ export const HERO = {
   tagline: 'Your tmux, in the browser and on your phone.',
   subline: 'Cockpit for the agent era.',
   lead:
-    'HexoKit is a remote console for the machine you actually work on — every tmux session and pane as a live terminal, in a sidebar, from your desk or your couch. Nothing to configure, no database, state read straight from tmux.',
+    'HexoKit is a remote console for the machine you actually work on — every tmux session and pane as a live terminal, from your desk or your couch. Nothing to configure, no database, state read straight from tmux.',
   desktopImage: {
     src: '/screenshots/hexokit-hero-desktop.webp',
     alt: 'The HexoKit desktop app: a sidebar of tmux sessions beside two live agent panes running a build and a review.',
@@ -142,8 +142,8 @@ export const FEATURES: readonly FeatureCard[] = [
     href: '/docs/install/',
   },
   {
-    title: 'Agents are just panes',
-    copy: 'Windows running an agent report active, waiting or idle through hooks that stamp a tmux pane option — Claude Code, Codex, Gemini CLI, Copilot CLI and more. Agent-agnostic: the dashboard never speaks an agent’s protocol.',
+    title: 'Waiting, working, idle — at a glance',
+    copy: 'Windows running an agent show active, waiting or idle — a hook stamps a tmux pane option, and Claude Code, Codex, Gemini CLI and Copilot CLI are wired by a one-time setup. HexoKit never speaks an agent’s protocol.',
     image: {
       src: '/screenshots/hexokit-agent-state.webp',
       alt: 'The session sidebar with per-window status dots beside a running agent pane; the status bar reads agt idle.',
@@ -153,8 +153,8 @@ export const FEATURES: readonly FeatureCard[] = [
     href: '/docs/agent-hooks/',
   },
   {
-    title: '`rk riff` — one agent per worktree',
-    copy: 'One command creates a git worktree, opens a tmux window in it and launches your agent; `-N 3` spawns three. The sidebar is the fleet view.',
+    title: 'One command per parallel agent',
+    copy: '`rk riff` creates a git worktree, opens a tmux window in it and launches your agent. `rk riff -N 3` spawns three at once. The sidebar becomes the fleet view.',
     image: {
       src: '/screenshots/run-kit-agent-session.webp',
       alt: 'A HexoKit agent session: a worktree window with the agent working and its status reported in the sidebar.',
@@ -164,8 +164,8 @@ export const FEATURES: readonly FeatureCard[] = [
     href: '/docs/workflows/',
   },
   {
-    title: 'Boards + status dots',
-    copy: 'Pin panes from any server into a named board and watch them side by side. Every window carries a status dot: hue = journey, shape = liveness, overlays = flags.',
+    title: 'Watch three agents and the dev server at once',
+    copy: 'Pin panes from any server into a named board and they render side by side. Every window carries one status dot: hue = journey, shape = liveness, overlays = flags.',
     image: {
       src: '/screenshots/hexokit-board.webp',
       alt: 'A HexoKit board named bb showing three pinned agent panes from the same server side by side.',
@@ -175,8 +175,8 @@ export const FEATURES: readonly FeatureCard[] = [
     href: '/docs/boards/',
   },
   {
-    title: 'Cron clock + operator',
-    copy: '`rk cron` wakes an agent on a schedule; `rk operator` is the one agent that runs the server — it watches the fleet, unblocks changes and pings your phone.',
+    title: 'Work that starts without you',
+    copy: '`rk cron` wakes an agent on a schedule. `rk operator` is the one agent that runs the server — it watches the fleet, unblocks changes and pings your phone.',
     image: {
       src: '/screenshots/hexokit-operator.webp',
       alt: 'The operator popover reporting on tracked changes and asking whether to start the next wave of work.',
@@ -186,8 +186,8 @@ export const FEATURES: readonly FeatureCard[] = [
     href: '/docs/cron-schedule-kinds/',
   },
   {
-    title: 'Code, web and GUI tiles',
-    copy: 'A window is not only a terminal: split in a `rk code` editor at the git root, a web tile your agent fills with `rk present`, or the host’s GUI display.',
+    title: 'A window is not only a terminal',
+    copy: 'Split in an editor at the git root with `rk code`, a web tile your agent fills with `rk present`, or the host’s GUI display.',
     image: {
       src: '/screenshots/hexokit-web-tile.webp',
       alt: 'A HexoKit window split between a terminal pane and a web tile rendering a formatted change plan.',
