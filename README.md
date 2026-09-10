@@ -1,8 +1,8 @@
-# shll.ai
+# hexokit-site
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-Source for **[shll.ai](https://shll.ai)** — the landing page for the [@sahil87](https://github.com/sahil87) AI coding toolkit (`idea`, `hop`, `fab-kit`, `wt`, `run-kit`, `tu`, `shll`).
+Source for **[hexokit.com](https://hexokit.com)** — the product site for **HexoKit** (your tmux, in the browser and on your phone) and its toolkit of companion CLIs (`fab-kit`, `wt`, `idea`, `tu`, `hop`, `shll`) from [@sahil87](https://github.com/sahil87). The product's own source repo stays [sahil87/run-kit](https://github.com/sahil87/run-kit) — this repo is the site.
 
 ## Layout
 
@@ -10,7 +10,7 @@ This repo hosts multiple website variants under `sites/`. One is the live build;
 
 ```
 sites/
-├── astro-starlight-terminal1/  # currently live at shll.ai
+├── astro-starlight-terminal1/  # currently live at hexokit.com
 └── _playground/                # scratch space for new experiments
 ```
 

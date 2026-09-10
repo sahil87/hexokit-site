@@ -4,9 +4,10 @@ name: 'Refresh: Help'
 # docs/memory/conventions/help-collection.md and the forward contract at
 # docs/specs/help-dump-contract.md). Replaces the retired push model
 # (help-automerge.yml). On a daily schedule (and on demand), this workflow
-# brew-installs each of the 7 toolkit CLIs, runs `<tool> help-dump`, stamps the
-# shll.ai-owned captured_at field, validates every help/*.json against the Zod
-# contract, and DIRECT-COMMITS the result to main — gated on validation passing.
+# brew-installs each of the 7 HexoKit toolkit CLIs, runs `<tool> help-dump`,
+# stamps the hexokit.com-owned captured_at field, validates every help/*.json
+# against the Zod contract, and DIRECT-COMMITS the result to main — gated on
+# validation passing.
 #
 # DESIGN (see Design Decisions in help-collection.md):
 #   - Direct commit to main is sound here because the committer is a SINGLE
@@ -100,22 +101,25 @@ jobs:
           brew tap sahil87/tap
           brew trust sahil87/tap
 
-      # Capture each tool independently. THREE distinct names per tool, which are
+      # Capture each tool independently. FOUR distinct names per tool, which are
       # NOT always equal — conflating them is a real bug (fab-kit's formula/slug
-      # is `fab-kit` but its binary is `fab`):
+      # is `fab-kit` but its binary is `fab`; hexokit's slug is `hexokit` but its
+      # formula/binary/repo are `run-kit` until the source-side rename):
       #   - file slug     → names the output file help/<slug>.json
       #   - formula name  → the Homebrew formula to `brew install sahil87/tap/<formula>`
       #   - binary name   → the executable to invoke `<binary> help-dump`
       #                     (also carried inside the JSON's `tool` field)
+      #   - repo name     → github.com/sahil87/<repo> (README/docs-site source in
+      #                     refresh-readme.yml; same table in src/lib/tool-roster.mjs)
       # Mapping (verified against the committed help/*.json `tool` fields and the
       # `sahil87/tap` formula names):
       #   slug       formula   binary
+      #   hexokit -> run-kit-> run-kit (the site's product slug; sources stay
+      #                                 run-kit until the source-side rename)
       #   idea    -> idea   -> idea
       #   hop     -> hop    -> hop
       #   fab-kit -> fab-kit-> fab     (binary is `fab`, NOT `fab-kit`)
       #   wt      -> wt     -> wt
-      #   run-kit -> run-kit-> run-kit (v3.0.0 renamed rk -> run-kit; `rk` is now
-      #                                 only a brew-installed symlink alias)
       #   tu      -> tu     -> tu     (help-dump in progress; may be absent — not a failure)
       #   shll    -> shll   -> shll
       #
@@ -136,12 +140,12 @@ jobs:
             "hop:hop:hop"
             "fab-kit:fab-kit:fab"
             "wt:wt:wt"
-            "run-kit:run-kit:run-kit"
+            "hexokit:run-kit:run-kit"
             "tu:tu:tu"
             "shll:shll:shll"
           )
 
-          # Single capture timestamp for the whole run (shll.ai-owned field —
+          # Single capture timestamp for the whole run (hexokit.com-owned field —
           # the tools do NOT emit captured_at; the puller stamps it; §3 asymmetry).
           captured_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           echo "captured_at = $captured_at"
@@ -188,7 +192,7 @@ jobs:
               cat "$tmpdir/$slug.err" || true
             fi
 
-            # Stamp captured_at (the shll.ai-owned field) into the tool-emitted
+            # Stamp captured_at (the hexokit.com-owned field) into the tool-emitted
             # envelope. Insert it in its CONTRACT position (after `version`,
             # before `schema_version` — see §3 of help-dump-contract.md and the
             # committed help/*.json key order) so the first refresh does not churn

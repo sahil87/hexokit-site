@@ -1,0 +1,53 @@
+id: lvnp
+name: 260910-lvnp-hexokit-landing
+created: 2026-09-10T11:24:40Z
+created_by: sahil-noon
+change_type: feat
+issues: []
+progress:
+  intake: done
+  apply: done
+  review: done
+  hydrate: done
+  ship: done
+  review-pr: done
+plan:
+  generated: true
+  task_count: 14
+  acceptance_count: 30
+  acceptance_completed: 30
+confidence:
+  certain: 12
+  confident: 10
+  tentative: 0
+  unresolved: 0
+  score: 3.5
+  fuzzy: true
+  dimensions:
+    signal: 70.7
+    reversibility: 90.5
+    competence: 82.5
+    disambiguation: 75.9
+stage_metrics:
+  intake: {started_at: "2026-09-10T11:24:40Z", driver: fab-new, iterations: 1, completed_at: "2026-09-10T12:20:46Z"}
+  apply: {started_at: "2026-09-10T12:20:46Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T13:10:30Z"}
+  review: {started_at: "2026-09-10T13:10:30Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T13:22:19Z"}
+  hydrate: {started_at: "2026-09-10T13:22:19Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T13:36:51Z"}
+  ship: {started_at: "2026-09-10T13:36:51Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T13:39:28Z"}
+  review-pr: {started_at: "2026-09-10T13:39:28Z", driver: git-pr, iterations: 1, completed_at: "2026-09-10T13:47:58Z", phase: replying, reviewer: '@Copilot'}
+prs:
+  - https://github.com/sahil87/hexokit-site/pull/4
+change_type_source: explicit
+true_impact:
+  added: 3040
+  deleted: 245
+  net: 2795
+  excluding:
+    added: 2402
+    deleted: 205
+    net: 2197
+  computed_at: "2026-09-10T13:39:28Z"
+  computed_at_stage: ship
+summary: Replaced the shll homepage with a hand-written HexoKit product landing at / (src/pages/index.astro on a StarlightPage splash, landing-data.ts + contract test, ToolkitHexagon, landing.css, eight curated webps); index.mdx deleted, leaving the terminal island and VersionTable unmounted.
+# true_impact: lazily created on first stage-finish that computes it (no placeholder here).
+last_updated: 2026-09-10T13:47:58Z

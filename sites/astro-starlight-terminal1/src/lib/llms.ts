@@ -6,7 +6,8 @@
  * precedent as commands-toc.ts and terminal-toolcard.ts).
  *
  * What lives here:
- *   - TOOLS — the canonical 7-tool list (slug order matches the homepage/sidebar).
+ *   - TOOLS — the canonical tool list, derived from the shared roster
+ *     (tool-roster.mjs) in display order.
  *   - stripToolPrefix — drop a redundant leading `<bin> — ` from a short
  *     description (mirrors terminal-toolcard.ts; the tool name is already the
  *     bullet's link text). The anti-drift rule (vn39 / Tool-Page-Depth): tool
@@ -23,7 +24,7 @@
  *     component tags from an MDX body, leaving readable prose for a text/plain
  *     dump (exact fidelity is not required — intake Assumption #5/#7).
  *   - absolutize — rewrite root-relative URLs (`/idea/`) in appended docs content
- *     to site-absolute (`https://shll.ai/idea/`), so the absolute-URL discipline
+ *     to site-absolute (`https://hexokit.com/idea/`), so the absolute-URL discipline
  *     (intake Assumption #2) holds for the whole emitted file, not just the
  *     curated index. Both markdown `](/path)` and HTML `href`/`src="/path"` forms
  *     are covered.
@@ -39,21 +40,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { HelpDocSchema, type HelpDoc, type Node } from './schemas.ts';
+import { TOOL_SLUGS } from './tool-slugs.ts';
 
 /**
- * The canonical 7-tool slug list — each has a `help/<tool>.json` at the repo
- * root and a `src/content/docs/tools/<tool>/overview.mdx`. Order matches the
- * homepage terminal / sidebar so the emitted index reads consistently.
+ * The canonical tool slug list, DERIVED from the shared roster
+ * (`tool-roster.mjs`, change it5d) in display order (product first, then the
+ * companions, then shll) — no second hand-maintained list. Each slug has a
+ * `help/<slug>.json` at the repo root and an overview entry in the `docs`
+ * collection (id = the tool's MOUNT — `docs` for hexokit).
  */
-export const TOOLS = [
-  'fab-kit',
-  'hop',
-  'idea',
-  'run-kit',
-  'shll',
-  'tu',
-  'wt',
-] as const;
+export const TOOLS: readonly string[] = TOOL_SLUGS;
 
 export type Tool = (typeof TOOLS)[number];
 
@@ -201,7 +197,7 @@ export function flattenMdx(body: string): string {
  * the leading-`/`-less tokens (`/N`, `/usr/bin`) that legitimately appear inside
  * canonical README prose — guarded by requiring the char after `/` to begin a
  * path segment and by anchoring on the link/attr syntax, never a bare `/`.
- * `origin` is `Astro.site` (`https://shll.ai`), normalized to no trailing slash.
+ * `origin` is `Astro.site` (`https://hexokit.com`), normalized to no trailing slash.
  */
 export function absolutize(content: string, origin: string): string {
   const base = origin.replace(/\/+$/, '');

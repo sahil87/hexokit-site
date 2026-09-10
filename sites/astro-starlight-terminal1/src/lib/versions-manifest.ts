@@ -43,14 +43,19 @@ export const NOTIFY_VALUES = ['never', 'patch', 'minor'] as const;
 export type Notify = (typeof NOTIFY_VALUES)[number];
 
 /**
- * One tool's policy entry: the required notify threshold plus an optional
- * `formula` override (defaults to the slug — slug == Homebrew formula name for
- * all 7 tools today, so the override exists only for a future divergence).
+ * One tool's policy entry: the required notify threshold plus optional
+ * `formula` / `envelope` overrides. `formula` defaults to the policy key (key ==
+ * Homebrew formula name for all 7 tools today, so the override exists only for
+ * a future divergence). `envelope` names which `help/<slug>.json` supplies
+ * `latest` when the help-file slug differs from the consumer-facing key — e.g.
+ * the `run-kit` row reads `help/hexokit.json` (the site's hexokit slug sources
+ * from the run-kit binary) until the roster rename flips the key.
  */
 export const PolicyEntrySchema = z
   .object({
     notify: z.enum(NOTIFY_VALUES),
     formula: z.string().optional(),
+    envelope: z.string().optional(),
   })
   .strict();
 export type PolicyEntry = z.infer<typeof PolicyEntrySchema>;
@@ -103,8 +108,10 @@ export function readPolicy(repoRoot: string): VersionsPolicy {
 /**
  * Build the versions manifest from the committed envelopes + the policy.
  *
- * The policy's keys are the ROSTER: each declared slug is looked up in
- * `<repoRoot>/help/<slug>.json`. A tool whose envelope is MISSING (ENOENT) or
+ * The policy's keys are the ROSTER: each declared key is looked up in
+ * `<repoRoot>/help/<entry.envelope ?? key>.json` — the row key stays the
+ * consumer-facing roster name even when the help-file slug differs (the
+ * `envelope` override). A tool whose envelope is MISSING (ENOENT) or
  * schema-INVALID skip-degrades — it is omitted from `tools` and the build
  * continues (pulled-data posture, mirroring `/llms.txt` `toolShort`). Present,
  * valid tools get a `{ latest, notify, formula }` row.
@@ -122,7 +129,10 @@ export function buildManifest(
   for (const [slug, entry] of Object.entries(policy)) {
     let rawEnvelope: string;
     try {
-      rawEnvelope = fs.readFileSync(path.join(repoRoot, 'help', `${slug}.json`), 'utf8');
+      rawEnvelope = fs.readFileSync(
+        path.join(repoRoot, 'help', `${entry.envelope ?? slug}.json`),
+        'utf8',
+      );
     } catch (err) {
       if ((err as NodeJS.ErrnoException).code === 'ENOENT') continue; // missing → skip-degrade
       throw err;

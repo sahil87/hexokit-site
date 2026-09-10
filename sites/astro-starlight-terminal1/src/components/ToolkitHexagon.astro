@@ -1,0 +1,284 @@
+---
+/**
+ * ToolkitHexagon — the `#toolkit` section of the landing page (change lvnp):
+ * the cube-in-hexagon brand mark with the six companion tools sitting on its
+ * six edges, plus the adjacent textual list.
+ *
+ * WHY THE LABELS ARE HTML ANCHORS OVER THE SVG, NOT `<a>` INSIDE IT:
+ * keyboard focus, visible focus rings and screen-reader reading order are all
+ * straightforward with ordinary `<a>` elements; SVG anchors behave
+ * inconsistently across browsers and assistive tech and are awkward to give a
+ * focus ring. So the SVG is purely decorative (`aria-hidden="true"`, `focusable
+ * ="false"`) and the six links are real HTML positioned over it. Under 40rem
+ * the absolute positioning is dropped entirely and the labels become a plain
+ * 2×3 grid beneath the mark — no label can then collide or overflow.
+ *
+ * WHY THE ADJACENT `<ul>` EXISTS: the constitution's Accessibility constraint
+ * asks that a decorative diagram carry a textual explanation next to it. The
+ * list also does real work — it says what each tool is FOR, which the mark
+ * cannot. Its blurbs are the hand-copy drift surface documented in
+ * `landing-data.ts` (verbatim from `toolkit/index.mdx`).
+ *
+ * THE MARK IS THE BRAND ASSET, UNCHANGED: geometry AND colours are copied
+ * verbatim from `src/assets/logo.svg` — the same fixed greys in both themes.
+ * A first cut recoloured the faces to `--c-*` tokens for theme parity, and it
+ * read as a different logo per theme; the user asked for the original mark, as
+ * PR #2's `HkMark.astro` does. Inlined (not `<img>`) only so the edge labels
+ * can be positioned against the same box. If the logo ever changes, re-copy.
+ */
+import { TOOLKIT_EDGES } from '../lib/landing-data.ts';
+
+// Edge label positions, clockwise from the top edge, as percentages of the
+// mark's box. The flat-top hexagon has a top and a bottom edge plus two edges
+// per side, so each label is parked just OUTSIDE the midpoint of the edge it
+// names. The side labels are pushed clear of the box (their `translate` pulls
+// them fully left/right of their anchor) rather than centred on it — centring
+// laid them over the mark's own border segments, where the label chip and the
+// artwork fought each other and the longest label was clipped by the box.
+const EDGE_POSITIONS = [
+  // top edge — centred above the mark
+  { top: '0', left: '50%', translate: '-50%, -140%' },
+  // upper right — outside the right border, upper third
+  { top: '27%', left: '100%', translate: '18%, -50%' },
+  // lower right — outside the right border, lower third
+  { top: '73%', left: '100%', translate: '18%, -50%' },
+  // bottom edge — centred below the mark
+  { top: '100%', left: '50%', translate: '-50%, 40%' },
+  // lower left — outside the left border, lower third
+  { top: '73%', left: '0', translate: '-118%, -50%' },
+  // upper left — outside the left border, upper third
+  { top: '27%', left: '0', translate: '-118%, -50%' },
+];
+
+const edges = TOOLKIT_EDGES.map((edge, i) => ({
+  ...edge,
+  position: EDGE_POSITIONS[i % EDGE_POSITIONS.length],
+}));
+---
+
+<section id="toolkit" class="landing-toolkit" aria-labelledby="toolkit-heading">
+  <p class="landing-label"><span class="landing-label-text">the toolkit</span></p>
+  <h2 id="toolkit-heading" class="landing-section-heading landing-toolkit-heading">
+    <a href="/toolkit/">The HexoKit toolkit</a>
+  </h2>
+  <p class="landing-toolkit-lead">
+    HexoKit is the cockpit. Six companions sit on its six edges — each a small CLI that does one
+    job and composes with the rest — and <a href="/shll/"><code>shll</code></a> installs
+    them all.
+  </p>
+
+  <div class="landing-toolkit-grid">
+    <div class="landing-hexagon">
+      <div class="landing-hexagon-mark">
+        {/* Decorative: the list beside it carries the meaning. */}
+        <svg viewBox="7 10 50 44" aria-hidden="true" focusable="false">
+          {/* Border segments — original colours, verbatim from logo.svg. */}
+          <polygon points="44,11.2 56,32 47.5,32 39.5,17.2" fill="#b4b4b4"></polygon>
+          <polygon points="56,32 44,52.8 39.5,46.8 47.5,32" fill="#b4b4b4"></polygon>
+          <polygon points="44,52.8 20,52.8 24.5,46.8 39.5,46.8" fill="#2a2a2a"></polygon>
+          <polygon points="20,52.8 8,32 16.5,32 24.5,46.8" fill="#2a2a2a"></polygon>
+          <polygon points="8,32 20,11.2 24.5,17.2 16.5,32" fill="#2a2a2a"></polygon>
+          <polygon points="20,11.2 44,11.2 39.5,17.2 24.5,17.2" fill="#b4b4b4"></polygon>
+          {/* Inner cube faces — original colours, verbatim from logo.svg. */}
+          <polygon points="24.5,17.2 39.5,17.2 47.5,32 32,32" fill="#888888"></polygon>
+          <polygon points="47.5,32 39.5,46.8 24.5,46.8 32,32" fill="#737373"></polygon>
+          <polygon points="24.5,46.8 16.5,32 24.5,17.2 32,32" fill="#545454"></polygon>
+        </svg>
+        {
+          edges.map((edge) => (
+            <a
+              class="landing-edge"
+              href={edge.href}
+              style={`--edge-top:${edge.position.top};--edge-left:${edge.position.left};--edge-translate:${edge.position.translate}`}
+            >
+              {edge.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <ul class="landing-toolkit-list">
+      {
+        edges.map((edge) => (
+          <li>
+            <a href={edge.href}>{edge.label}</a>
+            <span> — {edge.blurb}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  {/* The heading already links /toolkit/, but a heading is not read as a
+      call to action; this explicit line is (the same arrow-link pattern the
+      feature cards and the desktop card use). */}
+  <p class="landing-toolkit-more">
+    <a class="landing-card-link" href="/toolkit/">→ See the whole toolkit</a>
+  </p>
+</section>
+
+<style>
+  .landing-toolkit-more {
+    margin: 1.5rem 0 0;
+  }
+
+  .landing-toolkit-lead {
+    max-width: 62ch;
+    margin: 0 0 2rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--c-fg-dim);
+  }
+
+  .landing-toolkit-lead a {
+    /* The landing's accent-as-text token (see landing.css § Accent-as-text):
+       the shared accent in dark, a deeper ink in light where the accent alone
+       would fall below WCAG AA on the paper background. */
+    color: var(--landing-accent-text);
+    text-decoration: none;
+  }
+
+  .landing-toolkit-lead a:hover {
+    text-decoration: underline;
+  }
+
+  .landing-toolkit-lead a:focus-visible {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 2px;
+  }
+
+  .landing-toolkit-grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .landing-hexagon {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* The mark's box. Edge labels are positioned against THIS element, and the
+     generous inline margin is the room their absolute placement hangs into. */
+  .landing-hexagon-mark {
+    position: relative;
+    width: min(240px, 60vw);
+    aspect-ratio: 1;
+    margin: 2.5rem 4.5rem;
+  }
+
+  .landing-hexagon-mark svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .landing-edge {
+    position: absolute;
+    top: var(--edge-top);
+    left: var(--edge-left);
+    transform: translate(var(--edge-translate));
+    white-space: nowrap;
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+    background: var(--c-surface);
+    font-size: 0.78rem;
+    color: var(--c-fg-dim);
+    text-decoration: none;
+    transition:
+      color 0.12s ease,
+      border-color 0.12s ease;
+  }
+
+  .landing-edge:hover {
+    color: var(--landing-accent-text);
+    border-color: var(--landing-accent-text);
+  }
+
+  .landing-edge:focus-visible {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 2px;
+  }
+
+  .landing-toolkit-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .landing-toolkit-list li {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--c-fg-dim);
+  }
+
+  .landing-toolkit-list a {
+    color: var(--c-fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .landing-toolkit-list a:hover {
+    color: var(--landing-accent-text);
+    border-bottom-color: var(--landing-accent-text);
+  }
+
+  .landing-toolkit-list a:focus-visible {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 2px;
+  }
+
+  /* Under 40rem the edge labels stop being positioned and become a plain 2×3
+     grid beneath the mark — absolute labels cannot fit beside a phone-width
+     mark without overflowing the viewport. */
+  @media (max-width: 39.999rem) {
+    .landing-hexagon {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .landing-hexagon-mark {
+      margin: 1rem 0 1.5rem;
+      /* The labels are re-flowed out of this box by the rule below, so the
+         box only has to hold the mark itself. */
+    }
+
+    .landing-hexagon-mark .landing-edge {
+      position: static;
+      transform: none;
+    }
+
+    /* Re-flow the six labels into a 2×3 grid. The anchors are children of the
+       mark box, so the box itself becomes the grid container below the svg. */
+    .landing-hexagon-mark {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 20rem;
+      aspect-ratio: auto;
+    }
+
+    .landing-hexagon-mark svg {
+      grid-column: 1 / -1;
+      width: min(200px, 55vw);
+      height: auto;
+      margin: 0 auto 1rem;
+    }
+
+    .landing-edge {
+      text-align: center;
+    }
+  }
+
+  /* 48rem — the mark and the list sit side by side. */
+  @media (min-width: 48rem) {
+    .landing-toolkit-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    }
+  }
+</style>

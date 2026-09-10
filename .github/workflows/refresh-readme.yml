@@ -105,8 +105,9 @@ jobs:
       #   - repo      → the GitHub repo whose README.md is fetched
       #                 (all tools live at github.com/sahil87/<repo>)
       # (Unlike the help job there is no formula/binary mapping here — we fetch a
-      # file from the repo, we don't install + run a binary. Since run-kit v3.0.0
-      # its slug/formula/binary all align on `run-kit`; fab-kit remains the
+      # file from the repo, we don't install + run a binary. hexokit is the
+      # slug≠repo case — the site's product slug is `hexokit` but its source repo
+      # stays `run-kit` until the source-side rename; fab-kit remains the
       # slug≠binary case — repo/formula `fab-kit`, binary `fab`.)
       #
       # Per-tool flow: fetch the raw README to a TEMP file, run the extract CLI
@@ -131,7 +132,7 @@ jobs:
             "hop:hop"
             "fab-kit:fab-kit"
             "wt:wt"
-            "run-kit:run-kit"
+            "hexokit:run-kit"
             "tu:tu"
             "shll:shll"
           )
@@ -213,7 +214,7 @@ jobs:
             "hop:hop"
             "fab-kit:fab-kit"
             "wt:wt"
-            "run-kit:run-kit"
+            "hexokit:run-kit"
             "tu:tu"
             "shll:shll"
           )

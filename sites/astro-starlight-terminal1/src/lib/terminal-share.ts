@@ -117,11 +117,11 @@ export function buildPlayHash(commands: readonly string[]): string {
 /** The dim-comment-style header line of a shared transcript — the site's
  * voice, authored at apply (the o33t reversible-copy precedent). */
 export const SHARE_HEADER =
-  '# captured from the shll.ai terminal — yes, the homepage is a real shell.';
+  '# captured from the hexokit.com terminal — yes, the homepage is a real shell.';
 
 /** The self-advertising footer — backlog-literal brand copy. The deep link,
  * when present, rides a second `# replay it:` footer line (opts.playLink). */
-export const SHARE_FOOTER = '# replayed from https://shll.ai';
+export const SHARE_FOOTER = '# replayed from https://hexokit.com';
 
 /**
  * Assemble the shareable plain-text block from the transcript's line texts

@@ -3,17 +3,17 @@ title: Philosophy
 description: Why these tools exist and what they refuse to do.
 ---
 
-The shll toolkit is built on a few opinions about how AI-assisted coding should work. Not all of them are universal — they're choices, with tradeoffs.
+The HexoKit toolkit is built on a few opinions about how AI-assisted coding should work. Not all of them are universal — they're choices, with tradeoffs.
 
 ## Not a coding agent — a layer above one
 
-shll is not another coding agent, and it doesn't want to be. It's the workflow layer that sits *above* the agent you already use. The coding agent writes the code; shll handles everything around it — capturing the idea, writing the plan, isolating the work, and watching the session.
+HexoKit is not another coding agent, and it doesn't want to be. It's the workflow layer that sits *above* the agent you already use. The coding agent writes the code; the toolkit handles everything around it — capturing the idea, writing the plan, isolating the work, and watching the session.
 
-It's analogous to how GitHub Actions didn't replace Git — it organized and automated the work around it. shll doesn't compete with Claude Code, Codex, or Cursor; it organizes and scales how you use them. Switch agents tomorrow and the toolkit comes with you.
+It's analogous to how GitHub Actions didn't replace Git — it organized and automated the work around it. HexoKit doesn't compete with Claude Code, Codex, or Cursor; it organizes and scales how you use them. Switch agents tomorrow and the toolkit comes with you.
 
 ## Who it's for
 
-This is workflow infrastructure, and infrastructure earns its weight at scale. If you're just getting started with AI coding, you don't need it yet — learn to collaborate with a single agent first, and reach for shll when the workflow around that agent starts to hurt.
+This is workflow infrastructure, and infrastructure earns its weight at scale. If you're just getting started with AI coding, you don't need it yet — learn to collaborate with a single agent first, and reach for the toolkit when the workflow around that agent starts to hurt.
 
 It starts to pay off when you:
 

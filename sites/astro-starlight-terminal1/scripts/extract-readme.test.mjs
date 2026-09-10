@@ -933,7 +933,7 @@ test('715p R1: a longer outer fence masks a shorter inner fence as one block (Co
 // ── R2: flag scan stops at a bare `--` end-of-options separator ───────────────
 
 test('715p R2: a flag after a bare `--` is NOT attributed to the tool', async () => {
-  const rk = await loadHelp('run-kit');
+  const rk = await loadHelp('hexokit');
   // run-kit's README example: `run-kit riff -- --worktree-name pacing-canyon`
   // forwards `--worktree-name` to `wt` — it is NOT a run-kit flag.
   const slice = ['```bash', 'run-kit riff -- --worktree-name pacing-canyon', '```'].join('\n');
@@ -941,7 +941,7 @@ test('715p R2: a flag after a bare `--` is NOT attributed to the tool', async ()
 });
 
 test('715p R2: a fabricated flag BEFORE the `--` is STILL flagged', async () => {
-  const rk = await loadHelp('run-kit');
+  const rk = await loadHelp('hexokit');
   const slice = ['```bash', 'run-kit riff --bogus -- --passthrough', '```'].join('\n');
   const unknown = findUnknownTokens(slice, rk);
   assert.ok(unknown.includes('--bogus'), 'pre-`--` fabricated flag still flagged');
@@ -978,7 +978,7 @@ test('715p R3: a `[optional]` bracket does NOT stop the scan (real flags still c
 // ── R4: cobra completion/help are universally-valid root children ────────────
 
 test('715p R4: `completion` / `help` subcommands are NOT flagged (universal seed)', async () => {
-  const rk = await loadHelp('run-kit');
+  const rk = await loadHelp('hexokit');
   const fk = await loadHelp('fab-kit');
   // README command-table style: `run-kit completion`, `run-kit help riff`,
   // `fab completion bash`. help-dump excludes these (contract §4), but they are

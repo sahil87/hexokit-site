@@ -1,0 +1,41 @@
+---
+title: The toolkit
+description: HexoKit and the six tools around it — what the toolkit is, who it's for, and how the pieces fit together.
+---
+
+import ToolsIndex from '../../../components/ToolsIndex.astro';
+
+The **HexoKit toolkit** is HexoKit plus the six small CLIs around it — independent, brew-installable tools that each do one job well and compose into a single workflow. Together they run the whole loop: from capturing an idea to a merged pull request, with the AI doing the typing and a plan in place before it starts. It's built for developers running multiple coding agents in parallel who want a plan and a paper trail, not a black box — every backlog, plan, and cost report is a plain file you can `cat`, `grep`, and `git diff`.
+
+## The shape
+
+```text
+idea  →  fab-kit  →  wt        →  HexoKit
+ ↑          ↓           ↓             ↓
+ │       constitution  worktree     dashboard
+ │       plan          per branch   for agents
+ │
+ └── backlog feeds /fab-new
+```
+
+The chain runs **[idea](/idea/)** → **[fab-kit](/fab-kit/)** → **[wt](/wt/)** → **[HexoKit](/docs/)**: a backlog item becomes a planned change, the change runs in its own worktree, and the dashboard watches every agent.
+
+## The six companions
+
+- **[fab-kit](/fab-kit/)** — the planning harness: a constitution and a plan before any agent writes code.
+- **[wt](/wt/)** — disposable git worktrees so each change works in isolation.
+- **[idea](/idea/)** — capture ideas and feed a backlog without breaking flow.
+- **[tu](/tu/)** — track what your AI coding sessions cost.
+- **[hop](/hop/)** — a personal directory of your git repos; jump anywhere, batch-update from anywhere.
+- **[shll](/shll/)** — the bootstrap that installs and updates the whole set.
+
+And **[Desktop](/desktop/)** — the native macOS shell around the HexoKit dashboard, for when the browser tab isn't enough.
+
+## The family listing
+
+<section class="not-content" aria-label="The toolkit tools">
+<pre class="shell-session shell-caption not-content">
+<span class="shell-line"><span class="shell-prompt">$</span> ls toolkit/</span>
+</pre>
+<ToolsIndex />
+</section>

@@ -26,6 +26,7 @@ import path from 'node:path';
 import { HelpDocSchema, type Node } from '../lib/schemas.ts';
 import { parseHelp, type ParsedFlag } from '../lib/parse-help.ts';
 import { repoRootFromModuleUrl } from '../lib/repo-root.ts';
+import { mountFor } from '../lib/tool-slugs.ts';
 
 /** Boilerplate flags excluded from the cross-tool index (carried by the note). */
 function isBoilerplateFlag(f: ParsedFlag): boolean {
@@ -110,9 +111,17 @@ for (const slug of slugs) {
   }
 }
 
-/** Link to the owning tool's generated commands page (root namespace, change 3ke3). */
+/** Link to the owning tool's generated commands page (root namespace, change
+ *  3ke3; the URL segment is the roster mount since change it5d — hexokit's
+ *  commands page is `/docs/commands/`). */
 function commandsHref(slug: string): string {
-  return `/${slug}/commands/`;
+  // A slug with no roster mount is a build-stopping defect (a stray help/*.json
+  // file) — fail loudly rather than emitting a `/null/commands/` link.
+  const mount = mountFor(slug);
+  if (!mount) {
+    throw new Error(`CommandIndex: unknown tool slug \`${slug}\` — not in the roster.`);
+  }
+  return `/${mount}/commands/`;
 }
 
 const commandCount = rows.filter((r) => r.kind === 'command').length;

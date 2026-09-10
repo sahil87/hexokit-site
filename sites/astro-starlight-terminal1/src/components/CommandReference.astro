@@ -45,6 +45,7 @@ import { HelpDocSchema, type Node, type HelpDoc } from '../lib/schemas.ts';
 import { parseHelp, commandSlug, type ParsedFlag } from '../lib/parse-help.ts';
 import { repoRootFromModuleUrl } from '../lib/repo-root.ts';
 import { normalizeVersion } from '../lib/version.ts';
+import { repoFor } from '../lib/tool-slugs.ts';
 
 interface Props {
   /** Tool slug — names the help file at `<repo-root>/help/<tool>.json`. */
@@ -99,7 +100,14 @@ if (!node) {
     );
   }
   const slug = tool;
-  githubUrl = `https://github.com/sahil87/${slug}`;
+  // The repo name comes from the roster (slug ≠ repo for hexokit — its repo
+  // stays `run-kit` until the source-side rename). An unknown slug fails the
+  // build loudly (GithubButton's guard), never a `sahil87/null` link.
+  const repo = repoFor(slug);
+  if (!repo) {
+    throw new Error(`CommandReference: unknown tool slug \`${slug}\` — not in the roster.`);
+  }
+  githubUrl = `https://github.com/sahil87/${repo}`;
   const repoRoot = repoRootFromModuleUrl(import.meta.url);
   const helpPath = path.join(repoRoot, 'help', `${slug}.json`);
 

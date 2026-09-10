@@ -19,5 +19,8 @@
     "@fontsource/jetbrains-mono": "^5.2.8",
     "astro": "^6.3.3",
     "sharp": "^0.34.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
   }
 }

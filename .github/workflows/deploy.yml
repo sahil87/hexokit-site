@@ -14,7 +14,7 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
-# Path to the site that ships to shll.ai. Change this single value to swap
+# Path to the site that ships to hexokit.com. Change this single value to swap
 # which site under sites/ is built and deployed.
 env:
   SITE_DIR: sites/astro-starlight-terminal1
@@ -43,10 +43,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # The canonical script lives in sahil87/shll (versioned next to the CLI
-      # it bootstraps); the site serves a deploy-time copy at shll.ai/install.
+      # it bootstraps); the site serves a deploy-time copy at hexokit.com/install.
       # -f is deliberate: if the script is missing upstream, fail the deploy
       # rather than ship a site whose documented one-liner 404s.
-      - name: Fetch install script (served at shll.ai/install)
+      - name: Fetch install script (served at hexokit.com/install)
         working-directory: ${{ env.SITE_DIR }}
         run: curl -fsSL https://raw.githubusercontent.com/sahil87/shll/main/scripts/install.sh -o public/install
 

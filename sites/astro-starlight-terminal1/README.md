@@ -1,6 +1,6 @@
 # astro-starlight-terminal1
 
-The currently-live build of [shll.ai](https://shll.ai). Astro 6 + Starlight 0.39, terminal-themed.
+The currently-live build of [hexokit.com](https://hexokit.com). Astro 6 + Starlight 0.39, terminal-themed.
 
 ## Develop
 
@@ -25,20 +25,30 @@ Node ≥ 22.12 and pnpm 10. The `dist/` directory is gitignored — never commit
 
 ```
 src/
+├── pages/
+│   ├── index.astro      # product landing (StarlightPage splash wrapper)
+│   └── [mount]/         # per-tool docs/site tree, keyed by roster mount
 ├── content/docs/        # Starlight content collection
-│   ├── index.mdx        # splash (ASCII shell session + loop diagram)
-│   ├── getting-started/ # overview, install, philosophy
+│   ├── toolkit/         # the family: overview, install, daily-flow, philosophy
 │   ├── tools/<tool>/    # per-tool: overview, install, commands, workflows
-│   └── workflows/       # cross-tool recipes
+│   └── desktop.md       # the macOS app page
 ├── content.config.ts    # Starlight docs loader + schema
 ├── components/
-│   └── Diagram.astro    # theme-aware SVG <img> swap
+│   ├── HeaderNav.astro      # header nav (SocialIcons slot override)
+│   ├── ToolkitHexagon.astro # landing: brand mark + six edge links
+│   └── Diagram.astro        # theme-aware SVG <img> swap
+├── lib/
+│   ├── tool-roster.mjs  # the single tool roster (slug/mount/repo/formula)
+│   └── landing-data.ts  # the landing page's copy, links and assets
 ├── assets/
-│   └── logo.svg         # site logo (run-kit hexagon)
-└── styles/terminal.css  # palette + terminal aesthetic overrides
+│   └── logo.svg         # site logo (HexoKit hexagon)
+└── styles/
+    ├── terminal.css     # palette + terminal aesthetic overrides
+    └── landing.css      # landing-only layout, frames and motion
 public/
-├── CNAME                # shll.ai custom domain
+├── CNAME                # hexokit.com custom domain
 ├── favicon.{svg,ico}    # browser tab icon
+├── screenshots/         # curated site-owned product screenshots (.webp)
 ├── diagrams/loop-{light,dark}.svg
 └── og-image.png
 ```
@@ -57,4 +67,4 @@ Major customizations:
 - H2 headings get a `## ` sage prefix; dashed top border on H2s after content
 - Code blocks: themed Expressive Code terminal frames, Mac dots hidden
 - Blinking cursor on first paragraph of every doc page
-- Splash: hand-written `<pre class="shell-session">` (no Starlight cards)
+- Landing (`/`): a custom `src/pages/index.astro` body on Starlight's splash template, styled by `src/styles/landing.css` (no Starlight cards)
