@@ -1,0 +1,725 @@
+/* landing.css — the `/` product landing page (change lvnp).
+ *
+ * SCOPE: imported by `src/pages/index.astro` ONLY. It is deliberately NOT
+ * registered in astro.config.mjs `customCss` — the landing is the single
+ * consumer, and that array is another change's surface. `terminal.css` stays
+ * untouched: everything here is scoped under `.landing` / `.landing-footer`.
+ *
+ * TOKENS. Every colour resolves from the site's existing `--c-*` custom
+ * properties (defined in terminal.css for dark, redefined under
+ * `:root[data-theme='light']` for the paper-terminal theme), so light/dark
+ * parity is automatic (Constitution V) and there is no second palette to keep
+ * in step. The ONE exception is the accent-as-text block immediately below:
+ * two light-theme ink values that exist because `--c-accent` is a fill colour
+ * and fails WCAG AA as small text on the paper background. They are documented
+ * there with their measured ratios.
+ *
+ * MOTION VOCABULARY borrowed from run-kit's own UI (app/frontend/src/globals.css)
+ * so the site and the app read as one product: bracket section labels with a
+ * blinking caret cell (`rk-caret-blink`, 1.06s steps(1)), and the CRT glint on
+ * the primary CTA (a skewed highlight strip sweeping the button face on hover).
+ * The app's typed-sweep label reveal is JS-driven per character cell there; the
+ * CSS-only equivalent here is a one-shot inverse-video block that runs across a
+ * section label on hover — same gesture, no page JS. EVERY animation sits inside
+ * `@media (prefers-reduced-motion: no-preference)`, so the rest state IS the
+ * reduced-motion state and there is nothing to switch off (Constitution
+ * Accessibility). The page ships no client JavaScript of its own (Constitution I).
+ */
+
+/* ── Starlight splash chrome the landing does not want ───────────────────
+   The splash template renders the frontmatter `title` as a page H1 in its own
+   content panel above the slot. The landing has its own H1 (the tagline), and
+   two H1s is both a visual duplicate and a document-outline defect — so the
+   title panel is hidden. The title itself is NOT removed: it still drives the
+   sidebar label, Pagefind's result title and Starlight's own `<title>` merge.
+   The panel is targeted through `:has()` rather than by Starlight's hashed
+   class names, which are not a stable API.
+
+   `body:has(.landing)` scopes every rule in this block to the landing route, so
+   no docs page is affected by anything here. */
+body:has(.landing) .content-panel:has(> .sl-container > h1#_top) {
+  display: none;
+}
+
+/* The splash content panel's own padding/border would otherwise draw a rule
+   above the hero. */
+body:has(.landing) .content-panel {
+  border-top: 0;
+  padding-block: 0;
+}
+
+/* Starlight's splash caps its content column; the landing manages its own
+   width, so the cap is lifted for this route only. */
+body:has(.landing) .sl-container {
+  max-width: none;
+}
+
+/* ── The header's right group must stay reachable on a phone ─────────────
+   Starlight hides the header's `right-group` (the theme select AND the
+   HeaderNav links) below its `md` breakpoint, because on a DOCS page the
+   mobile sidebar carries those destinations. The landing has no sidebar, so
+   without this rule a phone visitor gets NO theme toggle (Constitution V asks
+   for both themes to work, which means reachable) and no nav — verified at
+   400px: one `<select>` in the DOM, zero clickable.
+
+   So the group is shown again on this route only, and allowed to wrap under
+   the search box rather than squeeze the header. `HeaderNav.astro` is not
+   edited (it belongs to a sibling change); this is a landing-scoped override
+   of Starlight's own utility class, which is why the class name is targeted
+   directly. */
+body:has(.landing) .right-group {
+  display: flex;
+}
+
+@media (max-width: 50rem) {
+  body:has(.landing) header .header {
+    flex-wrap: wrap;
+    height: auto;
+    row-gap: 0.5rem;
+    padding-block: 0.5rem;
+  }
+
+  body:has(.landing) .right-group {
+    /* Take the full second row, so the links and the theme select sit on
+       their own line instead of crowding the site title. */
+    flex-basis: 100%;
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+
+  /* The header is `position: fixed`, and Starlight offsets the content by
+     `--sl-nav-height` (3.5rem). Wrapping the right group onto a second row
+     makes the header taller than that, so the hero would slide underneath it
+     and the tagline would be clipped. Raise the offset to match the two-row
+     header. `auto` is NOT valid here — the variable is consumed as a length
+     (in `padding-top`/`scroll-padding-top` calculations), so it must be one. */
+  body:has(.landing) {
+    --sl-nav-height: 6.5rem;
+  }
+}
+
+/* ── Layout scale ────────────────────────────────────────────────────────
+   Named once, used everywhere — no scattered magic numbers. The breakpoints
+   themselves must be literals in @media (custom properties are not allowed
+   there), so each is annotated with the name it corresponds to. */
+/* ── Accent-as-text ──────────────────────────────────────────────────────
+   `--c-accent` is tuned as a BORDER/FILL colour. As small text it clears WCAG
+   AA comfortably on the dark palette (8.7:1) but only reaches ~3.5:1 on the
+   light "paper" background — below the 4.5:1 floor the constitution requires in
+   BOTH themes. So the landing reads accent TEXT through its own token, which
+   resolves to the shared accent in dark and to a deeper ink in light.
+
+   Scoped to the landing (`.landing`, the footer, and the hexagon section, which
+   is a sibling of `.landing`'s children) — the shared palette in terminal.css
+   is deliberately not touched, so no other page's appearance shifts. The values
+   are the light accent darkened until every accent-text pair measured ≥4.5:1
+   (the sub-line, the primary CTA's ink and the card links were the three
+   failures; see the contrast pass in this change's review). */
+.landing,
+.landing-footer,
+#toolkit {
+  /* Dark: the shared accent already passes as text. */
+  --landing-accent-text: var(--c-accent);
+  /* The ink that sits ON an accent-filled surface (the primary CTA). */
+  --landing-on-accent: var(--c-bg);
+  /* The accent as a FILL — unchanged; it is never asked to be text. */
+  --landing-accent-fill: var(--c-accent);
+}
+
+:root[data-theme='light'] .landing,
+:root[data-theme='light'] .landing-footer,
+:root[data-theme='light'] #toolkit {
+  /* 6.0:1 on --c-bg (#f5f1e8) and 5.5:1 on --c-surface (#ede7d6). */
+  --landing-accent-text: #7a5310;
+  /* On the accent fill, near-white ink beats the dark-theme choice: the light
+     accent is mid-tone, so --c-bg (#f5f1e8) on it reads 3.5:1 while this
+     deeper fill + light ink reads 5.6:1. */
+  --landing-on-accent: #fffdf7;
+  --landing-accent-fill: #7a5310;
+}
+
+.landing {
+  --landing-max: 72rem;
+  --landing-gutter: 1.25rem;
+  --landing-section-gap: 4.5rem;
+  --landing-radius: 6px;
+  /* Card/frame chrome */
+  --landing-frame-border: 1px solid var(--c-border);
+  /* The phone frame's ceiling when it stacks under the hero desktop shot */
+  --landing-phone-stacked-max: 260px;
+
+  max-width: var(--landing-max);
+  margin: 0 auto;
+  padding: 0 var(--landing-gutter) 4rem;
+  font-family: var(--sl-font-mono);
+  color: var(--c-fg);
+}
+
+.landing section {
+  margin-top: var(--landing-section-gap);
+}
+
+/* Starlight's splash template centres its content column; the landing owns its
+   own width, so it opts out of the inherited max-width. */
+.landing :where(h1, h2, h3) {
+  line-height: var(--sl-line-height-headings);
+  text-wrap: balance;
+}
+
+/* ── Bracket section label ───────────────────────────────────────────────
+   `[ install ]` in the site's shell-comment idiom, with a reserved caret cell
+   after it. The caret is an ::after block so no markup carries it. */
+.landing-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5ch;
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--c-fg-dim);
+}
+
+.landing-label::before {
+  content: '[';
+  color: var(--c-fg-faint);
+}
+
+.landing-label::after {
+  /* The reserved caret cell — a solid block that blinks (see motion block). */
+  content: '';
+  display: inline-block;
+  width: 0.55ch;
+  height: 1em;
+  background: var(--landing-accent-fill);
+  opacity: 0.85;
+  /* `]` is rendered by the span inside; the caret trails the whole label. */
+}
+
+.landing-label > .landing-label-text::after {
+  content: ' ]';
+  color: var(--c-fg-faint);
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────
+   One column under 60rem; text left / screenshots right above it. */
+.landing-hero {
+  margin-top: 2rem;
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.landing-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5ch;
+  margin: 0 0 1.25rem;
+  padding: 0.2rem 0.6rem;
+  border: var(--landing-frame-border);
+  border-radius: var(--landing-radius);
+  background: var(--c-surface);
+  font-size: 0.75rem;
+  color: var(--c-fg-dim);
+}
+
+.landing-eyebrow .landing-eyebrow-version {
+  color: var(--landing-accent-text);
+}
+
+.landing-hero h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 4.2vw, 2.9rem);
+  font-weight: 700;
+  color: var(--c-fg);
+}
+
+.landing-subline {
+  margin: 0.6rem 0 0;
+  font-size: clamp(1rem, 1.9vw, 1.3rem);
+  color: var(--landing-accent-text);
+}
+
+.landing-lead {
+  margin: 1.25rem 0 0;
+  max-width: 46ch;
+  color: var(--c-fg-dim);
+  line-height: 1.65;
+}
+
+/* ── CTAs ────────────────────────────────────────────────────────────── */
+.landing-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.landing-cta {
+  /* `position: relative` + `overflow: hidden` are the glint's clip box. */
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 1.1rem;
+  border: var(--landing-frame-border);
+  border-radius: var(--landing-radius);
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--c-fg);
+  background: var(--c-surface);
+  transition:
+    border-color 0.12s ease,
+    color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.landing-cta:hover {
+  border-color: var(--c-fg-dim);
+  color: var(--c-fg);
+}
+
+.landing-cta:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.landing-cta-primary {
+  border-color: var(--landing-accent-fill);
+  color: var(--landing-on-accent);
+  background: var(--landing-accent-fill);
+  font-weight: 600;
+}
+
+.landing-cta-primary:hover {
+  /* Keep the accent fill — only the border deepens, matching the app's
+     "nothing recolors the chip itself" hover rule. */
+  border-color: var(--landing-accent-fill);
+  color: var(--landing-on-accent);
+}
+
+.landing-cta-tertiary {
+  background: transparent;
+  border-color: transparent;
+  color: var(--c-fg-dim);
+}
+
+.landing-cta-tertiary:hover {
+  color: var(--c-fg);
+  border-color: var(--c-border);
+}
+
+/* ── Screenshot frames ───────────────────────────────────────────────────
+   CSS-only device chrome: a hairline border, a radius and a surface backdrop.
+   No device-mockup images (weight, and they date badly). */
+.landing-frame {
+  position: relative;
+  border: var(--landing-frame-border);
+  border-radius: var(--landing-radius);
+  background: var(--c-surface);
+  padding: 4px;
+  overflow: hidden;
+  /* A thin ambient lift so the frame separates from the page in both themes. */
+  box-shadow: 0 1px 0 var(--c-border);
+}
+
+.landing-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: calc(var(--landing-radius) - 2px);
+}
+
+/* Hero screenshot pair. Below 60rem the two frames stack; the phone is centred
+   and capped so it never dominates a phone-width viewport. */
+.landing-shots {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.landing-shot-phone {
+  width: 100%;
+  max-width: var(--landing-phone-stacked-max);
+}
+
+/* ── Install ─────────────────────────────────────────────────────────── */
+.landing-install-blocks {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 44rem;
+}
+
+.landing-note {
+  margin: 1rem 0 0;
+  max-width: 60ch;
+  font-size: 0.85rem;
+  color: var(--c-fg-dim);
+  line-height: 1.7;
+}
+
+.landing-note + .landing-note {
+  margin-top: 0.35rem;
+}
+
+/* ── Feature grid ────────────────────────────────────────────────────────
+   1 column below 40rem, 2 from 40rem, 3 from 60rem (R5). */
+.landing-features {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+}
+
+.landing-card {
+  display: flex;
+  flex-direction: column;
+  border: var(--landing-frame-border);
+  border-radius: var(--landing-radius);
+  background: var(--c-surface);
+  overflow: hidden;
+}
+
+.landing-card-shot {
+  /* A fixed-ratio window onto each screenshot so cards align on a grid row
+     regardless of the source aspect (the board shot is 3.1:1, the phone shots
+     are 0.46:1). `object-position: top` keeps each image's header row — the
+     part that identifies what is being shown. */
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-bottom: var(--landing-frame-border);
+  background: var(--c-bg);
+}
+
+.landing-card-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.landing-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.landing-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--c-fg);
+}
+
+.landing-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  /* --c-fg-dim on --c-surface clears WCAG AA at this size in both themes. */
+  color: var(--c-fg-dim);
+}
+
+.landing-card-link {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  font-size: 0.82rem;
+  color: var(--landing-accent-text);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.landing-card-link:hover {
+  text-decoration: underline;
+}
+
+.landing-card-link:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* ── "Nothing wraps your agent" ──────────────────────────────────────── */
+.landing-agnostic p {
+  max-width: 70ch;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--c-fg-dim);
+}
+
+.landing-agnostic strong {
+  color: var(--c-fg);
+  font-weight: 600;
+}
+
+.landing-contrast {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.landing-contrast-row {
+  border: var(--landing-frame-border);
+  border-left: 2px solid var(--c-accent-2);
+  border-radius: var(--landing-radius);
+  background: var(--c-surface);
+  padding: 0.9rem 1.1rem;
+}
+
+.landing-contrast-row.is-not {
+  border-left-color: var(--c-fg-faint);
+}
+
+.landing-contrast-row h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  color: var(--c-fg);
+}
+
+.landing-contrast-row p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--c-fg-dim);
+  max-width: none;
+}
+
+/* ── Toolkit hexagon section ─────────────────────────────────────────── */
+.landing-toolkit-heading a {
+  color: var(--c-fg);
+  text-decoration: none;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.landing-toolkit-heading a:hover {
+  color: var(--landing-accent-text);
+  border-bottom-color: var(--landing-accent-text);
+}
+
+.landing-toolkit-heading a:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* ── Desktop app card ────────────────────────────────────────────────── */
+.landing-desktop {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+}
+
+.landing-desktop-copy p {
+  max-width: 60ch;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--c-fg-dim);
+}
+
+.landing-desktop-copy strong {
+  color: var(--c-fg);
+  font-weight: 600;
+}
+
+/* ── Landing footer link row ─────────────────────────────────────────────
+   Starlight's own Footer.astro (copyright + author) still renders below this. */
+.landing-footer {
+  max-width: var(--landing-max);
+  margin: 4rem auto 0;
+  padding: 1.5rem var(--landing-gutter) 0;
+  border-top: 1px solid var(--c-border);
+  font-family: var(--sl-font-mono);
+}
+
+.landing-footer ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-footer a {
+  font-size: 0.82rem;
+  color: var(--c-fg-dim);
+  text-decoration: none;
+}
+
+.landing-footer a:hover {
+  color: var(--c-fg);
+}
+
+.landing-footer a:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* ── Breakpoints ─────────────────────────────────────────────────────────
+   Literal widths, each named in a comment: 40rem = the 2-column feature grid
+   and the hexagon's collapse point; 48rem = the hexagon's two-column split;
+   60rem = the hero's two-column split and the 3-column feature grid. */
+
+/* 40rem — feature grid gains a second column. */
+@media (min-width: 40rem) {
+  .landing-features {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .landing-contrast {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 48rem — the desktop card splits into copy + screenshot. */
+@media (min-width: 48rem) {
+  .landing-desktop {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
+
+/* 60rem — the hero splits into copy + screenshots, and the feature grid
+   reaches three columns. The phone frame stops stacking and overlaps the
+   desktop frame's lower-right corner. */
+@media (min-width: 60rem) {
+  .landing-hero {
+    /* The screenshots carry the pitch, so they take the larger share; the copy
+       column is already capped at ~46ch by `.landing-lead`. */
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 3.5rem;
+  }
+
+  .landing-features {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .landing-shots {
+    display: block;
+    /* Reserve the room the overlapping phone hangs into, so the following
+       section never collides with it. */
+    padding-bottom: 3.5rem;
+    padding-right: 2rem;
+  }
+
+  .landing-shot-phone {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 26%;
+    min-width: 132px;
+    max-width: 190px;
+    /* The phone reads as being in front of the desktop shot. */
+    box-shadow: 0 8px 26px rgb(0 0 0 / 42%);
+  }
+}
+
+/* ── Motion ──────────────────────────────────────────────────────────────
+   Everything below runs only when the visitor has NOT asked for reduced
+   motion. The rest state (no blink, no glint, no sweep) is therefore the
+   reduced-motion state, and no `prefers-reduced-motion: reduce` override is
+   needed to undo anything. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Bracket-label caret blink — run-kit's rk-caret-blink cadence. */
+  @keyframes landing-caret-blink {
+    0%,
+    50% {
+      opacity: 0.85;
+    }
+    50.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .landing-label::after {
+    animation: landing-caret-blink 1.06s steps(1) infinite;
+  }
+
+  /* Typed sweep — the CSS-only cousin of the app's per-cell typed-label. One
+     inverse-video block runs left-to-right across the label on hover, so the
+     gesture reads the same without any page JS. */
+  @keyframes landing-typed-sweep {
+    from {
+      transform: translateX(-0.6ch);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  .landing-label-text {
+    position: relative;
+  }
+
+  .landing-label-text::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 0.6ch;
+    background: var(--c-accent-2);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  section:hover > .landing-label .landing-label-text::before {
+    animation: landing-typed-sweep 520ms steps(14) 1;
+  }
+
+  /* CRT glint — a skewed highlight strip sweeps the primary CTA's face on
+     hover, one-shot. Hue-free: it brightens with the theme's own ink, it does
+     not tint the button. */
+  @keyframes landing-glint-sweep {
+    0% {
+      transform: translateX(-160%) skewX(-20deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.55;
+    }
+    100% {
+      transform: translateX(260%) skewX(-20deg);
+      opacity: 0;
+    }
+  }
+
+  .landing-cta-primary::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 38%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--landing-on-accent),
+      transparent
+    );
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .landing-cta-primary:hover::after,
+  .landing-cta-primary:focus-visible::after {
+    animation: landing-glint-sweep 450ms ease-out 1;
+  }
+
+  /* Scanlines — a very faint horizontal rule pattern over screenshot frames,
+     the CRT tell. Static (no animation), but gated with the rest of the motion
+     vocabulary because it is the same decorative layer. */
+  .landing-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 4%) 0 1px,
+      transparent 1px 3px
+    );
+    opacity: 0.4;
+  }
+}

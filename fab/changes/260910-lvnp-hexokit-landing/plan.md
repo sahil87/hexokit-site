@@ -160,7 +160,7 @@ Eight files SHALL exist under `public/screenshots/`: `hexokit-hero-desktop.webp`
 
 #### Content as data (`landing-data.ts`) with a contract test
 **Decision**: All copy, links, install lines and asset references live in one typed module; the `.astro` file only renders.
-**Why**: Copy edits become data edits; the node test mechanises the vn39 hard rule (`rk <verb>` ∈ `help/run-kit.json`) and the roster gate for the hexagon, which hand-written MDX could not.
+**Why**: Copy edits become data edits; the node test mechanises the vn39 hard rule (`rk <verb>` ∈ `help/hexokit.json`) and the roster gate for the hexagon, which hand-written MDX could not.
 **Rejected**: Copy inline in the `.astro` template — untestable, and the `ld0j` homepage showed how hand-copied tool one-liners drift.
 *Introduced by*: 260910-lvnp-hexokit-landing
 
@@ -186,29 +186,29 @@ Eight files SHALL exist under `public/screenshots/`: `hexokit-hero-desktop.webp`
 
 ### Phase 1: Setup
 
-- [ ] T001 Toolchain baseline: from the repo root run `just setup` and `just playwright` (Chromium for `just shot`); run `just build` on the untouched tree and note it passes (baseline for R15). Read `src/pages/[mount]/[...path].astro` (StarlightPage wrapper precedent), `src/components/HeaderNav.astro` (roster `repoFor` idiom, focus ring), `src/lib/tool-roster.mjs` + `src/lib/tool-slugs.ts` (roster helpers), `src/content/docs/toolkit/index.mdx` (the companion blurbs to copy verbatim), `src/components/InstallOneLiner.astro`, `src/components/Footer.astro`, `src/styles/terminal.css` (tokens, `.shell-session`, reduced-motion section) and run-kit's `app/frontend/src/globals.css` (typed-sweep, CRT glint, caret blink) for pattern extraction. <!-- R15 -->
-- [ ] T002 [P] Assets: write `sites/astro-starlight-terminal1/scripts/build-landing-screenshots.mjs` (sharp; resolves each intake § 3 source by `fs.readdirSync` + `startsWith` on the date/time prefix to dodge the U+202F in filenames; a `SOURCES` map of `{ prefix, crop: {left, top, width, height} | null, maxWidth, out }`). View each source with the Read tool to choose crop boxes (hero desktop: the Run Kit window without the macOS menu bar; agent-state: sidebar SESSIONS list + PANE panel; board: the app window without the blank area; web tile: the window). Run it to emit the eight `public/screenshots/hexokit-*.webp`, check sizes against R11's budgets, eyeball every output for sensitive text. <!-- R11 -->
+- [x] T001 Toolchain baseline: from the repo root run `just setup` and `just playwright` (Chromium for `just shot`); run `just build` on the untouched tree and note it passes (baseline for R15). Read `src/pages/[mount]/[...path].astro` (StarlightPage wrapper precedent), `src/components/HeaderNav.astro` (roster `repoFor` idiom, focus ring), `src/lib/tool-roster.mjs` + `src/lib/tool-slugs.ts` (roster helpers), `src/content/docs/toolkit/index.mdx` (the companion blurbs to copy verbatim), `src/components/InstallOneLiner.astro`, `src/components/Footer.astro`, `src/styles/terminal.css` (tokens, `.shell-session`, reduced-motion section) and run-kit's `app/frontend/src/globals.css` (typed-sweep, CRT glint, caret blink) for pattern extraction. <!-- R15 -->
+- [x] T002 [P] Assets: write `sites/astro-starlight-terminal1/scripts/build-landing-screenshots.mjs` (sharp; resolves each intake § 3 source by `fs.readdirSync` + `startsWith` on the date/time prefix to dodge the U+202F in filenames; a `SOURCES` map of `{ prefix, crop: {left, top, width, height} | null, maxWidth, out }`). View each source with the Read tool to choose crop boxes (hero desktop: the Run Kit window without the macOS menu bar; agent-state: sidebar SESSIONS list + PANE panel; board: the app window without the blank area; web tile: the window). Run it to emit the eight `public/screenshots/hexokit-*.webp`, check sizes against R11's budgets, eyeball every output for sensitive text. <!-- R11 -->
 
 ### Phase 2: Core Implementation
 
-- [ ] T003 Create `src/lib/landing-data.ts` exporting `HERO`, `INSTALL_LINES`, `FEATURES`, `TOOLKIT_EDGES`, `FOOTER_LINKS` with the exact copy from `intake.md` § 2 (feature titles/copy/links table, footer six, install two) and the hexagon blurbs copied verbatim from `src/content/docs/toolkit/index.mdx`; the five tool edge hrefs are `` `/${mountFor(slug)}/` `` and the desktop edge is `/desktop/`; image entries carry `src`, `alt`, `width`, `height` (read the real dimensions from the produced webps). Dependency-free beyond `src/lib/tool-slugs.ts` (`mountFor`, `labelFor`, `repoFor`, `isToolSlug`). <!-- R10 -->
-- [ ] T004 [P] Create `src/styles/landing.css`: layout (`.landing` max-width 72rem, section spacing), hero two-column ≥ 60rem with the phone-over-desktop overlap, feature grid breakpoints, hexagon two-column ≥ 48rem, CSS device frames, bracket-label + caret blink, typed-sweep label reveal, CRT glint on `.landing-cta-primary`, optional scanlines — all motion inside `@media (prefers-reduced-motion: no-preference)`; tokens only; both themes. <!-- R12 -->
-- [ ] T005 Create `src/pages/index.astro`: `StarlightPage` splash wrapper with the R2 `frontmatter.head`; import `landing.css` and `landing-data.ts`; render the hero (eyebrow with build-time version via `normalizeVersion` and a try/catch skip-degrade read of `help/hexokit.json` through `repoRootFromModuleUrl`, h1, sub-line, lead, three CTAs — GitHub via `repoFor('hexokit')` —, screenshot pair) and the `#install` section (two `<Code>` blocks + notes). <!-- R1, R2, R3, R4 -->
-- [ ] T006 Add the `#features` grid (six cards from `FEATURES`) and the `#agnostic` section (paragraph + It is / It isn't rows) to `index.astro`. <!-- R5, R6 -->
-- [ ] T007 Create `src/components/ToolkitHexagon.astro`: decorative inline SVG from `src/assets/logo.svg` geometry recoloured to tokens, six absolutely-positioned `<a>` labels from `TOOLKIT_EDGES`, the adjacent `<ul>` blurbs, collapse-to-grid under 40rem; mount it in `#toolkit` with the heading link to `/toolkit/`. <!-- R7 -->
-- [ ] T008 Add `#desktop` (image, copy, `<Code>` with `rk desktop install` / `rk desktop update`, reason line, `/docs/install/` link) and `footer.landing-footer` (`FOOTER_LINKS`) to `index.astro`. <!-- R8, R9 -->
-- [ ] T009 Delete `src/content/docs/index.mdx` (S3's version — the shll splash carrying HexoKit head overrides). Do NOT edit `astro.config.mjs` (R13). `grep -rn TerminalPrompt src/` afterwards: the component must have no remaining mount and must still exist in the tree. Confirm `just build` has no route collision and `dist/index.html` is the landing. <!-- R1, R13 -->
+- [x] T003 Create `src/lib/landing-data.ts` exporting `HERO`, `INSTALL_LINES`, `FEATURES`, `TOOLKIT_EDGES`, `FOOTER_LINKS` with the exact copy from `intake.md` § 2 (feature titles/copy/links table, footer six, install two) and the hexagon blurbs copied verbatim from `src/content/docs/toolkit/index.mdx`; the five tool edge hrefs are `` `/${mountFor(slug)}/` `` and the desktop edge is `/desktop/`; image entries carry `src`, `alt`, `width`, `height` (read the real dimensions from the produced webps). Dependency-free beyond `src/lib/tool-slugs.ts` (`mountFor`, `labelFor`, `repoFor`, `isToolSlug`). <!-- R10 -->
+- [x] T004 [P] Create `src/styles/landing.css`: layout (`.landing` max-width 72rem, section spacing), hero two-column ≥ 60rem with the phone-over-desktop overlap, feature grid breakpoints, hexagon two-column ≥ 48rem, CSS device frames, bracket-label + caret blink, typed-sweep label reveal, CRT glint on `.landing-cta-primary`, optional scanlines — all motion inside `@media (prefers-reduced-motion: no-preference)`; tokens only; both themes. <!-- R12 -->
+- [x] T005 Create `src/pages/index.astro`: `StarlightPage` splash wrapper with the R2 `frontmatter.head`; import `landing.css` and `landing-data.ts`; render the hero (eyebrow with build-time version via `normalizeVersion` and a try/catch skip-degrade read of `help/hexokit.json` through `repoRootFromModuleUrl`, h1, sub-line, lead, three CTAs — GitHub via `repoFor('hexokit')` —, screenshot pair) and the `#install` section (two `<Code>` blocks + notes). <!-- R1, R2, R3, R4 -->
+- [x] T006 Add the `#features` grid (six cards from `FEATURES`) and the `#agnostic` section (paragraph + It is / It isn't rows) to `index.astro`. <!-- R5, R6 -->
+- [x] T007 Create `src/components/ToolkitHexagon.astro`: decorative inline SVG from `src/assets/logo.svg` geometry recoloured to tokens, six absolutely-positioned `<a>` labels from `TOOLKIT_EDGES`, the adjacent `<ul>` blurbs, collapse-to-grid under 40rem; mount it in `#toolkit` with the heading link to `/toolkit/`. <!-- R7 -->
+- [x] T008 Add `#desktop` (image, copy, `<Code>` with `rk desktop install` / `rk desktop update`, reason line, `/docs/install/` link) and `footer.landing-footer` (`FOOTER_LINKS`) to `index.astro`. <!-- R8, R9 -->
+- [x] T009 Delete `src/content/docs/index.mdx` (S3's version — the shll splash carrying HexoKit head overrides). Do NOT edit `astro.config.mjs` (R13). `grep -rn TerminalPrompt src/` afterwards: the component must have no remaining mount and must still exist in the tree. Confirm `just build` has no route collision and `dist/index.html` is the landing. <!-- R1, R13 -->
 
 ### Phase 3: Integration & Edge Cases
 
-- [ ] T010 Create `scripts/landing-data.test.mjs` (node `--test`, imports the `.ts` module directly like `scripts/terminal-toolcard.test.mjs`): roster mounts (`/${mountFor(slug)}/`), the desktop edge → `/desktop/`, `rk <verb>` ∈ `help/hexokit.json` `root.commands[].name` (parse backticked tokens `` `rk ([a-z][\w-]*)` `` from all copy strings), footer six in order, install two verbatim. Run `just test`. <!-- R10 -->
-- [ ] T011 Run `just validate`, `just test`, `just build`; grep `dist/index.html` for exactly one `<title>`, one `og:title`, one `og:type` content=website, the six footer hrefs in order, the two install strings, and no `<script>` authored by the landing; fix anything that fails. <!-- R2, R4, R9, R12, R15 -->
-- [ ] T012 Visual iteration: start `just dev` in the background (or `just build && just preview`), then `just shot http://127.0.0.1:4321/ <scratchpad>/home-1440-dark.png`, `… 1440 900 light`, `… 400 900` (dark) and `… 400 900 light`; view all four with the Read tool; iterate on `landing.css` / markup until the hero overlap, card density, hexagon proportions and label placement read well, nothing overflows at 400px, both themes are legible, and image weight above the fold is ≤ ~600 KB; re-shoot after each round. If `rk` is on PATH and `$TMUX` is set, `rk present http://127.0.0.1:4321/` so the user can see the dev server (fail-silent otherwise). <!-- R3, R5, R7, R12, R15 -->
-- [ ] T013 Accessibility pass on the built page: keyboard-tab through the CTAs, hexagon labels, card links and footer in DOM order with visible focus rings; every `<img>` has meaningful alt; the SVG is `aria-hidden` with the `<ul>` explanation adjacent; contrast of dim text (`--c-fg-dim`) on `--c-surface` acceptable in both themes (adjust to `--c-fg` where it is not). <!-- R7, R12 -->
+- [x] T010 Create `scripts/landing-data.test.mjs` (node `--test`, imports the `.ts` module directly like `scripts/terminal-toolcard.test.mjs`): roster mounts (`/${mountFor(slug)}/`), the desktop edge → `/desktop/`, `rk <verb>` ∈ `help/hexokit.json` `root.commands[].name` (parse backticked tokens `` `rk ([a-z][\w-]*)` `` from all copy strings), footer six in order, install two verbatim. Run `just test`. <!-- R10 -->
+- [x] T011 Run `just validate`, `just test`, `just build`; grep `dist/index.html` for exactly one `<title>`, one `og:title`, one `og:type` content=website, the six footer hrefs in order, the two install strings, and no `<script>` authored by the landing; fix anything that fails. <!-- R2, R4, R9, R12, R15 -->
+- [x] T012 Visual iteration: start `just dev` in the background (or `just build && just preview`), then `just shot http://127.0.0.1:4321/ <scratchpad>/home-1440-dark.png`, `… 1440 900 light`, `… 400 900` (dark) and `… 400 900 light`; view all four with the Read tool; iterate on `landing.css` / markup until the hero overlap, card density, hexagon proportions and label placement read well, nothing overflows at 400px, both themes are legible, and image weight above the fold is ≤ ~600 KB; re-shoot after each round. If `rk` is on PATH and `$TMUX` is set, `rk present http://127.0.0.1:4321/` so the user can see the dev server (fail-silent otherwise). <!-- R3, R5, R7, R12, R15 -->
+- [x] T013 Accessibility pass on the built page: keyboard-tab through the CTAs, hexagon labels, card links and footer in DOM order with visible focus rings; every `<img>` has meaningful alt; the SVG is `aria-hidden` with the `<ul>` explanation adjacent; contrast of dim text (`--c-fg-dim`) on `--c-surface` acceptable in both themes (adjust to `--c-fg` where it is not). <!-- R7, R12 -->
 
 ### Phase 4: Polish
 
-- [ ] T014 Update `sites/astro-starlight-terminal1/README.md` Layout block: add `src/pages/index.astro` (landing) and `src/styles/landing.css`, drop the `index.mdx` splash line, and — since the block is being edited anyway — correct the `getting-started/` / `workflows/` lines S3 moved to `toolkit/` (plus `desktop.md`, `HeaderNav.astro`, `tool-roster.mjs`). Final `just verify`; confirm `git status` shows no raw `.png` under `public/` and no edits to `terminal.css`, `Head.astro`, `Footer.astro`, `InstallOneLiner.astro`, or `astro.config.mjs`. <!-- R14, R13, R15 -->
+- [x] T014 Update `sites/astro-starlight-terminal1/README.md` Layout block: add `src/pages/index.astro` (landing) and `src/styles/landing.css`, drop the `index.mdx` splash line, and — since the block is being edited anyway — correct the `getting-started/` / `workflows/` lines S3 moved to `toolkit/` (plus `desktop.md`, `HeaderNav.astro`, `tool-roster.mjs`). Final `just verify`; confirm `git status` shows no raw `.png` under `public/` and no edits to `terminal.css`, `Head.astro`, `Footer.astro`, `InstallOneLiner.astro`, or `astro.config.mjs`. <!-- R14, R13, R15 -->
 
 ## Execution Order
 
@@ -222,51 +222,51 @@ Eight files SHALL exist under `public/screenshots/`: `hexokit-hero-desktop.webp`
 
 ### Functional Completeness
 
-- [ ] A-001 R1: `dist/index.html` is the landing page with Starlight header and `Footer.astro` row; no sidebar/ToC/pagination; `src/content/docs/index.mdx` is gone and the build logs no duplicate-route warning
-- [ ] A-002 R2: exactly one `<title>`, one `og:title`, one `og:type` (`website`) and one meta description on `/`, values per R2; `Head.astro` unchanged in the diff
-- [ ] A-003 R3: hero shows the verbatim tagline and sub-line, the lead, three CTAs with the specified hrefs, the version eyebrow, and both hero images with `width`/`height`/`alt` and eager loading
-- [ ] A-004 R4: two Expressive Code blocks with the exact install strings and copy buttons, plus the toolkit note and the tmux ≥ 3.4 line; `InstallOneLiner.astro` unchanged and not imported by the landing
-- [ ] A-005 R5: six cards in the specified order, each with lazy image, title, copy and a `/docs/…` link, rendered from `FEATURES`
-- [ ] A-006 R6: differentiator paragraph and It is / It isn't rows present with the bold phrases verbatim and no `run-kit` product mention
-- [ ] A-007 R7: hexagon heading links `/toolkit/`; six labels in `TOOLKIT_EDGES` order with the specified hrefs (five roster mounts + `/desktop/`); SVG `aria-hidden`; adjacent blurb list matches `toolkit/index.mdx` verbatim
-- [ ] A-008 R8: `#desktop` exists once with image, copy, `rk desktop install` / `rk desktop update` block and `/docs/install/` link
-- [ ] A-009 R9: footer links match `FOOTER_LINKS` exactly and in order; `Footer.astro` unchanged and still rendered
-- [ ] A-010 R10: `landing-data.ts` exports the five named constants; `landing-data.test.mjs` exists and passes under `node --test scripts/*.test.mjs`
-- [ ] A-011 R11: the eight `hexokit-*.webp` files exist with the budgets in R11; `scripts/build-landing-screenshots.mjs` is committed; no raw PNGs or OCR output under the repo
-- [ ] A-012 R12: `landing.css` is imported only by `index.astro`, uses only existing tokens, gates all motion on `prefers-reduced-motion: no-preference`; `terminal.css` and `customCss` unchanged
-- [ ] A-013 R13: `astro.config.mjs` is unchanged against `origin/main`
-- [ ] A-014 R14: site README Layout block names `src/pages/index.astro` and `src/styles/landing.css`
-- [ ] A-015 R15: `just validate`, `just test`, `just build` exit 0
+- [x] A-001 R1: `dist/index.html` is the landing page with Starlight header and `Footer.astro` row; no sidebar/ToC/pagination; `src/content/docs/index.mdx` is gone and the build logs no duplicate-route warning
+- [x] A-002 R2: exactly one `<title>`, one `og:title`, one `og:type` (`website`) and one meta description on `/`, values per R2; `Head.astro` unchanged in the diff
+- [x] A-003 R3: hero shows the verbatim tagline and sub-line, the lead, three CTAs with the specified hrefs, the version eyebrow, and both hero images with `width`/`height`/`alt` and eager loading
+- [x] A-004 R4: two Expressive Code blocks with the exact install strings and copy buttons, plus the toolkit note and the tmux ≥ 3.4 line; `InstallOneLiner.astro` unchanged and not imported by the landing
+- [x] A-005 R5: six cards in the specified order, each with lazy image, title, copy and a `/docs/…` link, rendered from `FEATURES`
+- [x] A-006 R6: differentiator paragraph and It is / It isn't rows present with the bold phrases verbatim and no `run-kit` product mention
+- [x] A-007 R7: hexagon heading links `/toolkit/`; six labels in `TOOLKIT_EDGES` order with the specified hrefs (five roster mounts + `/desktop/`); SVG `aria-hidden`; adjacent blurb list matches `toolkit/index.mdx` verbatim
+- [x] A-008 R8: `#desktop` exists once with image, copy, `rk desktop install` / `rk desktop update` block and `/docs/install/` link
+- [x] A-009 R9: footer links match `FOOTER_LINKS` exactly and in order; `Footer.astro` unchanged and still rendered
+- [x] A-010 R10: `landing-data.ts` exports the five named constants; `landing-data.test.mjs` exists and passes under `node --test scripts/*.test.mjs`
+- [x] A-011 R11: the eight `hexokit-*.webp` files exist with the budgets in R11; `scripts/build-landing-screenshots.mjs` is committed; no raw PNGs or OCR output under the repo
+- [x] A-012 R12: `landing.css` is imported only by `index.astro`, uses only existing tokens, gates all motion on `prefers-reduced-motion: no-preference`; `terminal.css` and `customCss` unchanged
+- [x] A-013 R13: `astro.config.mjs` is unchanged against `origin/main`
+- [x] A-014 R14: site README Layout block names `src/pages/index.astro` and `src/styles/landing.css`
+- [x] A-015 R15: `just validate`, `just test`, `just build` exit 0
 
 ### Behavioral Correctness
 
-- [ ] A-016 R3: at 400px width the phone frame stacks under the desktop frame (≤ 260px wide) and the page has no horizontal scroll
-- [ ] A-017 R5: the grid is 3 columns at ≥ 60rem, 2 at ≥ 40rem, 1 below (verified in the 1440 and 400 captures)
-- [ ] A-018 R12: the 1440/400 × dark/light `just shot` captures were produced and reviewed; every section legible in both themes
+- [x] A-016 R3: at 400px width the phone frame stacks under the desktop frame (≤ 260px wide) and the page has no horizontal scroll
+- [x] A-017 R5: the grid is 3 columns at ≥ 60rem, 2 at ≥ 40rem, 1 below (verified in the 1440 and 400 captures)
+- [x] A-018 R12: the 1440/400 × dark/light `just shot` captures were produced and reviewed; every section legible in both themes
 
 ### Removal Verification
 
-- [ ] A-019 R1: no `tools-chips`, `tools-listing`, `$ shll install` transcript, `<VersionTable/>`, `<TerminalPrompt/>`, loop `<Diagram/>`, `cat ABOUT.md` or `$ whoami` markup remains in `dist/index.html`
-- [ ] A-020 R1: `TerminalPrompt.astro`, `terminal-*.ts`, their tests, `Diagram.astro`, loop SVGs, `VersionTable.astro`, `InstallOneLiner.astro` still exist in the tree (retained, not deleted)
+- [x] A-019 R1: no `tools-chips`, `tools-listing`, `$ shll install` transcript, `<VersionTable/>`, `<TerminalPrompt/>`, loop `<Diagram/>`, `cat ABOUT.md` or `$ whoami` markup remains in `dist/index.html`
+- [x] A-020 R1: `TerminalPrompt.astro`, `terminal-*.ts`, their tests, `Diagram.astro`, loop SVGs, `VersionTable.astro`, `InstallOneLiner.astro` still exist in the tree (retained, not deleted)
 
 ### Scenario Coverage
 
-- [ ] A-021 R10: the test fails when a `FEATURES` copy string names an `rk` verb absent from `help/hexokit.json` (verified by a temporary edit or an inline negative case)
-- [ ] A-022 R7: keyboard Tab order visits the six hexagon labels in `TOOLKIT_EDGES` order with visible focus rings
-- [ ] A-023 R3: with `help/hexokit.json` temporarily absent (or the read stubbed), the build still succeeds and the eyebrow renders without a version
+- [x] A-021 R10: the test fails when a `FEATURES` copy string names an `rk` verb absent from `help/hexokit.json` (verified by a temporary edit or an inline negative case)
+- [x] A-022 R7: keyboard Tab order visits the six hexagon labels in `TOOLKIT_EDGES` order with visible focus rings
+- [x] A-023 R3: with `help/hexokit.json` temporarily absent (or the read stubbed), the build still succeeds and the eyebrow renders without a version — **verified with a real absent-file build**: `/index.html` rendered fine with the eyebrow version dropped (`readProductVersion` try/catch returns null). The overall `just build` still fails, but only in the pre-existing `ToolsIndex.astro` hard-fail guard on `/toolkit/` (0 diff lines vs. merge-base — S3 code, out of this change's scope); the landing itself degrades exactly as R3 requires.
 
 ### Edge Cases & Error Handling
 
-- [ ] A-024 R11: every output crop was inspected for sensitive text (tokens, emails, private data) before commit; the board crop shows the three pinned panes and the `Board: bb` header, or the documented alternate was used
-- [ ] A-025 R12: with reduced motion preferred, no animation runs (caret blink, typed sweep, glint, scanlines all gated)
+- [x] A-024 R11: every output crop was inspected for sensitive text (tokens, emails, private data) before commit; the board crop shows the three pinned panes and the `Board: bb` header, or the documented alternate was used
+- [x] A-025 R12: with reduced motion preferred, no animation runs (caret blink, typed sweep, glint, scanlines all gated)
 
 ### Code Quality
 
-- [ ] A-026 Pattern consistency: new files follow the site's conventions — frontmatter doc-comment headers on `.astro` components, `not-content` opt-out, `--c-*` tokens, `scripts/*.test.mjs` harness, `repoRootFromModuleUrl` for repo-root reads
-- [ ] A-027 No unnecessary duplication: `<Code>` (not hand-rolled frames), `isToolSlug`, `normalizeVersion`, `repoRootFromModuleUrl` reused; no second copy of link styling or terminal chrome
-- [ ] A-028 Readability over cleverness: `index.astro` is a linear sequence of sections; `landing-data.ts` is plain data; no god component (extract `ToolkitHexagon.astro`; extract further if a section's markup exceeds ~80 lines)
-- [ ] A-029 No magic values: breakpoints, budgets and image dimensions are named (CSS custom properties or constants), not scattered literals
-- [ ] A-030 Existing project patterns: no new runtime or build dependency (Constitution VI); static output only (Constitution I); both themes (Constitution V)
+- [x] A-026 Pattern consistency: new files follow the site's conventions — frontmatter doc-comment headers on `.astro` components, `not-content` opt-out, `--c-*` tokens, `scripts/*.test.mjs` harness, `repoRootFromModuleUrl` for repo-root reads
+- [x] A-027 No unnecessary duplication: `<Code>` (not hand-rolled frames), `isToolSlug`, `normalizeVersion`, `repoRootFromModuleUrl` reused; no second copy of link styling or terminal chrome
+- [x] A-028 Readability over cleverness: `index.astro` is a linear sequence of sections; `landing-data.ts` is plain data; no god component (extract `ToolkitHexagon.astro`; extract further if a section's markup exceeds ~80 lines)
+- [x] A-029 No magic values: breakpoints, budgets and image dimensions are named (CSS custom properties or constants), not scattered literals
+- [x] A-030 Existing project patterns: no new runtime or build dependency (Constitution VI); static output only (Constitution I); both themes (Constitution V)
 
 ## Notes
 
@@ -274,6 +274,16 @@ Eight files SHALL exist under `public/screenshots/`: `hexokit-hero-desktop.webp`
 - All acceptance items must pass before `/fab-continue` (hydrate)
 - If an item is not applicable, mark checked and prefix with **N/A**: `- [x] A-NNN **N/A**: {reason}`
 - Design iteration is expected (Size L): T012 is a loop, not a step — re-shoot after every layout change and stop only when the four captures read well.
+
+## Deletion Candidates
+
+Discovered redundancy this change created (not auto-deleted — for the human reviewer). The change's own `### Deprecated Requirements` already covers the intentional `index.mdx` removal; these are the *downstream* leftovers it exposed.
+
+- `sites/astro-starlight-terminal1/src/components/VersionTable.astro` — its only consumer was the deleted homepage `index.mdx` (`$ shll version` block, change `jf3q`); `grep -rn VersionTable src/` now returns the component and its memory references only. **Do not delete in this change** (plan Non-Goals retain it), but it is now an unmounted component with zero call sites.
+- `sites/astro-starlight-terminal1/src/components/TerminalPrompt.astro` + `src/lib/terminal-{cheatsheet,eggs,share,suggest,toolcard,toys}.ts` + their six `scripts/terminal-*.test.mjs` — deliberately retained unmounted by user decision (intake assumption 2) so a sibling change can mount them on `/toolkit/`. If that mount never lands, this is ~7 modules plus their test suite carrying no route.
+- `sites/astro-starlight-terminal1/docs/memory/site/homepage-terminal.md` (754 lines) — describes a terminal island that is no longer mounted anywhere. Hydrate is queued to rewrite it; if the `/toolkit/` mount is abandoned, most of the file becomes history rather than present truth.
+- `terminal.css` `.home-prose` / `.tools-listing` selector groups (change `ld0j`) — styled the homepage newcomer blocks (`cat ABOUT.md` prose, the `ls tools/` grid) that this change removed from `/`. `terminal.css` is deliberately untouched here (plan Non-Goals), so these rules now style markup that no page emits; verify against `/toolkit/` before removing.
+- `sites/astro-starlight-terminal1/public/screenshots/run-kit-console.webp` — the other pre-existing curated screenshot; the landing reuses `run-kit-agent-session.webp` (feature card 3) but not this one. Still referenced by a tool overview page, so confirm before acting.
 
 ## Assumptions
 

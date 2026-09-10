@@ -1,0 +1,321 @@
+---
+/**
+ * `/` — the HexoKit product landing page (change lvnp).
+ *
+ * SHELL: a `src/pages/index.astro` route wrapping `<StarlightPage
+ * template="splash">` with a fully custom body. It is NOT the Starlight docs
+ * template and NOT a standalone `<html>` page. Wrapping StarlightPage means the
+ * header nav, theme toggle, Pagefind, `Head.astro` (analytics beacon, og:image,
+ * JSON-LD) and `Footer.astro` all render here for free — every one of those is
+ * a shared site surface, and duplicating them on a standalone page would mean
+ * maintaining two copies. The `[mount]/[...path].astro` route proves the
+ * pattern. `src/content/docs/index.mdx` is deleted so nothing else claims `/`.
+ *
+ * HEAD: page-level `<title>` / `og:title` / `og:type` ride
+ * `frontmatter.head`, the same mechanism the deleted `index.mdx` used.
+ * Starlight's head merge gives frontmatter priority and dedupes the singleton
+ * `<title>` and same-`property` metas, so the built page carries exactly one of
+ * each. `Head.astro` is deliberately NOT edited — its homepage JSON-LD and
+ * `og:image` belong to a sibling change.
+ *
+ * CONTENT: every string, link and image lives in `src/lib/landing-data.ts`, so
+ * copy edits are data edits and the `rk <verb>` tokens can be tested against
+ * `help/hexokit.json` (`scripts/landing-data.test.mjs`). This file lays that
+ * data out and authors no copy of its own beyond section labels.
+ *
+ * NO CLIENT JS: the page ships none of its own (Constitution I). The only
+ * scripts on it are Starlight's (theme, Pagefind) and Expressive Code's copy
+ * button, already carried by every page with a fenced code block.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Code } from '@astrojs/starlight/components';
+import ToolkitHexagon from '../components/ToolkitHexagon.astro';
+import { repoRootFromModuleUrl } from '../lib/repo-root.ts';
+import { normalizeVersion } from '../lib/version.ts';
+import {
+  DESKTOP_COMMANDS,
+  FEATURES,
+  FOOTER_LINKS,
+  GITHUB_URL,
+  HERO,
+  INSTALL_LINES,
+} from '../lib/landing-data.ts';
+import '../styles/landing.css';
+
+/**
+ * The hero eyebrow's version badge, read at BUILD TIME from the repo-root
+ * `help/hexokit.json` through the shared `help/`-anchored ascent (the same
+ * cross-boundary idiom `CommandReference` uses — a fixed `../../..` depth does
+ * not survive Vite's bundling).
+ *
+ * SKIP-DEGRADE: `help/hexokit.json` is producer-refreshed data, not a source
+ * file. A missing or malformed envelope must never fail the site build, so a
+ * failed read simply drops the version from the eyebrow (the terminal tool
+ * cards take the same posture). The eyebrow itself always renders.
+ */
+function readProductVersion(): string | null {
+  try {
+    const helpPath = path.join(repoRootFromModuleUrl(import.meta.url), 'help', 'hexokit.json');
+    const parsed: unknown = JSON.parse(fs.readFileSync(helpPath, 'utf8'));
+    const version = (parsed as { version?: unknown }).version;
+    return typeof version === 'string' && version.length > 0 ? normalizeVersion(version) : null;
+  } catch {
+    return null;
+  }
+}
+
+const productVersion = readProductVersion();
+
+/**
+ * Render the ONE piece of markup the data file is allowed to carry: backtick
+ * spans become `<code>`. Feature titles and copy name commands (`rk riff`,
+ * `-N 3`), and those must render as code chips rather than literal backticks.
+ *
+ * Everything outside the backticks is HTML-escaped FIRST, so a copy string can
+ * never inject markup — the output is only ever text plus the `<code>` tags
+ * this function emits. That is what makes it safe to hand to `set:html`.
+ * Astro escapes interpolated text by default; opting out here is deliberate and
+ * bounded to this transform.
+ */
+function inlineCode(text: string): string {
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  return escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+const pageTitle = 'HexoKit — your tmux, in the browser and on your phone';
+const pageDescription =
+  'Your tmux, in the browser and on your phone. Cockpit for the agent era — every tmux pane as a live terminal, agent-agnostic, no database.';
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'HexoKit',
+    description: pageDescription,
+    template: 'splash',
+    tableOfContents: false,
+    head: [
+      { tag: 'title', content: pageTitle },
+      { tag: 'meta', attrs: { property: 'og:title', content: pageTitle } },
+      { tag: 'meta', attrs: { property: 'og:type', content: 'website' } },
+    ],
+  }}
+>
+  <main class="landing not-content">
+    {/* ── Hero ─────────────────────────────────────────────────────── */}
+    <section id="top" class="landing-hero" aria-label="HexoKit">
+      <div class="landing-hero-copy">
+        <p class="landing-eyebrow">
+          <span>hexokit</span>
+          {productVersion && <span class="landing-eyebrow-version">· {productVersion}</span>}
+        </p>
+        <h1>{HERO.tagline}</h1>
+        <p class="landing-subline">{HERO.subline}</p>
+        <p class="landing-lead">{HERO.lead}</p>
+        <div class="landing-ctas">
+          <a class="landing-cta landing-cta-primary" href="#install">Install</a>
+          <a class="landing-cta" href="/docs/">Read the docs</a>
+          <a class="landing-cta landing-cta-tertiary" href={GITHUB_URL}>GitHub</a>
+        </div>
+      </div>
+
+      {/* The phone frame overlaps the desktop frame's lower-right corner from
+          60rem up, and stacks beneath it (centred, capped) below that. */}
+      <div class="landing-shots">
+        <div class="landing-frame landing-shot-desktop">
+          <img
+            src={HERO.desktopImage.src}
+            alt={HERO.desktopImage.alt}
+            width={HERO.desktopImage.width}
+            height={HERO.desktopImage.height}
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+        <div class="landing-frame landing-shot-phone">
+          <img
+            src={HERO.phoneImage.src}
+            alt={HERO.phoneImage.alt}
+            width={HERO.phoneImage.width}
+            height={HERO.phoneImage.height}
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      </div>
+    </section>
+
+    {/* ── Install ──────────────────────────────────────────────────── */}
+    <section id="install" aria-labelledby="install-heading">
+      <p class="landing-label"><span class="landing-label-text">install</span></p>
+      <h2 id="install-heading" class="landing-section-heading">One line, then you are in</h2>
+      <div class="landing-install-blocks">
+        {INSTALL_LINES.map((line) => <Code code={line} lang="bash" />)}
+      </div>
+      <p class="landing-note">
+        Installs <code>shll</code> and <code>hexokit</code>. Want the six companions too? See the{' '}
+        <a href="/toolkit/">toolkit</a>.
+      </p>
+      <p class="landing-note">
+        Requires tmux ≥ 3.4 — <code>rk doctor</code> checks.
+      </p>
+    </section>
+
+    {/* ── Features ─────────────────────────────────────────────────── */}
+    <section id="features" aria-labelledby="features-heading">
+      <p class="landing-label"><span class="landing-label-text">what it does</span></p>
+      <h2 id="features-heading" class="landing-section-heading">Six things it is good at</h2>
+      <div class="landing-features">
+        {
+          FEATURES.map((feature) => (
+            <article class="landing-card">
+              <div class="landing-card-shot">
+                <img
+                  src={feature.image.src}
+                  alt={feature.image.alt}
+                  width={feature.image.width}
+                  height={feature.image.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="landing-card-body">
+                <h3 set:html={inlineCode(feature.title)} />
+                <p set:html={inlineCode(feature.copy)} />
+                <a class="landing-card-link" href={feature.href}>
+                  → docs
+                </a>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    {/* ── The differentiator ───────────────────────────────────────── */}
+    <section id="agnostic" class="landing-agnostic" aria-labelledby="agnostic-heading">
+      <p class="landing-label"><span class="landing-label-text">the difference</span></p>
+      <h2 id="agnostic-heading" class="landing-section-heading">Nothing wraps your agent</h2>
+      <p>
+        What makes HexoKit so good right now is what tends to run in those panes:{' '}
+        <strong>AI coding agents, many at once.</strong> <code>rk riff</code> spawns each one in its
+        own git worktree, and the dashboard lets you watch the whole fleet. But HexoKit never wraps
+        the agent — a pane is just a pane. It&rsquo;s equally a build, a REPL, an ssh session,{' '}
+        <code>htop</code>. <strong>The agent is one of the things you run, not the thing HexoKit
+        is.</strong> When the agent tooling churns underneath you (and it does, monthly), the
+        terminal layer stays put.
+      </p>
+      <div class="landing-contrast">
+        <div class="landing-contrast-row">
+          <h3>It is</h3>
+          <p>
+            A remote, phone-first console for your tmux: agent-agnostic, no database, state derived
+            from tmux + the filesystem. A spawner (<code>rk riff</code>) and a dashboard (
+            <code>rk serve</code>) that compose.
+          </p>
+        </div>
+        <div class="landing-contrast-row is-not">
+          <h3>It isn&rsquo;t</h3>
+          <p>
+            An agent wrapper: it doesn&rsquo;t speak any agent&rsquo;s protocol, parse any
+            agent&rsquo;s output, or care what&rsquo;s in the pane.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    {/* ── The toolkit hexagon ──────────────────────────────────────── */}
+    <ToolkitHexagon />
+
+    {/* ── Desktop app card ─────────────────────────────────────────── */}
+    <section id="desktop" aria-labelledby="desktop-heading">
+      <p class="landing-label"><span class="landing-label-text">desktop</span></p>
+      <h2 id="desktop-heading" class="landing-section-heading">The macOS app</h2>
+      <div class="landing-desktop">
+        <div class="landing-desktop-copy">
+          <p>
+            An Electron shell that wraps the dashboard and frees the browser-reserved{' '}
+            <strong>⌘</strong> keyboard tier for the terminal. It connects three ways —{' '}
+            <strong>This Mac</strong> (one-click daemon start), <strong>over SSH</strong> (
+            <code>rk remote</code>), or <strong>a URL</strong> — and never starts, stops or updates
+            anything on its own. Your tmux sessions survive every daemon action.
+          </p>
+          <Code code={DESKTOP_COMMANDS.join('\n')} lang="bash" />
+          <p class="landing-note">
+            Install through the CLI: it produces a quarantine-free, digest-verified app, where a
+            browser-downloaded DMG trips Gatekeeper.
+          </p>
+          <p>
+            <a class="landing-card-link" href="/docs/install/">→ Install guide</a>
+          </p>
+        </div>
+        <div class="landing-frame">
+          <img
+            src="/screenshots/hexokit-desktop-app.webp"
+            alt="The HexoKit desktop app on macOS: the native window with its own menu bar, showing the session sidebar and a live agent pane."
+            width={1600}
+            height={1039}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="landing-footer not-content">
+    <ul>
+      {FOOTER_LINKS.map((link) => (
+        <li><a href={link.href}>{link.label}</a></li>
+      ))}
+    </ul>
+  </footer>
+</StarlightPage>
+
+<style>
+  /* Section headings on the landing are quieter than Starlight's doc H2s and
+     carry no `## ` prefix (that prefix is scoped to `.sl-markdown-content`
+     outside `.not-content`, which this page opts out of). */
+  .landing-section-heading {
+    margin: 0 0 1.5rem;
+    font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+    font-weight: 600;
+    color: var(--c-fg);
+  }
+
+  /* Inline `code` inside landing prose — the site's surface-2 chip, scoped
+     here so `terminal.css` stays untouched. */
+  .landing :global(code) {
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    background: var(--c-surface-2);
+    font-size: 0.9em;
+    color: var(--c-fg);
+  }
+
+  /* Landing prose links: underline on hover, visible focus ring. Scoped to the
+     landing so the shared terminal-link selector group is left alone. */
+  .landing-note :global(a),
+  .landing-agnostic :global(a) {
+    /* The landing's accent-as-text token: the shared accent in dark, a deeper
+       ink in light where the accent would fail WCAG AA (see landing.css). */
+    color: var(--landing-accent-text);
+    text-decoration: none;
+  }
+
+  .landing-note :global(a:hover),
+  .landing-agnostic :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .landing-note :global(a:focus-visible),
+  .landing-agnostic :global(a:focus-visible) {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 2px;
+  }
+</style>

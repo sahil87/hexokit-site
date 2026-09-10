@@ -60,4 +60,4 @@ verify: validate test build
 
 # Headless full-page screenshot of a URL: just shot <url> <out.png> [width] [height] [dark|light]
 shot url out width="1440" height="900" scheme="dark":
-    cd {{site}} && pnpm exec playwright screenshot --full-page --color-scheme={{scheme}} --viewport-size={{width}},{{height}} "{{url}}" "{{out}}"
+    cd {{site}} && pnpm exec playwright screenshot --full-page --wait-for-timeout=2000 --color-scheme={{scheme}} --viewport-size={{width}},{{height}} "{{url}}" "{{out}}"

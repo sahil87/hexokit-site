@@ -1,6 +1,6 @@
 ---
 type: memory
-description: "The SEO & social-share layer plus its agent-discoverability and editorial siblings: Starlight's baseline, the site-wide og:image set in `Head.astro`, the 1200×630 `og-image.png` (wordmark `hexokit`) + generator, homepage `head:` overrides, the JSON-LD route dispatcher (homepage graph naming HexoKit; mount-gated per-tool graph with Docs/Toolkit breadcrumbs), `/llms.txt` + `/llms-full.txt` (roster-driven), and the editorial layer (hand-authored meta descriptions, cross-tool link graph)"
+description: "The SEO & social-share layer plus its agent-discoverability and editorial siblings: Starlight's baseline, the site-wide og:image set in `Head.astro`, the 1200×630 `og-image.png` + generator, the homepage `head:` overrides riding `StarlightPage`'s `frontmatter.head`, the JSON-LD route dispatcher (homepage graph; mount-gated per-tool graph with Docs/Toolkit breadcrumbs), `/llms.txt` + `/llms-full.txt`, and the editorial layer (hand-authored meta descriptions, cross-tool link graph)"
 ---
 # SEO & Social-Share Meta
 
@@ -28,23 +28,27 @@ The shared image is a **committed static asset**, exactly **1200×630** (the ~1.
 
 **Generation is OUT of the build (Constitution VI).** `sites/astro-starlight-terminal1/scripts/generate-og-image.mjs` is a **one-off, unwired** generator: node stdlib only, it writes a self-contained HTML mock and screenshots it at 1200×630 with the Playwright-cached `chrome-headless-shell` binary already on the machine. It is NOT referenced from `package.json`, adds zero runtime or build dependencies, and exists purely for reproducibility — re-run it manually to regenerate the card, then verify with `file public/og-image.png` (must report `1200 x 630`). *Rejected*: SVG→PNG converters (none installed); adding `sharp`/`playwright` as devDependencies (Constitution VI).
 
-## Homepage `<head>` overrides (`index.mdx` frontmatter)
+## Homepage `<head>` overrides (`StarlightPage` `frontmatter.head`)
 
-`src/content/docs/index.mdx` carries frontmatter `head:` entries that override Starlight's defaults **on the homepage only**:
+`/` is served by `src/pages/index.astro`, which passes `head:` entries on its `<StarlightPage>` `frontmatter` prop. They override Starlight's defaults **on the homepage only**:
 
 - `title` tag → **`HexoKit — your tmux, in the browser and on your phone`** (no site-title suffix) — carries the product keyword framing.
 - `og:title` meta → same string.
 - `og:type` meta → `website` (correct for a landing page; every other page keeps Starlight's default `article`, correct for docs content).
 
-**Mechanism**: Starlight's head-merging gives frontmatter `head:` entries priority over its defaults and **dedupes** the singleton `<title>` and same-`property` metas — so the built homepage carries exactly one of each. This is the dedupe-aware path for overriding tags Starlight already emits (contrast the og:image set above, which is append-only because Starlight emits none). The visible hero H1 is unaffected — the splash hero renders from the `hero:` block, not the page title.
+The `frontmatter.description` on the same call supplies the page's meta description.
+
+**Mechanism**: Starlight's head-merging gives `head:` entries priority over its defaults and **dedupes** the singleton `<title>` and same-`property` metas — so the built homepage carries exactly one of each. This is the dedupe-aware path for overriding tags Starlight already emits (contrast the og:image set above, which is append-only because Starlight emits none). The semantics are identical whether the entries arrive as content-collection frontmatter or as the `frontmatter` prop of a `StarlightPage` route — the merge is the same code path, which is why moving `/` from a content page to a `src/pages/` route ([landing page](../../../sites/astro-starlight-terminal1/docs/memory/site/landing-page.md)) needed no change here. The visible H1 is unaffected: the landing renders its own `<h1>` in the page body, and Starlight's splash title panel is hidden by `landing.css`.
 
 **Scope note:** all non-homepage titles keep the `{page} | HexoKit` suffix (the site title is `HexoKit` in `astro.config.mjs`). The `shll | HexoKit` title on the shll *tool's* overview page (`/shll/` — a page legitimately named after the tool) is Starlight's correct default.
+
+**`Head.astro` is untouched by the landing.** Its homepage JSON-LD branch (below) and the site-wide og:image set render on `/` unchanged through the `StarlightPage` wrapper.
 
 ## JSON-LD: a route dispatcher in `Head.astro` (NOT frontmatter)
 
 JSON-LD is authored as a **route dispatcher** in `src/components/Head.astro` — two mutually-exclusive branches, each emitting its own `<script type="application/ld+json">` block. JSON-LD is **inert data, not executable JS** — no Constitution I conflict.
 
-**Placement decision (`kb1r`)**: all JSON-LD is emitted from `Head.astro` (gated on the route), serializing a plain JS object via `JSON.stringify` into `set:html`. This keeps the JSON authorable as a real object, and is safe by construction — `JSON.stringify` of these objects never produces `<` or raw HTML, so the body survives emission byte-exact (verified at `kb1r`: `JSON.parse` succeeds on the script body extracted from built HTML). *Rejected*: an `index.mdx` frontmatter `head:` entry with the JSON as a string `content:` — a large JSON blob inside YAML frontmatter is fragile and unreadable, and is exactly the MDX/YAML escaping friction the intake flagged as a drop trigger; it also can't reach per-route help-JSON data.
+**Placement decision (`kb1r`)**: all JSON-LD is emitted from `Head.astro` (gated on the route), serializing a plain JS object via `JSON.stringify` into `set:html`. This keeps the JSON authorable as a real object, and is safe by construction — `JSON.stringify` of these objects never produces `<` or raw HTML, so the body survives emission byte-exact (verified at `kb1r`: `JSON.parse` succeeds on the script body extracted from built HTML). *Rejected*: a page-level `head:` entry with the JSON as a string `content:` — a large JSON blob authored as a head-entry string is fragile and unreadable, and it cannot reach per-route help-JSON data.
 
 ### Homepage branch — WebSite + SoftwareApplication
 
@@ -149,11 +153,11 @@ Before `bees`, the 7 tool overviews carried **zero** cross-tool links — the to
 
 - **The chain**: `idea → fab-kit → wt → run-kit` (backlog → plan → isolated worktree → dashboard), with **`tu`** (cost) and **`hop`** (repo nav) as cross-cutting, and **`shll`** as the bootstrap. Realized per-page link map: idea→{fab-kit, wt, tu}; fab-kit→{idea, wt, run-kit}; wt→{fab-kit, run-kit}; run-kit→{wt, tu}; tu→{fab-kit, run-kit}; hop→{idea, wt}; shll→{idea, fab-kit, wt, run-kit} + the install page.
 - **Link form — site-absolute `/<mount>/`.** Cross-tool links → `/<mount>/`, sibling links → `/<mount>/readme/` and `/<mount>/commands/` (HexoKit's overview is `/docs/`). Under the flat root mount the relative form would resolve wrong (`../readme/` from `/idea/` → `/readme/`), so site-absolute is the simplest correct form. Targets are the canonical `/<mount>/` entry pages — the constitutional [directory-entry role of the overview](/conventions/tool-page-rubric.md#pulled-readme-slice-exception-change-w32m). The `shll` overview's bootstrap link to the install page is `/toolkit/install/` (it points out of the tool namespace).
-- **The `/toolkit/` overview's ASCII workflow diagram is navigable too.** Its `idea → fab-kit → wt → HexoKit` chain tool names (and the surrounding `tu`/`hop`/`shll` prose) are **site-absolute `/<mount>/` links** (root-relative from a page outside the tool namespace). The diagram is a clickable map, not just an illustration (this also satisfies the Constitution Accessibility SHOULD for decorative diagrams, the same way [`ld0j`](/conventions/tool-page-rubric.md#homepage-newcomer-content-blocks-hand-authored-change-ld0j) moved the homepage diagram links inline).
+- **The `/toolkit/` overview's ASCII workflow diagram is navigable too.** Its `idea → fab-kit → wt → HexoKit` chain tool names (and the surrounding `tu`/`hop`/`shll` prose) are **site-absolute `/<mount>/` links** (root-relative from a page outside the tool namespace). The diagram is a clickable map, not just an illustration (this also satisfies the Constitution Accessibility SHOULD for decorative diagrams, the same way the [landing page's hexagon](../../../sites/astro-starlight-terminal1/docs/memory/site/landing-page.md) carries an adjacent blurb list beside its decorative mark).
 
 ### Job-framed lead sentences on the overviews (the H1-substitute framing)
 
-The bare-slug Starlight `title:` (the H1) was **not changed** — it cascades to the sidebar label and the settled [`kb1r` title discipline](#homepage-head-overrides-indexmdx-frontmatter). Instead, each overview body's opening was expanded from a terse 1–2-sentence framing to a **3–4-sentence job-framed lead** ("what is `<tool>` / why use it / who it's for") that surfaces ranking keywords in the first indexable paragraph. The homepage `cat ABOUT.md` prose and the toolkit overview intro were keyword-sharpened by **refining existing copy only** — no new claims, no new sections; the homepage `head:` overrides block, hero `tagline`, and install/`whoami` blocks were left byte-for-byte (the `ld0j` sourced-copy discipline preserved). This thickening of the overview body is the rubric change recorded in [tool-page-rubric](/conventions/tool-page-rubric.md).
+The bare-slug Starlight `title:` (the H1) was **not changed** — it cascades to the sidebar label and the settled [`kb1r` title discipline](#homepage-head-overrides-starlightpage-frontmatterhead). Instead, each overview body's opening was expanded from a terse 1–2-sentence framing to a **3–4-sentence job-framed lead** ("what is `<tool>` / why use it / who it's for") that surfaces ranking keywords in the first indexable paragraph. The homepage `cat ABOUT.md` prose and the toolkit overview intro were keyword-sharpened by **refining existing copy only** — no new claims, no new sections; the homepage `head:` overrides block, hero `tagline`, and install/`whoami` blocks were left byte-for-byte (the `ld0j` sourced-copy discipline preserved). This thickening of the overview body is the rubric change recorded in [tool-page-rubric](/conventions/tool-page-rubric.md).
 
 ## Design Decisions
 

@@ -35,7 +35,14 @@ Display order is **the product first, then the companions in the hexagon order, 
 
 `tool-slugs.ts` is the typed re-export for the TS graph: it keeps its pre-roster export names (`TOOL_SLUGS`, `ToolSlug`, `isToolSlug`) so existing imports compile unchanged, adds the `ToolRecord` type, and re-exports the helpers. `astro.config.mjs` and `docs-site-sidebar.mjs` import the `.mjs` directly.
 
-Consumers routed through the roster include: `astro.config.mjs` (redirects + sidebar), `[mount]/[...path].astro` (the dynamic docs/site route), `docs-site-sidebar.mjs` (sidebar links + redirect enumeration), `commands-toc.ts` / `readme-toc.ts` (route-id gates return the slug via `slugForMount`), `Head.astro` (the mount-gated JSON-LD dispatcher), `GithubButton.astro` / `github-stars.ts` / `CommandReference.astro` (GitHub URLs via `repoFor`), `ToolsIndex.astro` / `VersionTable.astro` (shared roster, build-stop posture), `CommandIndex.astro`, `InstallOneLiner.astro`, `llms.ts` (`TOOLS` derived), and the homepage terminal island's serialized slug→mount map.
+Consumers routed through the roster include: `astro.config.mjs` (redirects + sidebar), `[mount]/[...path].astro` (the dynamic docs/site route), `docs-site-sidebar.mjs` (sidebar links + redirect enumeration), `commands-toc.ts` / `readme-toc.ts` (route-id gates return the slug via `slugForMount`), `Head.astro` (the mount-gated JSON-LD dispatcher), `GithubButton.astro` / `github-stars.ts` / `CommandReference.astro` (GitHub URLs via `repoFor`), `ToolsIndex.astro` / `VersionTable.astro` (shared roster, build-stop posture), `CommandIndex.astro`, `InstallOneLiner.astro`, `llms.ts` (`TOOLS` derived), the terminal island's serialized slug→mount map, and `src/lib/landing-data.ts`.
+
+**The landing page is a roster consumer.** [`/`](../../../sites/astro-starlight-terminal1/docs/memory/site/landing-page.md) resolves through `src/lib/tool-slugs.ts` rather than hardcoding any path:
+
+- **`mountFor(slug)`** builds the five tool hrefs on the toolkit hexagon, wrapped in a `mountHref` helper that **throws naming the slug** when it is not in the roster, so an unrostered edge fails the build instead of emitting `/null/` (the `HeaderNav`/`GithubButton` guard idiom). The sixth edge, `desktop`, is not a roster tool and links `/desktop/` directly.
+- **`labelFor`**-shaped display: each edge carries its own visible `label` alongside the roster `slug`, so the mark's labels stay short without the roster owning presentation.
+- **`repoFor('hexokit')`** builds the hero's GitHub CTA and the footer's GitHub link as `https://github.com/sahil87/${repo}` — the same idiom `HeaderNav.astro` uses, so the URL follows the roster through any future repo rename.
+- **`isToolSlug`** gates the contract test (`scripts/landing-data.test.mjs`), which asserts every tool edge is a real roster slug and links `` `/${mountFor(slug)}/` ``. HexoKit's mount already differs from its slug, so a hardcoded `/<slug>/` is a live bug class on this page, not a hypothetical one — the test is what keeps it from reappearing.
 
 ## Design Decisions
 
