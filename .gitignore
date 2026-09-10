@@ -33,24 +33,10 @@ pnpm-debug.log*
 
 .fab-*
 
-/.agents
-
-/.claude
-
-/.cursor
-
-/.opencode
-
-/.codex
-
-/.gemini
-
 .uploads/
 
 .status.yaml.lock
 
 !fab/.fab-version
-
-/.kimi
 
 /.claude/settings.local.json
