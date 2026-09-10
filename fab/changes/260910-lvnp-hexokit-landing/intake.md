@@ -122,6 +122,8 @@ Followed by the two-row *It is / It isn't* contrast: *It is* — a remote, phone
 
 **Design-iteration pass (2026-09-10, after the copy pass; user feedback on PR #4).** (1) Card images were too zoomed out: card crops are now tight ~16:10 boxes on the one UI region each claim is about (`agent-state` 1000×625 on the lower sidebar + `agt idle` strip; `board` on two pinned panes; `operator` on the popover's left two thirds; `web-tile` on the tile + terminal edge; a new `hexokit-fleet.webp` re-crop of the committed `run-kit-agent-session.webp` for the fleet card). (2) A seventh, full-width feature card "The operator drops in from any tab" (`wide: true`, image `hexokit-operator-console.webp` — the operator console's Quake-style drawer over a tab) — the user asked for the Quake terminal as a feature; the H2 no longer counts cards, so a seventh is fine; the contract test now expects seven. (3) The toolkit hexagon renders the ORIGINAL logo colours (verbatim `logo.svg` greys) in both themes — the token-recoloured mark read as a different logo per theme; user decision, matching PR #2's `HkMark.astro`.
 
+**Differentiator H2 (2026-09-10, user's line).** "Nothing wraps your agent" → **"Use any agent, untouched"** — plainer than "wraps", and it carries both halves of the thesis (agent-agnostic + no wrapper). The paragraph and the It is / It isn't rows beneath it are unchanged.
+
 ### 3. Assets
 
 Sources are in `/Users/sahil/Desktop/Desktop - Sahil’s MacBook Pro/` (address with globs — U+202F before AM/PM). Outputs go to `public/screenshots/` next to the two existing run-kit webps (constitution v2.1.3: site-owned curated screenshots, `.webp`, meaningful alt text).
