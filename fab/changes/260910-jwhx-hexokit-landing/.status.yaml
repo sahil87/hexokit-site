@@ -10,7 +10,7 @@ progress:
     review: done
     hydrate: done
     ship: done
-    review-pr: active
+    review-pr: done
 plan:
     generated: true
     task_count: 16
@@ -34,7 +34,7 @@ stage_metrics:
     review: {started_at: "2026-09-10T10:58:18Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T11:04:19Z"}
     hydrate: {started_at: "2026-09-10T11:04:19Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T11:14:28Z"}
     ship: {started_at: "2026-09-10T11:14:28Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T11:15:49Z"}
-    review-pr: {started_at: "2026-09-10T11:15:49Z", driver: git-pr, iterations: 1}
+    review-pr: {started_at: "2026-09-10T11:15:49Z", driver: git-pr, iterations: 1, completed_at: "2026-09-10T11:23:51Z"}
 prs:
     - https://github.com/sahil87/hexokit-site/pull/2
 change_type_source: explicit
@@ -50,4 +50,4 @@ true_impact:
     computed_at_stage: ship
 summary: Replace the shll splash at / with the hand-written HexoKit product landing page (custom StarlightPage, landing-scoped run-kit palette, six-card features, toolkit hexagon, desktop card, page-local footer); retire the homepage terminal mount
 # true_impact: lazily created on first stage-finish that computes it (no placeholder here).
-last_updated: 2026-09-10T11:15:49Z
+last_updated: 2026-09-10T11:23:51Z
