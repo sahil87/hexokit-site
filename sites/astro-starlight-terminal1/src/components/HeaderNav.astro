@@ -21,11 +21,18 @@
  */
 import { repoFor } from '../lib/tool-slugs.ts';
 
+// Site-authored nav: a missing roster entry must fail the build loudly
+// (GithubButton's guard), never link `sahil87/null`.
+const hexokitRepo = repoFor('hexokit');
+if (!hexokitRepo) {
+  throw new Error('HeaderNav: `hexokit` is not in the tool roster.');
+}
+
 const links = [
   { label: 'Docs', href: '/docs/' },
   { label: 'Toolkit', href: '/toolkit/' },
   { label: 'Desktop', href: '/desktop/' },
-  { label: 'GitHub', href: `https://github.com/sahil87/${repoFor('hexokit')}` },
+  { label: 'GitHub', href: `https://github.com/sahil87/${hexokitRepo}` },
 ];
 ---
 

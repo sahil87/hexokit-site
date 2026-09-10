@@ -101,8 +101,13 @@ if (!node) {
   }
   const slug = tool;
   // The repo name comes from the roster (slug ≠ repo for hexokit — its repo
-  // stays `run-kit` until the source-side rename).
-  githubUrl = `https://github.com/sahil87/${repoFor(slug)}`;
+  // stays `run-kit` until the source-side rename). An unknown slug fails the
+  // build loudly (GithubButton's guard), never a `sahil87/null` link.
+  const repo = repoFor(slug);
+  if (!repo) {
+    throw new Error(`CommandReference: unknown tool slug \`${slug}\` — not in the roster.`);
+  }
+  githubUrl = `https://github.com/sahil87/${repo}`;
   const repoRoot = repoRootFromModuleUrl(import.meta.url);
   const helpPath = path.join(repoRoot, 'help', `${slug}.json`);
 

@@ -115,7 +115,13 @@ for (const slug of slugs) {
  *  3ke3; the URL segment is the roster mount since change it5d — hexokit's
  *  commands page is `/docs/commands/`). */
 function commandsHref(slug: string): string {
-  return `/${mountFor(slug)}/commands/`;
+  // A slug with no roster mount is a build-stopping defect (a stray help/*.json
+  // file) — fail loudly rather than emitting a `/null/commands/` link.
+  const mount = mountFor(slug);
+  if (!mount) {
+    throw new Error(`CommandIndex: unknown tool slug \`${slug}\` — not in the roster.`);
+  }
+  return `/${mount}/commands/`;
 }
 
 const commandCount = rows.filter((r) => r.kind === 'command').length;
