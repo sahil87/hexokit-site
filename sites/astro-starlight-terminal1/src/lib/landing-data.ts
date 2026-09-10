@@ -14,7 +14,7 @@
  *      from its slug, so hardcoded `/<slug>/` paths are a known bug class.
  *
  * THE BLURBS ARE LANDING COPY, NOT A COPY: `TOOLKIT_EDGES[].blurb` is the
- * landing's own, deliberately short (6–7 word) line per companion (copy study 2,
+ * landing's own, deliberately short (6–7-word) line per companion (copy study 2,
  * change a9xx). `src/content/docs/toolkit/index.mdx` § The six companions keeps
  * the long form for the directory page. The two sets describe the same job per
  * tool but are NOT expected to match word for word — when a tool's job changes,
