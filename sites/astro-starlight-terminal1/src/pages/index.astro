@@ -1,0 +1,323 @@
+---
+/**
+ * index.astro — the HexoKit product landing page at `/`
+ * (change 260910-jwhx-hexokit-landing, plan row S4 of the hexokit-rebrand plan).
+ *
+ * A CUSTOM page on top of the Starlight docs layer — not the docs splash
+ * template. `StarlightPage` with `template: 'splash'` keeps the site chrome
+ * (header, theme toggle, search, site footer) and the --sl-* token system while
+ * removing the sidebar and right rail. There is NO `hero:` key: the hero is
+ * hand-written markup, so Starlight's [data-has-hero] styling never fires. The
+ * retired shll splash (src/content/docs/index.mdx) is deleted — a content page
+ * and this page would both emit `/`.
+ *
+ * The page root is a div.hk-landing, NOT a <main>: Starlight's Page.astro
+ * already emits the page's <main> landmark around the slot, and a nested main
+ * would break landmark uniqueness. `.hk-landing` is the token-scope root —
+ * landing.css (imported only here) maps run-kit's app palette onto --hk-*
+ * tokens under it (dark + light), so the landing reads like the app while the
+ * docs layer keeps its amber palette.
+ *
+ * Starlight's docs PageTitle <h1> is hidden by landing.css — the hero below
+ * carries the page's single visible h1.
+ *
+ * This page adds ZERO client JS (Constitution I): the only script on the page
+ * is Expressive Code's copy button, already shipped site-wide. No new
+ * dependencies (Constitution VI).
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Code } from '@astrojs/starlight/components';
+import HkMark from '../components/HkMark.astro';
+import '../styles/landing.css';
+
+/**
+ * All link targets in one place (plan §4), following the site's URL scheme
+ * (D7 / the four-name rule in src/lib/tool-roster.mjs): HexoKit's own pages
+ * mount at /docs/ (the product's mount, not its `hexokit` slug), the family
+ * page is /toolkit/, the companions sit at their root mounts, and
+ * /docs/install/ is a pulled docs-site page. A path change is a one-place edit
+ * here; scripts/landing-links.test.mjs checks every target resolves to a real
+ * route (or a documented, owner-named forward link).
+ */
+const LINKS = {
+  docs: '/docs/',
+  toolkit: '/toolkit/',
+  docsInstallDesktop: '/docs/install/#desktop-app-macos',
+  fabKit: '/fab-kit/',
+  wt: '/wt/',
+  idea: '/idea/',
+  tu: '/tu/',
+  hop: '/hop/',
+  desktopAnchor: '#desktop',
+  github: 'https://github.com/sahil87/run-kit',
+  discord: 'https://discord.gg/32XHh5mJYn',
+  versions: '/versions.json',
+  llms: '/llms.txt',
+} as const;
+
+/* Commands as constants (greppable, never through a markdown transform — the
+   InstallOneLiner.astro remark-hazard precedent). Both are forward-looking:
+   hexokit.com/install lands in S5 and the hexokit formula in C2; until then a
+   copied command fails — accepted, the site is unannounced (D10/D13). */
+const INSTALL_ONE_LINER = 'curl -fsSL https://hexokit.com/install | sh';
+const BREW_LINE = 'brew install sahil87/tap/hexokit';
+const DESKTOP_INSTALL = 'rk desktop install';
+
+const TITLE = 'HexoKit — your tmux, in the browser and on your phone';
+const DESCRIPTION =
+  'HexoKit is a remote, phone-first console for your tmux: every session and pane as a live terminal from any device, built for running many AI coding agents in parallel without wrapping any of them.';
+
+/* Homepage <head> owned by this page (the kb1r frontmatter-head mechanism:
+   Starlight's merge dedupes the singleton <title> and same-property metas, so
+   the built head carries exactly one of each). The homepage JSON-LD branch in
+   Head.astro and the site-wide og:image still read "shll" — S3 owns those. */
+const head = [
+  { tag: 'title', content: TITLE },
+  { tag: 'meta', attrs: { name: 'description', content: DESCRIPTION } },
+  { tag: 'meta', attrs: { property: 'og:title', content: TITLE } },
+  { tag: 'meta', attrs: { property: 'og:type', content: 'website' } },
+  { tag: 'meta', attrs: { property: 'og:description', content: DESCRIPTION } },
+];
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'HexoKit',
+    description: DESCRIPTION,
+    template: 'splash',
+    tableOfContents: false,
+    head,
+  }}
+>
+  <div class="hk-landing">
+    <!-- 1. Hero — tagline and sub-line verbatim per the plan § Site shape. -->
+    <section class="hk-hero not-content" aria-labelledby="hk-hero-title">
+      <div class="hk-hero-brand">
+        <HkMark size={56} />
+        <h1 id="hk-hero-title" class="hk-wordmark">HexoKit</h1>
+      </div>
+      <p class="hk-tagline">
+        Your tmux, in the browser and on your phone.<span class="hk-caret" aria-hidden="true"> ▊</span>
+      </p>
+      <p class="hk-subline">Cockpit for the agent era.</p>
+      <p class="hk-cta-row">
+        <a class="hk-cta hk-cta-primary" href="#install">Install</a>
+        <a class="hk-cta" href={LINKS.docs}>Read the docs</a>
+      </p>
+      <div class="hk-hero-shots">
+        <img
+          class="hk-shot-desktop"
+          src="/screenshots/run-kit-console.webp"
+          width="1800"
+          height="1124"
+          loading="eager"
+          decoding="async"
+          alt="HexoKit desktop dashboard: sidebar of servers, sessions and panes with status dots, a live coding-agent terminal, and host stats."
+        />
+        <img
+          class="hk-shot-phone"
+          src="/screenshots/hexokit-phone-terminal.webp"
+          width="900"
+          height="1957"
+          loading="eager"
+          decoding="async"
+          alt="HexoKit on a phone: a live agent terminal with the touch key row."
+        />
+      </div>
+    </section>
+
+    <!-- 2. Install — two EC blocks so each line copies alone with the copy
+         button. InstallOneLiner.astro is deliberately NOT reused: it hardcodes
+         shll.ai/install, is roster-gated, and tells the whole-toolkit story. -->
+    <section id="install" class="not-content" aria-labelledby="hk-install-title">
+      <h2 id="hk-install-title" class="hk-h2">Install</h2>
+      <Code code={INSTALL_ONE_LINER} lang="bash" />
+      <Code code={BREW_LINE} lang="bash" />
+      <p class="hk-note">
+        Installs <code>shll</code> (the toolkit manager) and HexoKit. Want the six companion tools
+        too? See <a href={LINKS.toolkit}>the toolkit</a>.
+      </p>
+    </section>
+
+    <!-- 3. Features — six cards, copy adapted from the run-kit README (the
+         canonical source). Cards without an existing capture (4 and 6) ship a
+         styled image slot — the capture list is the design-iteration hand-off.
+         Every rk verb named here is a top-level command in help/run-kit.json
+         (the vn39 hard rule for hand-written prose; verified at apply). -->
+    <section class="not-content" aria-labelledby="hk-features-title">
+      <h2 id="hk-features-title" class="hk-h2">Features</h2>
+      <div class="hk-grid">
+        <article class="hk-card">
+          <img
+            src="/screenshots/hexokit-phone-dashboard.webp"
+            width="900"
+            height="1957"
+            loading="lazy"
+            decoding="async"
+            alt="HexoKit mobile dashboard: the list of sessions and panes with status dots, on a phone."
+          />
+          <h3>Every pane, a live terminal — from any device</h3>
+          <p>
+            Every tmux session and pane on the box shows up in a sidebar. Click one for a live
+            browser terminal, from your desk or your couch.
+          </p>
+        </article>
+        <article class="hk-card">
+          <img
+            src="/screenshots/run-kit-agent-session.webp"
+            width="1800"
+            height="1395"
+            loading="lazy"
+            decoding="async"
+            alt="A live coding-agent session in a HexoKit pane, with the sidebar's status dots beside it."
+          />
+          <h3>Agents are just panes</h3>
+          <p>
+            State comes from harness hooks, not from parsing output — busy, waiting, idle, in any
+            agent you run. The agent is one of the things you run, not the thing HexoKit is.
+          </p>
+        </article>
+        <article class="hk-card">
+          <img
+            src="/screenshots/hexokit-fleet-sidebar.webp"
+            width="370"
+            height="910"
+            loading="lazy"
+            decoding="async"
+            alt="The HexoKit sidebar: servers, sessions and panes with status dots — the agent fleet at a glance."
+          />
+          <h3><code>rk riff</code> — one agent per worktree, watch the fleet</h3>
+          <p>
+            One command spawns a git worktree, a tmux window inside it, and your agent. Spawn three
+            at once, watch them side by side.
+          </p>
+        </article>
+        <article class="hk-card">
+          <div class="hk-slot"><span>boards · screenshot pending</span></div>
+          <h3>Boards and the status pyramid</h3>
+          <p>
+            Pin panes from any server into a board; every window carries one status dot — hue for
+            journey, shape for liveness — readable at a glance on a phone.
+          </p>
+        </article>
+        <article class="hk-card">
+          <img
+            src="/screenshots/hexokit-operator.webp"
+            width="1600"
+            height="668"
+            loading="lazy"
+            decoding="async"
+            alt="The HexoKit operator pane: an operator agent watching the fleet in its own terminal."
+          />
+          <h3>Cron clock and the operator</h3>
+          <p>
+            Scheduled agent prompts on a clock, and one operator agent that watches the fleet and
+            pings your phone when something needs you.
+          </p>
+        </article>
+        <article class="hk-card">
+          <div class="hk-slot"><span>tiles · screenshot pending</span></div>
+          <h3>Code, web and GUI tiles</h3>
+          <p>
+            Beside the terminal: a full editor at the window's git root, a web tile for any port or
+            URL, a GUI lens — same tab, same device.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. The differentiator — the vs-herdr/cmux paragraph from the README,
+         product name swapped, otherwise verbatim-ish. Stays even if every
+         other section is redesigned. -->
+    <section class="not-content" aria-labelledby="hk-diff-title">
+      <h2 id="hk-diff-title" class="hk-h2">Nothing wraps your agent.</h2>
+      <div class="hk-prose">
+        <p>
+          HexoKit never wraps the agent — a pane is just a pane. It's equally a build, a REPL, an
+          ssh session, <code>htop</code>.
+          <strong>The agent is one of the things you run, not the thing HexoKit is.</strong> It
+          doesn't speak any agent's protocol, parse any agent's output, or care what's in the pane.
+          That's the point: when the agent tooling churns underneath you (and it does, monthly), the
+          terminal layer stays put.
+        </p>
+      </div>
+    </section>
+
+    <!-- 5. The toolkit hexagon — the mark in the centre cell (linking to
+         /toolkit/) and the six companions on the six edges, clockwise from the
+         top: fab-kit, wt, idea, tu, hop, desktop. One-liners reuse the retired
+         homepage's validated tools-listing prose (vn39-clean), plus one new
+         line for desktop. The SVG is decorative; the six links ARE the textual
+         explanation the constitution's Accessibility clause asks for. -->
+    <section id="toolkit" class="not-content" aria-labelledby="hk-toolkit-title">
+      <h2 id="hk-toolkit-title" class="hk-h2">The toolkit</h2>
+      <p class="hk-note">
+        HexoKit is the cockpit. Six small tools sit on its edges — each brew-installable alone, each
+        better together.
+      </p>
+      <div class="hk-hex">
+        <a class="hk-hex-mark" href={LINKS.toolkit} aria-label="The HexoKit toolkit">
+          <HkMark size={180} />
+        </a>
+        <a class="hk-hex-edge hk-edge-fab-kit" href={LINKS.fabKit}>
+          <span class="hk-edge-name">fab-kit</span>
+          <span class="hk-edge-line">
+            the planning harness — a constitution and a plan before any agent writes code
+          </span>
+        </a>
+        <a class="hk-hex-edge hk-edge-wt" href={LINKS.wt}>
+          <span class="hk-edge-name">wt</span>
+          <span class="hk-edge-line">disposable git worktrees so each change works in isolation</span>
+        </a>
+        <a class="hk-hex-edge hk-edge-idea" href={LINKS.idea}>
+          <span class="hk-edge-name">idea</span>
+          <span class="hk-edge-line">capture ideas and feed a backlog without breaking flow</span>
+        </a>
+        <a class="hk-hex-edge hk-edge-tu" href={LINKS.tu}>
+          <span class="hk-edge-name">tu</span>
+          <span class="hk-edge-line">track what your AI coding sessions cost</span>
+        </a>
+        <a class="hk-hex-edge hk-edge-hop" href={LINKS.hop}>
+          <span class="hk-edge-name">hop</span>
+          <span class="hk-edge-line">a personal directory of your git repos — jump anywhere</span>
+        </a>
+        <a class="hk-hex-edge hk-edge-desktop" href={LINKS.desktopAnchor}>
+          <span class="hk-edge-name">desktop</span>
+          <span class="hk-edge-line">the native macOS shell for the dashboard</span>
+        </a>
+      </div>
+      <p class="hk-note"><a href={LINKS.toolkit}>See the whole toolkit →</a></p>
+    </section>
+
+    <!-- 6. Desktop app card. No screenshot in v1 — the Electron window is
+         visually the dashboard; a titlebar-visible capture is on the slot
+         list. -->
+    <section id="desktop" class="not-content" aria-labelledby="hk-desktop-title">
+      <div class="hk-desktop-card">
+        <h2 id="hk-desktop-title" class="hk-h2">HexoKit Desktop (macOS)</h2>
+        <p>
+          A native window around your dashboard that frees the browser-reserved <kbd>⌘</kbd>
+          keyboard tier. Install and update it from the CLI — quarantine-free, digest-verified — and
+          connect three ways: this Mac, a box over SSH, or any URL. It never starts, stops or
+          updates anything on its own; your tmux sessions survive every daemon action.
+        </p>
+        <Code code={DESKTOP_INSTALL} lang="bash" />
+        <p><a href={LINKS.docsInstallDesktop}>Install &amp; access guide →</a></p>
+      </div>
+    </section>
+
+    <!-- 7. Page-local footer — the landing's own link row. The site-wide
+         Footer.astro (copyright/MIT/LinkedIn/noon.design) still renders below
+         via StarlightPage; it is a shared override S3 may touch, untouched
+         here. GitHub links the current repo name — after C3's rename GitHub
+         redirects the old URL, so the link never breaks. -->
+    <footer class="hk-footer not-content">
+      <a href={LINKS.docs}>Docs</a><span aria-hidden="true">&nbsp;·&nbsp;</span>
+      <a href={LINKS.toolkit}>Toolkit</a><span aria-hidden="true">&nbsp;·&nbsp;</span>
+      <a href={LINKS.github}>GitHub</a><span aria-hidden="true">&nbsp;·&nbsp;</span>
+      <a href={LINKS.discord}>Discord</a><span aria-hidden="true">&nbsp;·&nbsp;</span>
+      <a href={LINKS.versions}>versions.json</a><span aria-hidden="true">&nbsp;·&nbsp;</span>
+      <a href={LINKS.llms}>llms.txt</a>
+    </footer>
+  </div>
+</StarlightPage>

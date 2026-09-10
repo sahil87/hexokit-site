@@ -25,8 +25,8 @@ Node ≥ 22.12 and pnpm 10. The `dist/` directory is gitignored — never commit
 
 ```
 src/
+├── pages/index.astro    # HexoKit product landing (custom page, not the docs template)
 ├── content/docs/        # Starlight content collection
-│   ├── index.mdx        # splash (ASCII shell session + loop diagram)
 │   ├── getting-started/ # overview, install, philosophy
 │   ├── tools/<tool>/    # per-tool: overview, install, commands, workflows
 │   └── workflows/       # cross-tool recipes
@@ -35,10 +35,13 @@ src/
 │   └── Diagram.astro    # theme-aware SVG <img> swap
 ├── assets/
 │   └── logo.svg         # site logo (run-kit hexagon)
-└── styles/terminal.css  # palette + terminal aesthetic overrides
+└── styles/
+    ├── terminal.css     # palette + terminal aesthetic overrides (docs layer)
+    └── landing.css      # landing-only .hk-landing token layer (run-kit palette)
 public/
 ├── CNAME                # hexokit.com custom domain
 ├── favicon.{svg,ico}    # browser tab icon
+├── screenshots/         # site-owned curated screenshots (constitution's third content class)
 ├── diagrams/loop-{light,dark}.svg
 └── og-image.png
 ```
@@ -57,4 +60,4 @@ Major customizations:
 - H2 headings get a `## ` sage prefix; dashed top border on H2s after content
 - Code blocks: themed Expressive Code terminal frames, Mac dots hidden
 - Blinking cursor on first paragraph of every doc page
-- Splash: hand-written `<pre class="shell-session">` (no Starlight cards)
+- Splash: the homepage is a custom page (`src/pages/index.astro` via `<StarlightPage template: 'splash'>`, no `hero:`) — the HexoKit product landing with its own `.hk-landing` token layer in `styles/landing.css` (run-kit palette, dark + light); the docs layer keeps this file's amber palette

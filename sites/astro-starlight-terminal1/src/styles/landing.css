@@ -1,0 +1,443 @@
+/**
+ * landing.css — the HexoKit product landing page's scoped visual layer
+ * (change 260910-jwhx-hexokit-landing). Imported ONLY by src/pages/index.astro.
+ *
+ * Why a separate stylesheet: the landing borrows run-kit's app palette
+ * (run-kit app/frontend/src/globals.css) so site and app read as one thing,
+ * while the docs layer keeps its amber terminal palette (terminal.css stays
+ * untouched — S3 may edit it). Everything is scoped under `.hk-landing`, the
+ * page root class, so no rule can leak into the docs pages.
+ *
+ * Rules carried over from the app:
+ *  - every color comes from an --hk-* token — the only hex literals in this
+ *    file live in the two token blocks below (keep it that way; T014 greps);
+ *  - hover on controls is hue-free (motion + brightness only); green is
+ *    reserved for brand/state, never the interaction itself;
+ *  - one focus ring on every interactive element (Constitution Accessibility);
+ *  - all motion is CSS-only and gated under prefers-reduced-motion.
+ */
+
+/* ── Tokens (dark = default) — values copied from run-kit globals.css ─────── */
+.hk-landing {
+  --hk-bg: #0f1117; /* --color-bg-primary */
+  --hk-card: #171b24; /* --color-bg-card */
+  --hk-inset: #0a0c12; /* --color-bg-inset */
+  --hk-fg: #e8eaf0; /* --color-text-primary */
+  --hk-fg-dim: #7a8394; /* --color-text-secondary */
+  --hk-border: #454d66; /* --color-border */
+  --hk-accent: #5b8af0; /* --color-accent (blue) */
+  --hk-accent-bright: #82a8f7;
+  --hk-green: #22c55e; /* --color-accent-green — STATE/brand only, never hover hue */
+  --hk-yellow: #facc15;
+  --hk-purple: #c084fc;
+  --hk-red: #f87171;
+  /* Glitch RGB-split hues (run-kit rk-glitch) — tokenized so the no-literal-hex
+     rule holds everywhere outside the token blocks. */
+  --hk-glitch-red: #ff3b3b;
+  --hk-glitch-blue: #3bd1ff;
+}
+:root[data-theme='light'] .hk-landing {
+  --hk-bg: #f8f9fb;
+  --hk-card: #ffffff;
+  --hk-inset: #e8eaef;
+  --hk-fg: #1a1d24;
+  --hk-fg-dim: #6b7280;
+  --hk-border: #d1d5db;
+  --hk-accent: #4a7ae8;
+  --hk-accent-bright: #3b66d6;
+  --hk-green: #16a34a;
+  --hk-yellow: #b07d02;
+  --hk-purple: #9333ea;
+  --hk-red: #dc2626;
+}
+
+/* ── Named breakpoints — the single source for the media queries below. CSS
+   custom properties cannot drive @media, so the names live in this comment;
+   grep the name when changing a value, never repeat the literal.
+     --bp-stack:        48rem — hero screenshots stack below this width
+     --bp-hex-collapse: 40rem — the hexagon grid collapses to one column ────── */
+
+/* ── Page chrome ─────────────────────────────────────────────────────────── */
+/* Starlight always renders its docs PageTitle <h1> on a non-hero page; the
+   landing hero carries the page's single h1 instead, so the chrome one is
+   hidden (display:none also drops it from the accessibility tree — exactly one
+   h1 remains). This stylesheet loads only on `/`, so the selector cannot hit
+   any other page. */
+main > .content-panel:first-child:has(> .sl-container > h1#_top) {
+  display: none;
+}
+
+.hk-landing {
+  background: var(--hk-bg);
+  color: var(--hk-fg);
+  font-family: var(--sl-font-mono);
+  /* Full-bleed paint: extend the landing background across the viewport width
+     inside Starlight's content frame. The header above and the site footer
+     below keep the docs palette — an accepted seam (S3 owns the header). */
+  box-shadow: 0 0 0 100vmax var(--hk-bg);
+  clip-path: inset(0 -100vmax);
+}
+
+.hk-landing section {
+  margin-block: 3.5rem;
+}
+
+/* Section headings carry the site's `## ` shell-comment prefix, scoped here so
+   terminal.css (S3's file) stays untouched. */
+.hk-h2 {
+  margin: 0 0 1.25rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--hk-fg);
+}
+.hk-h2::before {
+  content: '## ';
+  color: var(--hk-green);
+}
+
+/* ── Focus + hover (ported rules): one ring, hue-free hover ──────────────── */
+.hk-landing :where(a, button):focus-visible {
+  outline: 2px solid var(--hk-green);
+  outline-offset: 2px;
+}
+.hk-landing a {
+  color: var(--hk-accent-bright);
+  text-decoration: none;
+}
+.hk-landing a:hover {
+  filter: brightness(1.25);
+}
+
+/* Inline code chips (EC frames render their own pre > code — excluded). */
+.hk-landing :not(pre) > code {
+  background: var(--hk-inset);
+  border: 1px solid var(--hk-border);
+  border-radius: 0.25rem;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.9em;
+}
+.hk-landing kbd {
+  background: var(--hk-inset);
+  border: 1px solid var(--hk-border);
+  border-radius: 0.25rem;
+  padding: 0 0.3rem;
+  font-family: inherit;
+  font-size: 0.9em;
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+.hk-hero {
+  padding-block-start: 1.5rem;
+}
+.hk-hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.hk-hero-brand svg {
+  flex: none;
+}
+.hk-wordmark {
+  margin: 0;
+  font-size: 2.75rem;
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--hk-fg);
+}
+/* Glitch = brand only: the one-shot RGB-split rides the wordmark hover, and
+   the hover snaps the color to --hk-green (the app's deliberate hue exception
+   — identity, not a control state). */
+.hk-wordmark:hover {
+  animation: hk-glitch 300ms steps(2) 1;
+  color: var(--hk-green);
+}
+.hk-tagline {
+  margin: 1.25rem 0 0;
+  font-size: 1.3rem;
+  color: var(--hk-fg);
+}
+.hk-caret {
+  color: var(--hk-green);
+  animation: hk-caret-blink 1.06s steps(1) infinite;
+}
+.hk-subline {
+  margin: 0.4rem 0 0;
+  font-size: 1rem;
+  color: var(--hk-fg-dim);
+}
+.hk-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0;
+}
+.hk-cta {
+  position: relative;
+  overflow: hidden; /* clips the glint strip */
+  display: inline-block;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--hk-border);
+  border-radius: 0.4rem;
+  background: var(--hk-card);
+  color: var(--hk-fg);
+  font-size: 0.95rem;
+}
+.hk-cta:hover {
+  border-color: var(--hk-fg-dim); /* hue-free: border brightens, hue stays */
+  filter: brightness(1.15);
+}
+.hk-cta-primary {
+  border-color: var(--hk-accent);
+  color: var(--hk-accent-bright);
+  font-weight: 600;
+}
+.hk-hero-shots {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1.2fr);
+  gap: 1.25rem;
+  align-items: start;
+  margin-block-start: 2.5rem;
+}
+.hk-hero-shots img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--hk-border);
+  border-radius: 0.5rem;
+  background: var(--hk-inset);
+}
+/* --bp-stack: 48rem */
+@media (max-width: 48rem) {
+  .hk-hero-shots {
+    grid-template-columns: 1fr;
+  }
+  .hk-hero-shots .hk-shot-phone {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    max-height: 60vh;
+    margin-inline: auto;
+  }
+}
+
+/* ── Install ─────────────────────────────────────────────────────────────── */
+.hk-landing .expressive-code {
+  margin-block: 0.6rem;
+}
+.hk-note {
+  margin: 0.85rem 0 0;
+  font-size: 0.9rem;
+  color: var(--hk-fg-dim);
+}
+
+/* ── Feature cards ───────────────────────────────────────────────────────── */
+.hk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1.25rem;
+}
+.hk-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--hk-card);
+  border: 1px solid var(--hk-border);
+  border-radius: 0.5rem;
+}
+.hk-card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+  border: 1px solid var(--hk-border);
+  border-radius: 0.35rem;
+  background: var(--hk-inset);
+}
+.hk-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--hk-fg);
+}
+.hk-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--hk-fg-dim);
+}
+/* Image slot — a visible placeholder styled as the app's empty panes, not a
+   broken image. Swapping a slot for a capture is a one-line edit per card. */
+.hk-slot {
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hk-inset);
+  border: 1px dashed var(--hk-border);
+  border-radius: 0.35rem;
+}
+.hk-slot span {
+  font-size: 0.85rem;
+  color: var(--hk-fg-dim);
+}
+
+/* ── Differentiator ──────────────────────────────────────────────────────── */
+.hk-prose {
+  max-width: 70ch;
+}
+.hk-prose p {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--hk-fg-dim);
+}
+.hk-prose strong {
+  color: var(--hk-fg);
+}
+
+/* ── Toolkit hexagon — a 3x3 grid (mark in the centre cell, the six edge
+   labels in the surrounding cells pulled toward their edge), never absolute
+   positioning on the SVG, so it collapses to a plain list on narrow screens.
+   Middle-left and middle-right cells stay empty (flat-top hexagon edges are
+   top / upper-right / lower-right / bottom / lower-left / upper-left). ────── */
+.hk-hex {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: repeat(3, auto);
+  grid-template-areas:
+    'edge-tl edge-t  edge-tr'
+    '.       mark    .      '
+    'edge-bl edge-b  edge-br';
+  gap: 0.5rem 1.5rem;
+  margin-block: 1.75rem;
+}
+.hk-hex-mark {
+  grid-area: mark;
+  display: block;
+  line-height: 0;
+}
+.hk-hex-edge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-width: 16rem;
+}
+.hk-edge-name {
+  font-weight: 600;
+  color: var(--hk-accent-bright);
+}
+.hk-edge-line {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--hk-fg-dim);
+}
+.hk-edge-fab-kit { grid-area: edge-t; justify-self: center; align-self: end; text-align: center; }
+.hk-edge-wt      { grid-area: edge-tr; justify-self: start;  align-self: end; }
+.hk-edge-idea    { grid-area: edge-br; justify-self: start;  align-self: start; }
+.hk-edge-tu      { grid-area: edge-b; justify-self: center; align-self: start; text-align: center; }
+.hk-edge-hop     { grid-area: edge-bl; justify-self: end;   align-self: start; text-align: right; }
+.hk-edge-desktop { grid-area: edge-tl; justify-self: end;   align-self: end; text-align: right; }
+/* --bp-hex-collapse: 40rem */
+@media (max-width: 40rem) {
+  .hk-hex {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'mark'
+      'edge-t'
+      'edge-tr'
+      'edge-br'
+      'edge-b'
+      'edge-bl'
+      'edge-tl';
+    justify-items: center;
+    text-align: center;
+  }
+  .hk-hex-edge {
+    justify-self: center;
+    text-align: center;
+  }
+}
+
+/* ── Desktop app card ────────────────────────────────────────────────────── */
+.hk-desktop-card {
+  padding: 1.5rem;
+  background: var(--hk-card);
+  border: 1px solid var(--hk-border);
+  border-radius: 0.5rem;
+}
+.hk-desktop-card p {
+  line-height: 1.65;
+  color: var(--hk-fg-dim);
+}
+
+/* ── Page-local footer ───────────────────────────────────────────────────── */
+.hk-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  margin-block-start: 4rem;
+  padding-block-start: 1.25rem;
+  border-top: 1px dashed var(--hk-border);
+  font-size: 0.85rem;
+  color: var(--hk-fg-dim);
+}
+
+/* ── Motion ports (CSS-only, from run-kit globals.css) ───────────────────── */
+/* Glint sweep — a skewed, hue-free highlight strip across the CTA buttons on
+   hover (rk-glint-sweep); it brightens with the theme's text color and never
+   recolors the chip. */
+@keyframes hk-glint-sweep {
+  0% { transform: translateX(-160%) skewX(-20deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateX(260%) skewX(-20deg); opacity: 0; }
+}
+.hk-cta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--hk-fg) 22%, transparent) 50%,
+    transparent 100%
+  );
+  transform: translateX(-160%) skewX(-20deg);
+  opacity: 0;
+}
+.hk-cta:hover::after {
+  animation: hk-glint-sweep 450ms ease-out;
+}
+
+/* Glitch — one-shot RGB-split text-shadow, steps(2) (rk-glitch). */
+@keyframes hk-glitch {
+  0% { text-shadow: none; transform: translateX(0); }
+  50% {
+    text-shadow:
+      -2px 0 color-mix(in srgb, var(--hk-glitch-red) 85%, transparent),
+      2px 0 color-mix(in srgb, var(--hk-glitch-blue) 85%, transparent);
+    transform: translateX(1px);
+  }
+  100% { text-shadow: none; transform: translateX(0); }
+}
+
+/* Caret blink — the block cursor after the tagline (rk-caret-blink). */
+@keyframes hk-caret-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* ── Reduced motion: every landing animation off; the caret stays visible and
+   steady (the cuur site convention — cursors never vanish under reduce). ───── */
+@media (prefers-reduced-motion: reduce) {
+  .hk-landing *,
+  .hk-landing *::before,
+  .hk-landing *::after {
+    animation: none !important;
+  }
+  .hk-landing .hk-caret {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,51 @@
+id: jwhx
+name: 260910-jwhx-hexokit-landing
+created: 2026-09-10T10:25:27Z
+created_by: sahil-noon
+change_type: feat
+issues: []
+progress:
+    intake: done
+    apply: done
+    review: done
+    hydrate: done
+    ship: active
+    review-pr: pending
+plan:
+    generated: true
+    task_count: 16
+    acceptance_count: 28
+    acceptance_completed: 28
+confidence:
+    certain: 5
+    confident: 9
+    tentative: 0
+    unresolved: 0
+    score: 3.2
+    fuzzy: true
+    dimensions:
+        signal: 70.0
+        reversibility: 86.1
+        competence: 73.9
+        disambiguation: 69.6
+stage_metrics:
+    intake: {started_at: "2026-09-10T10:25:27Z", driver: fab-new, iterations: 1, completed_at: "2026-09-10T10:32:24Z"}
+    apply: {started_at: "2026-09-10T10:32:24Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T10:58:18Z"}
+    review: {started_at: "2026-09-10T10:58:18Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T11:04:19Z"}
+    hydrate: {started_at: "2026-09-10T11:04:19Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T11:14:28Z"}
+    ship: {started_at: "2026-09-10T11:14:28Z", driver: fab-fff, iterations: 1}
+prs: []
+change_type_source: explicit
+true_impact:
+    added: 0
+    deleted: 0
+    net: 0
+    excluding:
+        added: 0
+        deleted: 0
+        net: 0
+    computed_at: "2026-09-10T11:14:28Z"
+    computed_at_stage: hydrate
+summary: Replace the shll splash at / with the hand-written HexoKit product landing page (custom StarlightPage, landing-scoped run-kit palette, six-card features, toolkit hexagon, desktop card, page-local footer); retire the homepage terminal mount
+# true_impact: lazily created on first stage-finish that computes it (no placeholder here).
+last_updated: 2026-09-10T11:14:28Z

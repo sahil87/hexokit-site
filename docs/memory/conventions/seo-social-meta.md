@@ -28,15 +28,16 @@ The shared image is a **committed static asset**, exactly **1200×630** (the ~1.
 
 **Generation is OUT of the build (Constitution VI).** `sites/astro-starlight-terminal1/scripts/generate-og-image.mjs` is a **one-off, unwired** generator: node stdlib only, it writes a self-contained HTML mock and screenshots it at 1200×630 with the Playwright-cached `chrome-headless-shell` binary already on the machine. It is NOT referenced from `package.json`, adds zero runtime or build dependencies, and exists purely for reproducibility — re-run it manually to regenerate the card, then verify with `file public/og-image.png` (must report `1200 x 630`). *Rejected*: SVG→PNG converters (none installed); adding `sharp`/`playwright` as devDependencies (Constitution VI).
 
-## Homepage `<head>` overrides (`index.mdx` frontmatter)
+## Homepage `<head>` overrides (the landing page's `StarlightPage` frontmatter)
 
-`src/content/docs/index.mdx` carries frontmatter `head:` entries that override Starlight's defaults **on the homepage only**:
+The homepage is the custom landing page `src/pages/index.astro` ([landing-page](/conventions/landing-page.md)), which supplies the overrides **on the homepage only** via the `head` array in its `<StarlightPage>` frontmatter (the same frontmatter-`head:` mechanism a content page would use):
 
 - `title` tag → **`HexoKit — your tmux, in the browser and on your phone`** (no site-title suffix) — carries the product keyword framing.
-- `og:title` meta → same string.
+- `meta name="description"` → a hand-authored, SEO-shaped sentence (*HexoKit is a remote, phone-first console for your tmux: every session and pane as a live terminal from any device, built for running many AI coding agents in parallel without wrapping any of them.*) — the editorial convention below, not a `root.short` derivation.
+- `og:title` meta → the title string; `og:description` → the description.
 - `og:type` meta → `website` (correct for a landing page; every other page keeps Starlight's default `article`, correct for docs content).
 
-**Mechanism**: Starlight's head-merging gives frontmatter `head:` entries priority over its defaults and **dedupes** the singleton `<title>` and same-`property` metas — so the built homepage carries exactly one of each. This is the dedupe-aware path for overriding tags Starlight already emits (contrast the og:image set above, which is append-only because Starlight emits none). The visible hero H1 is unaffected — the splash hero renders from the `hero:` block, not the page title.
+**Mechanism**: Starlight's head-merging gives frontmatter `head:` entries priority over its defaults and **dedupes** the singleton `<title>` and same-`property` metas — so the built homepage carries exactly one of each. This is the dedupe-aware path for overriding tags Starlight already emits (contrast the og:image set above, which is append-only because Starlight emits none). The visible hero H1 is unaffected — the landing hides Starlight's `PageTitle` and renders its own `<h1>HexoKit</h1>`.
 
 **Scope note:** all non-homepage titles keep the `{page} | HexoKit` suffix (the site title is `HexoKit` in `astro.config.mjs`). The `shll | HexoKit` title on the shll *tool's* overview page (`/shll/` — a page legitimately named after the tool) is Starlight's correct default.
 
@@ -121,7 +122,7 @@ Opens with `# HexoKit — full content`, then **iterates `TOOL_ROSTER` in displa
 
 ### Accepted drift surface (low-severity, fails loudly)
 
-`src/lib/llms.ts`'s `TOOLS` is **derived** from the shared roster (`TOOL_SLUGS` from [tool-roster.mjs](/conventions/tool-roster.md), display order) — there is no hand-maintained slug list left in the endpoints. (The homepage terminal instead enumerates `help/` via `readdirSync` — see [help-collection](/conventions/help-collection.md).) What remains hand-authored in the endpoints: the curated section labels/descriptions and the `toolkit`/`desktop` group matchers — a stale matcher surfaces as a missing bullet in the output, visible on inspection.
+`src/lib/llms.ts`'s `TOOLS` is **derived** from the shared roster (`TOOL_SLUGS` from [tool-roster.mjs](/conventions/tool-roster.md), display order) — there is no hand-maintained slug list left in the endpoints. (The terminal island — retained in-tree, mounted on no page — instead enumerates `help/` via `readdirSync` — see [help-collection](/conventions/help-collection.md).) What remains hand-authored in the endpoints: the curated section labels/descriptions and the `toolkit`/`desktop` group matchers — a stale matcher surfaces as a missing bullet in the output, visible on inspection.
 
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 <!-- The kb1r/pgox layer (crawlers+scrapers) and the 354p layer (coding agents)  -->
@@ -153,7 +154,7 @@ Before `bees`, the 7 tool overviews carried **zero** cross-tool links — the to
 
 ### Job-framed lead sentences on the overviews (the H1-substitute framing)
 
-The bare-slug Starlight `title:` (the H1) was **not changed** — it cascades to the sidebar label and the settled [`kb1r` title discipline](#homepage-head-overrides-indexmdx-frontmatter). Instead, each overview body's opening was expanded from a terse 1–2-sentence framing to a **3–4-sentence job-framed lead** ("what is `<tool>` / why use it / who it's for") that surfaces ranking keywords in the first indexable paragraph. The homepage `cat ABOUT.md` prose and the toolkit overview intro were keyword-sharpened by **refining existing copy only** — no new claims, no new sections; the homepage `head:` overrides block, hero `tagline`, and install/`whoami` blocks were left byte-for-byte (the `ld0j` sourced-copy discipline preserved). This thickening of the overview body is the rubric change recorded in [tool-page-rubric](/conventions/tool-page-rubric.md).
+The bare-slug Starlight `title:` (the H1) was **not changed** — it cascades to the sidebar label and the settled [`kb1r` title discipline](#homepage-head-overrides-the-landing-pages-starlightpage-frontmatter). Instead, each overview body's opening was expanded from a terse 1–2-sentence framing to a **3–4-sentence job-framed lead** ("what is `<tool>` / why use it / who it's for") that surfaces ranking keywords in the first indexable paragraph. The toolkit overview intro was keyword-sharpened by **refining existing copy only** — no new claims, no new sections. (The homepage prose this pass also touched belonged to the retired shll splash; `/` is now the [landing-page](/conventions/landing-page.md), whose head overrides are described above.) This thickening of the overview body is the rubric change recorded in [tool-page-rubric](/conventions/tool-page-rubric.md).
 
 ## Design Decisions
 

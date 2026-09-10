@@ -1,0 +1,39 @@
+---
+/**
+ * HkMark — the cube-in-hexagon HexoKit mark as inline SVG, sized per placement
+ * (hero wordmark, toolkit-hexagon centre). Geometry copied verbatim from
+ * src/assets/logo.svg (itself mirrored by hand from sahil87/run-kit
+ * assets/logo.svg — no auto-sync pipeline); kept as ONE component so the
+ * geometry has a single home on the landing page. The hardcoded grayscale
+ * palette is the mark's deliberate dual-theme-by-palette design (it reads
+ * correctly in both themes with no currentColor/filter mechanism) — do not
+ * "fix" it. Decorative everywhere it is used: aria-hidden.
+ */
+interface Props {
+  /** Rendered edge length in px. */
+  size?: number;
+}
+
+const { size = 56 } = Astro.props;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="7 10 50 44"
+  width={size}
+  height={size}
+  aria-hidden="true"
+  focusable="false"
+>
+  <!-- Border segments — wide contrast range -->
+  <polygon points="44,11.2 56,32 47.5,32 39.5,17.2" fill="#b4b4b4"></polygon>
+  <polygon points="56,32 44,52.8 39.5,46.8 47.5,32" fill="#b4b4b4"></polygon>
+  <polygon points="44,52.8 20,52.8 24.5,46.8 39.5,46.8" fill="#2a2a2a"></polygon>
+  <polygon points="20,52.8 8,32 16.5,32 24.5,46.8" fill="#2a2a2a"></polygon>
+  <polygon points="8,32 20,11.2 24.5,17.2 16.5,32" fill="#2a2a2a"></polygon>
+  <polygon points="20,11.2 44,11.2 39.5,17.2 24.5,17.2" fill="#b4b4b4"></polygon>
+  <!-- Inner cube faces — contrasts with adjacent border segments -->
+  <polygon points="24.5,17.2 39.5,17.2 47.5,32 32,32" fill="#888888"></polygon>
+  <polygon points="47.5,32 39.5,46.8 24.5,46.8 32,32" fill="#737373"></polygon>
+  <polygon points="24.5,46.8 16.5,32 24.5,17.2 32,32" fill="#545454"></polygon>
+</svg>
