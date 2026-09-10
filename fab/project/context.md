@@ -41,3 +41,11 @@ GitHub Pages via `.github/workflows/deploy.yml` on push to `main`, serving `hexo
 - Not the product's source — HexoKit's code lives in `sahil87/run-kit`; this repo hosts the site and the pulled documentation mirrors.
 - Not a monorepo with shared dependencies — each site under `sites/` owns its own `package.json` and stack. Sharing is opt-in, not the default.
 - Not server-rendered.
+
+## Task runner (`just`) and Playwright
+
+A root `justfile` wraps the live site's toolchain (`just --list`): `setup` (pnpm install), `dev`, `build`, `preview`, `validate` + `test` + `verify` (the same commands `.github/workflows/ci.yml` runs), and two Playwright recipes.
+
+**Playwright is installed per worktree, whenever needed — not by default.** `@playwright/test` is a *devDependency* of the live site (dev-only tooling for visual verification, not a runtime or build dependency — Constitution VI's justification bar applies to those; the static output is unaffected). `pnpm install` brings the npm package; the Chromium browser is fetched only by `just playwright` (copied from run-kit's `just setup`: `pnpm exec playwright install --with-deps chromium`). The recipes are cross-platform (Playwright's installer covers macOS and Linux); the browser build lands in Playwright's per-user cache (`~/Library/Caches/ms-playwright` on macOS, `~/.cache/ms-playwright` on Linux), so a worktree whose build is already cached pays nothing. A fresh worktree has no `node_modules`, so Playwright is absent there until `just setup` / `just playwright` runs — do not go looking for an install in sibling worktrees.
+
+Use it for design review: `just shot <url> <out.png> [width] [height] [scheme]` takes a full-page headless screenshot (default 1440×900, dark) of a dev/preview page or a `file:///abs/path.html`; pass `400 900` for phone width and `light` as the fifth argument for the light theme. The scheme flag drives `prefers-color-scheme`, which Starlight's default `auto` theme follows in a fresh headless context, so both themes (Constitution V) are one recipe call each — no `localStorage` poking needed.
