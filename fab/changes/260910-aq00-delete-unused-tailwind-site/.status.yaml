@@ -5,49 +5,49 @@ created_by: sahil-noon
 change_type: chore
 issues: []
 progress:
-    intake: done
-    apply: done
-    review: done
-    hydrate: done
-    ship: done
-    review-pr: active
+  intake: done
+  apply: done
+  review: done
+  hydrate: done
+  ship: done
+  review-pr: done
 plan:
-    generated: true
-    task_count: 7
-    acceptance_count: 18
-    acceptance_completed: 18
+  generated: true
+  task_count: 7
+  acceptance_count: 18
+  acceptance_completed: 18
 confidence:
-    certain: 11
-    confident: 3
-    tentative: 0
-    unresolved: 0
-    score: 4.8
-    fuzzy: true
-    dimensions:
-        signal: 78.6
-        reversibility: 91.8
-        competence: 87.9
-        disambiguation: 78.6
+  certain: 11
+  confident: 3
+  tentative: 0
+  unresolved: 0
+  score: 4.8
+  fuzzy: true
+  dimensions:
+    signal: 78.6
+    reversibility: 91.8
+    competence: 87.9
+    disambiguation: 78.6
 stage_metrics:
-    intake: {started_at: "2026-09-10T15:09:44Z", driver: fab-new, iterations: 1, completed_at: "2026-09-10T15:16:39Z"}
-    apply: {started_at: "2026-09-10T15:16:39Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T15:23:49Z"}
-    review: {started_at: "2026-09-10T15:23:49Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T15:28:12Z"}
-    hydrate: {started_at: "2026-09-10T15:28:12Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T15:32:01Z"}
-    ship: {started_at: "2026-09-10T15:32:01Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T15:33:39Z"}
-    review-pr: {started_at: "2026-09-10T15:33:39Z", driver: git-pr, iterations: 1}
+  intake: {started_at: "2026-09-10T15:09:44Z", driver: fab-new, iterations: 1, completed_at: "2026-09-10T15:16:39Z"}
+  apply: {started_at: "2026-09-10T15:16:39Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T15:23:49Z"}
+  review: {started_at: "2026-09-10T15:23:49Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T15:28:12Z"}
+  hydrate: {started_at: "2026-09-10T15:28:12Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T15:32:01Z"}
+  ship: {started_at: "2026-09-10T15:32:01Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T15:33:39Z"}
+  review-pr: {started_at: "2026-09-10T15:33:39Z", driver: git-pr, iterations: 1, completed_at: "2026-09-10T15:48:01Z", phase: replying, reviewer: '@copilot-pull-request-reviewer'}
 prs:
-    - https://github.com/sahil87/hexokit-site/pull/5
+  - https://github.com/sahil87/hexokit-site/pull/5
 change_type_source: explicit
 true_impact:
-    added: 425
-    deleted: 4812
-    net: -4387
-    excluding:
-        added: 3
-        deleted: 4794
-        net: -4791
-    computed_at: "2026-09-10T15:33:39Z"
-    computed_at_stage: ship
+  added: 425
+  deleted: 4812
+  net: -4387
+  excluding:
+    added: 3
+    deleted: 4794
+    net: -4791
+  computed_at: "2026-09-10T15:33:39Z"
+  computed_at_stage: ship
 summary: Deleted the retired sites/astro-tailwind-terminal1 variant and reconciled tool-page-rubric to the live Starlight site; scrubbed README, project context, launch.json and terminal.css references
 # true_impact: lazily created on first stage-finish that computes it (no placeholder here).
-last_updated: 2026-09-10T15:33:39Z
+last_updated: 2026-09-10T15:48:01Z
