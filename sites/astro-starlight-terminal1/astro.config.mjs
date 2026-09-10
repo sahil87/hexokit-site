@@ -11,7 +11,7 @@ const TOOL_SLUGS = ['idea', 'hop', 'fab-kit', 'wt', 'run-kit', 'tu', 'shll'];
 
 export default defineConfig({
   site: 'https://hexokit.com',
-  // Change 3ke3: the short per-tool URLs (shll.ai/wt) are now CANONICAL real
+  // Change 3ke3: the short per-tool URLs (hexokit.com/wt) are now CANONICAL real
   // pages (via `slug:` frontmatter overrides — see the tool content files), not
   // redirect stubs. The redirects are REVERSED: every previously-canonical/shared
   // deep `/tools/<tool>/*` URL now redirects to its new root path, so old links
