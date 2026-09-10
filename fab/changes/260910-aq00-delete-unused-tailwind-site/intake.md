@@ -103,7 +103,7 @@ Keep the existing "Tool pages SHALL NOT contain **hand-written**: …" list and 
 
 **(g) Frontmatter `description`** — leave unchanged; the rewrite does not change what the file covers (it already describes the live Starlight page shape). Verify at apply that nothing in the rewritten sections introduces coverage the description lacks.
 
-After the rewrite, `grep -n 'astro-tailwind-terminal1\|src/content/tools/\|src/data/tools.ts\|tools\` zod' docs/memory/conventions/tool-page-rubric.md` MUST return nothing.
+After the rewrite, `grep -n 'astro-tailwind-terminal1\|src/content/tools/\|src/data/tools.ts\|zod' docs/memory/conventions/tool-page-rubric.md` MUST return nothing.
 
 ### 6. `sites/astro-starlight-terminal1/src/styles/terminal.css` — reword two provenance comments
 

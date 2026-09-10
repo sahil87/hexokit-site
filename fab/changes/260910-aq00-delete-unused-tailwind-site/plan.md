@@ -44,7 +44,7 @@ The `sites/` tree in `README.md` (`## Layout`) and in `fab/project/context.md` (
 - (g) Frontmatter `description` is unchanged unless the rewrite adds coverage it lacks (expected: unchanged). `type: memory` stays.
 
 - **GIVEN** the rubric after apply
-- **WHEN** `grep -n 'astro-tailwind-terminal1\|src/content/tools/\|src/data/tools.ts\|tools` zod\|At a glance' docs/memory/conventions/tool-page-rubric.md` runs
+- **WHEN** `grep -n 'astro-tailwind-terminal1\|src/content/tools/\|src/data/tools.ts\|zod\|At a glance' docs/memory/conventions/tool-page-rubric.md` runs
 - **THEN** the only permitted hits are inside the two struck-through Design Decision titles (`~~…At a glance…~~`) — everything else returns nothing
 - **AND** the sections from `## Overview body shape: site-authored framing …` through `## Per-tool GitHub affordance` are byte-identical except for the (e) parenthetical
 
