@@ -15,7 +15,6 @@ The roster wiring these together is **one module**: `sites/astro-starlight-termi
 ```
 sites/
 ├── astro-starlight-terminal1/  # currently LIVE at hexokit.com (Astro 6 + Starlight, terminal theme)
-├── astro-tailwind-terminal1/   # variant (not deployed)
 └── _playground/                # scratch space — experiments (no deploy)
 help/ content/                  # repo-root pulled data (survive a live-site swap)
 .github/workflows/deploy.yml    # SITE_DIR env var selects which site ships

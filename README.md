@@ -11,7 +11,6 @@ This repo hosts multiple website variants under `sites/`. One is the live build;
 ```
 sites/
 ├── astro-starlight-terminal1/  # currently live at hexokit.com
-├── astro-tailwind-terminal1/   # alternate build (previously live)
 └── _playground/                # scratch space for new experiments
 ```
 
