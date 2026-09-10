@@ -1,0 +1,10 @@
+{"action":"enter","driver":"fab-new","event":"stage-transition","stage":"intake","ts":"2026-09-10T15:09:44Z"}
+{"args":"Delete the unused website folder from sites/ (we have kept it long enough), and remove its references from docs and memory.","cmd":"fab-new","event":"command","ts":"2026-09-10T15:09:44Z"}
+{"delta":"+0.0","event":"confidence","score":4.8,"trigger":"calc-score","ts":"2026-09-10T15:12:48Z"}
+{"cmd":"fab-switch","event":"command","ts":"2026-09-10T15:13:41Z"}
+{"cmd":"fab-fff","event":"command","ts":"2026-09-10T15:16:14Z"}
+{"action":"enter","driver":"fab-fff","event":"stage-transition","stage":"apply","ts":"2026-09-10T15:16:39Z"}
+{"action":"enter","driver":"fab-fff","event":"stage-transition","stage":"review","ts":"2026-09-10T15:23:49Z"}
+{"action":"enter","driver":"fab-fff","event":"stage-transition","stage":"hydrate","ts":"2026-09-10T15:28:12Z"}
+{"event":"review","result":"passed","ts":"2026-09-10T15:28:12Z"}
+{"action":"enter","driver":"fab-fff","event":"stage-transition","stage":"ship","ts":"2026-09-10T15:32:01Z"}

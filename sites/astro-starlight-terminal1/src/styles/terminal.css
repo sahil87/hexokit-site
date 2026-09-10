@@ -1,4 +1,4 @@
-/* terminal.css — port of astro-tailwind-terminal1's aesthetic to Starlight.
+/* terminal.css — port of the retired tailwind variant's terminal aesthetic to Starlight.
    Strategy: override Starlight's CSS custom properties + add a few selectors
    for the signature elements (## h2 prefix, ASCII rule). */
 
@@ -459,7 +459,7 @@ starlight-readme-toc .readme-toc-sublist {
   outline: none;
 }
 
-/* Blinking cursor — reuses the @keyframes from astro-tailwind-terminal1. */
+/* Blinking cursor — @keyframes carried over from the retired tailwind variant. */
 @keyframes shell-blink {
   50% { opacity: 0; }
 }

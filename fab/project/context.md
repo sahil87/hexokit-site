@@ -9,7 +9,6 @@ This repo is in an active **design-iteration phase** — content, tech stack, an
 ```
 sites/
 ├── astro-starlight-terminal1/  # currently LIVE at shll.ai (Astro 6 + Starlight, terminal theme)
-├── astro-tailwind-terminal1/   # variant (not deployed)
 └── _playground/                # scratch space — experiments (no deploy)
 .github/workflows/deploy.yml    # SITE_DIR env var selects which site ships
 fab/                            # project meta (config, constitution, this file)
