@@ -12,8 +12,8 @@ The script bootstraps `shll` (trusts + brew-installs its formula), then hands of
 Then wire your shell:
 
 ```bash
-shll shell-setup                        # wire your shell integration
-shll agent-setup                        # optional, once per machine: agent context + run-kit dashboard state
+shll setup shell                        # wire your shell integration
+shll setup agent                        # optional, once per machine: agent context + run-kit dashboard state
 exec $SHELL                             # reload so the shell integration takes effect
 ```
 
@@ -49,7 +49,7 @@ shll version
 
 ## Optional: run-kit agent state
 
-The `shll agent-setup` line above is optional and once per machine — it writes the toolkit's agent-context stanza into your installed agent harnesses (v1: Claude Code), teaching agents the `shll skill` two-step. It also **delegates** run-kit's hook installation to `run-kit agent-setup` (now hooks-only), which is what lights up live agent state in [run-kit](/run-kit/)'s dashboard: **active** / **waiting** / **idle** for every pane running a coding agent. Details on the dashboard and the hooks it installs are in the [run-kit install guide](/run-kit/install/).
+The `shll setup agent` line above is optional and once per machine — it writes the toolkit's agent-context stanza into your installed agent harnesses (v1: Claude Code), teaching agents the `shll skill` two-step. It also **delegates** run-kit's hook installation to `run-kit agent setup` (now hooks-only), which is what lights up live agent state in [HexoKit](/docs/)'s dashboard: **active** / **waiting** / **idle** for every pane running a coding agent. Details on the dashboard and the hooks it installs are in the [install guide](/docs/install/).
 
 ## Per-tool install
 
@@ -79,4 +79,4 @@ Updates every installed tool to the latest tap version. To pin a specific tool, 
 
 ---
 
-Next: head to a [tool overview](/idea/) or learn the [daily flow](/workflows/daily-flow/).
+Next: head to a [tool overview](/idea/) or learn the [daily flow](/toolkit/daily-flow/).

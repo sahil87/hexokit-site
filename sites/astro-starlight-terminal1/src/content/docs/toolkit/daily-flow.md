@@ -1,6 +1,6 @@
 ---
 title: Daily flow
-description: A typical day with the shll toolkit — from morning standup to evening shutdown.
+description: A typical day with the HexoKit toolkit — from morning standup to evening shutdown.
 ---
 
 This is the cross-tool flow that the toolkit is designed around. Use it as a template, not a script.

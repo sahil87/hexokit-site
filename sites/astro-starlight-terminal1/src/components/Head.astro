@@ -20,8 +20,8 @@
  *
  * Constitution I exception (client-side runtime JS): deliberate, user-approved,
  * scoped to analytics only, `defer`red — never blocks primary content. Cookieless,
- * so no consent gate. The token is a public site token (ships in page HTML), not a
- * secret — hardcoded by design.
+ * so no consent gate. The token is a public site token (ships in page HTML), not
+ * a secret — hardcoded by design.
  *
  * Production only: gated on `import.meta.env.PROD` (true during `astro build`, false
  * during `astro dev`) so local dev / preview sessions don't pollute the Cloudflare
@@ -35,33 +35,37 @@
  * (Starlight has no og:image of its own). The URL MUST be absolute — OG scrapers
  * do not resolve relative URLs — so it derives from `site` in astro.config.mjs.
  *
- * JSON-LD (change kb1r, homepage only): one inert application/ld+json block
- * carrying WebSite + SoftwareApplication. Emitted here (gated on pathname '/')
- * rather than via index.mdx frontmatter `head:` to keep the JSON authorable as a
- * plain object — JSON.stringify never produces `<` or raw HTML, so set:html is
- * safe and the body survives emission byte-exact. Inert data, not executable JS
- * (no Constitution I conflict).
+ * JSON-LD (change kb1r, homepage only; HexoKit identity since change it5d): one
+ * inert application/ld+json block carrying WebSite (name HexoKit) +
+ * SoftwareApplication (name HexoKit, url = the product repo via the roster).
+ * Emitted here (gated on pathname '/') rather than via index.mdx frontmatter
+ * `head:` to keep the JSON authorable as a plain object — JSON.stringify never
+ * produces `<` or raw HTML, so set:html is safe and the body survives emission
+ * byte-exact. Inert data, not executable JS (no Constitution I conflict).
  *
- * Per-tool JSON-LD (change pgox; namespace moved to root by change 3ke3): the
- * homepage block above is now one branch of a route DISPATCHER. Every per-tool
- * page emits its own inert application/ld+json @graph with two nodes — a per-tool
- * SoftwareApplication (name = file slug; description single-sourced from
- * help/<tool>.json `root.short`) and a BreadcrumbList (Home › Tools › <tool>
- * [› <page>]) with all `item` URLs absolute, derived from `Astro.site`.
+ * Per-tool JSON-LD (change pgox; root namespace 3ke3; mount-gated it5d): the
+ * homepage block above is one branch of a route DISPATCHER. Every per-tool page
+ * emits its own inert application/ld+json @graph with two nodes — a per-tool
+ * SoftwareApplication (name = the roster LABEL, e.g. HexoKit; description
+ * single-sourced from help/<slug>.json `root.short`; url via the roster's repo)
+ * and a BreadcrumbList with all `item` URLs absolute, derived from `Astro.site`.
  *
- * Since 3ke3 the per-tool namespace is at the site ROOT, so coverage is:
- *   - overview `/<tool>/`            (1 segment)  → 3-crumb BreadcrumbList
- *   - readme/commands `/<tool>/<page>/` (2 segments) → 4-crumb BreadcrumbList
  * Route detection parses Astro.url.pathname (the same pathname-gate idiom as the
  * homepage branch, NOT starlightRoute.id) and GATES the first segment on the
- * shared tool-slug roster — a bare `/<x>/` shape would otherwise match any root
- * page. Parity is preserved: nested docs-site pages (2+ segments under a tool)
- * stay uncovered exactly as before. The homepage block is unchanged byte-for-byte;
- * the branches are mutually exclusive (`/` never matches a tool path).
+ * roster's MOUNT set (`isToolMount` — a bare `/<x>/` shape would otherwise match
+ * any root page). The segment is the mount (HexoKit's pages are `/docs/…`); the
+ * slug is resolved via `slugForMount`. Coverage:
+ *   - overview `/<mount>/`               (1 segment)  → no page crumb
+ *   - readme/commands `/<mount>/<page>/` (2 segments) → page crumb
+ * Breadcrumb shape: Home › Docs [› Readme|Commands] for the product (hexokit);
+ * Home › Toolkit (→ /toolkit/) › <label> [› page] for the companions. Nested
+ * docs-site pages (2+ segments where <page> is not readme/commands) stay
+ * uncovered — parity with the pre-it5d coverage. The homepage block and the
+ * per-tool branch are mutually exclusive (`/` never matches a tool path).
  *
  * Failure split (mirrors CommandReference.astro, NOT VersionTable's build-stop —
  * this is inert SEO metadata, not a correctness-critical committed artifact):
- *   - MISSING help/<tool>.json (ENOENT) → emit the SoftwareApplication node
+ *   - MISSING help/<slug>.json (ENOENT) → emit the SoftwareApplication node
  *     WITHOUT its `description` field and continue the build (an absent producer
  *     file is an expected interim state; the BreadcrumbList needs no help JSON
  *     and always emits).
@@ -72,7 +76,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { HelpDocSchema } from '../lib/schemas.ts';
 import { repoRootFromModuleUrl } from '../lib/repo-root.ts';
-import { isToolSlug } from '../lib/tool-slugs.ts';
+import { isToolMount, slugForMount, labelFor, repoFor } from '../lib/tool-slugs.ts';
 import Default from '@astrojs/starlight/components/Head.astro';
 
 const beacon =
@@ -80,7 +84,7 @@ const beacon =
 
 const siteOrigin = new URL('/', Astro.site).origin;
 const ogImage = new URL('/og-image.png', Astro.site).href;
-const ogImageAlt = 'shll — seven small CLIs that force AI agents to plan before they code';
+const ogImageAlt = 'HexoKit — your tmux, in the browser and on your phone';
 
 const isHomepage = Astro.url.pathname === '/';
 const jsonLd = JSON.stringify({
@@ -88,31 +92,25 @@ const jsonLd = JSON.stringify({
   '@graph': [
     {
       '@type': 'WebSite',
-      name: 'shll',
+      name: 'HexoKit',
       url: siteOrigin,
     },
     {
       '@type': 'SoftwareApplication',
-      name: 'shll toolkit',
+      name: 'HexoKit',
+      description: 'Your tmux, in the browser and on your phone.',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'macOS, Linux',
       offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
-      url: 'https://github.com/sahil87',
+      url: `https://github.com/sahil87/${repoFor('hexokit')}`,
     },
   ],
 });
 
-// --- Per-tool JSON-LD branch (change pgox; root namespace, change 3ke3) ------
+// --- Per-tool JSON-LD branch (change pgox; root namespace 3ke3; mounts it5d) --
 // Mutually exclusive with the homepage branch above: a tool page can never be
 // `/`, and `/` never matches the tool-page shapes. Parse pathname for the same
 // reason the homepage uses pathname (one consistent gate idiom in this file).
-//
-// Two shapes, both gated on the tool-slug roster (a bare `/<x>/` would otherwise
-// match ANY root page — getting-started, reference, etc.):
-//   - overview        `/<tool>/`          → 1 segment,  no page crumb
-//   - readme/commands `/<tool>/<page>/`   → 2 segments, page ∈ {readme, commands}
-// Nested docs-site pages (2+ segments where <page> is not readme/commands) are
-// deliberately NOT matched — parity with the pre-3ke3 2-segment-only coverage.
 const rootSegments = Astro.url.pathname.replace(/^\/+|\/+$/g, '').split('/');
 
 /** Reserved per-tool page slugs → display labels for the breadcrumb page crumb. */
@@ -121,35 +119,37 @@ const PAGE_LABELS: Record<string, string> = {
   commands: 'Commands',
 };
 
-/** `{ tool, page }` when the pathname is a covered per-tool page, else null.
- *  `page` is null for the overview (1-segment) shape. */
-let toolPage: { tool: string; page: string | null } | null = null;
-if (rootSegments.length === 1 && isToolSlug(rootSegments[0])) {
-  toolPage = { tool: rootSegments[0], page: null };
+/** `{ slug, mount, page }` when the pathname is a covered per-tool page, else
+ *  null. `page` is null for the overview (1-segment) shape. The first segment
+ *  is the MOUNT (gated on `isToolMount`); `slug` is resolved from it. */
+let toolPage: { slug: string; mount: string; page: string | null } | null = null;
+if (rootSegments.length === 1 && isToolMount(rootSegments[0])) {
+  toolPage = { slug: slugForMount(rootSegments[0])!, mount: rootSegments[0], page: null };
 } else if (
   rootSegments.length === 2 &&
-  isToolSlug(rootSegments[0]) &&
+  isToolMount(rootSegments[0]) &&
   Object.hasOwn(PAGE_LABELS, rootSegments[1])
 ) {
-  toolPage = { tool: rootSegments[0], page: rootSegments[1] };
+  toolPage = { slug: slugForMount(rootSegments[0])!, mount: rootSegments[0], page: rootSegments[1] };
 }
 
 let toolJsonLd: string | null = null;
 if (toolPage) {
-  const { tool, page } = toolPage;
+  const { slug, mount, page } = toolPage;
 
-  // SoftwareApplication: name is the FILE SLUG (e.g. "run-kit"), not the binary.
-  // description is single-sourced from help/<tool>.json `root.short`.
+  // SoftwareApplication: name is the roster LABEL (HexoKit for /docs/ pages);
+  // url is the roster repo (hexokit's stays run-kit until the source rename).
+  // description is single-sourced from help/<slug>.json `root.short`.
   const softwareApplication: Record<string, unknown> = {
     '@type': 'SoftwareApplication',
-    name: tool,
+    name: labelFor(slug),
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'macOS, Linux',
     offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
-    url: `https://github.com/sahil87/${tool}`,
+    url: `https://github.com/sahil87/${repoFor(slug)}`,
   };
 
-  const helpPath = path.join(repoRootFromModuleUrl(import.meta.url), 'help', `${tool}.json`);
+  const helpPath = path.join(repoRootFromModuleUrl(import.meta.url), 'help', `${slug}.json`);
   let raw: string | undefined;
   try {
     raw = fs.readFileSync(helpPath, 'utf8');
@@ -170,34 +170,40 @@ if (toolPage) {
         `Head: invalid help document at ${helpPath} — does not match HelpDocSchema:\n${detail}`,
       );
     }
-    // Attach `description` (single-sourced from help/<tool>.json `root.short`).
+    // Attach `description` (single-sourced from help/<slug>.json `root.short`).
     // Assigned after object creation, so it lands as the last key — key order is
     // cosmetic in JSON-LD anyway; consumers key by name, not position.
     softwareApplication.description = doc.root.short;
   }
 
   // BreadcrumbList: all `item` URLs absolute, derived from Astro.site — never
-  // hardcode the origin (`site: 'https://shll.ai'` is the single source). The
-  // `Tools` crumb still resolves to `/tools/` (the directory landing, unchanged),
-  // while the tool crumb now points at the tool's new root URL `/<tool>/` (its
-  // overview). The page crumb (position 4) is present only for readme/commands;
-  // the overview page has no fourth crumb (it IS the tool crumb's destination).
+  // hardcode the origin (`site: 'https://hexokit.com'` is the single source).
+  // The second crumb is `Docs` (→ /docs/) for the product and `Toolkit`
+  // (→ /toolkit/) for the companions; the tool crumb points at the tool's
+  // canonical root `/<mount>/`. The page crumb is present only for
+  // readme/commands; the overview page has no extra crumb (it IS the tool
+  // crumb's destination).
+  const isProduct = slug === 'hexokit';
   const itemListElement: Record<string, unknown>[] = [
     { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
-    { '@type': 'ListItem', position: 2, name: 'Tools', item: new URL('/tools/', Astro.site).href },
-    {
+    isProduct
+      ? { '@type': 'ListItem', position: 2, name: 'Docs', item: new URL(`/${mount}/`, Astro.site).href }
+      : { '@type': 'ListItem', position: 2, name: 'Toolkit', item: new URL('/toolkit/', Astro.site).href },
+  ];
+  if (!isProduct) {
+    itemListElement.push({
       '@type': 'ListItem',
       position: 3,
-      name: tool,
-      item: new URL(`/${tool}/`, Astro.site).href,
-    },
-  ];
+      name: labelFor(slug),
+      item: new URL(`/${mount}/`, Astro.site).href,
+    });
+  }
   if (page) {
     itemListElement.push({
       '@type': 'ListItem',
-      position: 4,
+      position: itemListElement.length + 1,
       name: PAGE_LABELS[page],
-      item: new URL(`/${tool}/${page}/`, Astro.site).href,
+      item: new URL(`/${mount}/${page}/`, Astro.site).href,
     });
   }
   const breadcrumbList = {

@@ -125,9 +125,9 @@ const html = `<!doctype html>
   <div class="terminal-window">
     <div class="titlebar"><span class="dot dot-1"></span><span class="dot dot-2"></span><span class="dot dot-3"></span></div>
     <div class="session">
-      <div class="promptline"><span class="prompt">$</span><span class="wordmark">shll</span><span class="cursor"></span></div>
-      <div class="tagline">Seven small CLIs that force AI agents to plan before they code.</div>
-      <div class="site">shll.ai</div>
+      <div class="promptline"><span class="prompt">$</span><span class="wordmark">hexokit</span><span class="cursor"></span></div>
+      <div class="tagline">Your tmux, in the browser and on your phone.</div>
+      <div class="site">hexokit.com</div>
     </div>
   </div>
 </body>

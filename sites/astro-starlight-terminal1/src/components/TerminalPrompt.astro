@@ -33,6 +33,7 @@ import path from 'node:path';
 import { HelpDocSchema } from '../lib/schemas.ts';
 import { repoRootFromModuleUrl } from '../lib/repo-root.ts';
 import { stripToolPrefix, stripUsagePrefix } from '../lib/terminal-toolcard.ts';
+import { TOOL_ROSTER } from '../lib/tool-roster.mjs';
 
 interface SlimToolHelp {
   short: string;
@@ -42,8 +43,8 @@ interface SlimToolHelp {
 
 const helpDir = path.join(repoRootFromModuleUrl(import.meta.url), 'help');
 
-// Keyed by tool slug (the file name — help/run-kit.json held binary `rk`
-// pre-v3.0.0; it holds `run-kit` after the corpus refresh).
+// Keyed by tool slug (the file name — the product's payload lives in
+// help/hexokit.json since change it5d; its binary stays `run-kit`).
 // Enumerating the directory rather than a roster const: the island's TOOLS
 // list is unreachable from this frontmatter, and the help/ collection IS the
 // roster (a stray extra file would add an unreferenced entry, harmless).
@@ -71,9 +72,30 @@ for (const file of fs.readdirSync(helpDir)) {
   };
 }
 
+// Dual-key the product's payload (change it5d): the island's existing
+// `run-kit` card lookups keep resolving while `hexokit` is accepted too. The
+// island's copy is S4's — this is the minimal retarget only.
+if (toolHelp.hexokit && !toolHelp['run-kit']) {
+  toolHelp['run-kit'] = toolHelp.hexokit;
+}
+
 // `<` → \u003c so the serialized payload can never terminate its own
 // <script> element early (standard embedded-JSON hygiene).
 const toolHelpJson = JSON.stringify(toolHelp).replace(/</g, '\\u003c');
+
+// The name → URL-mount map from the shared roster (change it5d), serialized
+// for the island: a tool's mount differs from its slug for HexoKit (slug
+// `hexokit` mounts at /docs/), so the island's ROUTE_* helpers resolve through
+// this map instead of interpolating the name. The island keys the product card
+// by `run-kit` (its copy is S4's), so legacy mounts are keys too — both
+// `hexokit` and `run-kit` resolve to `docs`. (Plain loop, not flatMap+spread —
+// the Astro compiler's import hoisting mangles that expression shape.)
+const mountEntries: [string, string][] = [];
+for (const t of TOOL_ROSTER) {
+  mountEntries.push([t.slug, t.mount]);
+  for (const m of t.legacyMounts ?? []) mountEntries.push([m, t.mount]);
+}
+const mountMapJson = JSON.stringify(Object.fromEntries(mountEntries)).replace(/</g, '\\u003c');
 ---
 
 <script>
@@ -427,6 +449,11 @@ const toolHelpJson = JSON.stringify(toolHelp).replace(/</g, '\\u003c');
       "rk — run-kit's card, by its short alias  (alias of run-kit)",
       "the same card — rk is a short alias; run-kit is canonical. 'cd run-kit' navigates.",
     ),
+    // change it5d: the product's site slug is an accepted name for the card.
+    hexokit: helpDetail(
+      "hexokit — run-kit's card, by its site slug  (alias of run-kit)",
+      "the same card — hexokit is the site identity; run-kit is the binary. 'cd run-kit' navigates.",
+    ),
     fab: helpDetail(
       "fab — fab-kit's card, by its binary name  (alias of fab-kit)",
       "the same card — fab is what you actually type. 'cd fab-kit' navigates.",
@@ -488,13 +515,31 @@ const toolHelpJson = JSON.stringify(toolHelp).replace(/</g, '\\u003c');
   ];
 
   // Change 3ke3: the per-tool namespace moved to the site root, so the overview
-  // is `/<tool>/` and its siblings are `/<tool>/readme/` / `/<tool>/commands/`.
-  const ROUTE_OVERVIEW = (tool: string) => `/${tool}/`;
-  const ROUTE_INSTALL = '/getting-started/install/';
+  // is `/<mount>/` and its siblings are `/<mount>/readme/` / `/<mount>/commands/`.
+  // Change it5d: the segment is the tool's MOUNT, resolved through the roster
+  // map embedded by the frontmatter (slug ≠ mount for the product — its card
+  // stays keyed `run-kit` but /docs/ is where it lives). An unmapped name falls
+  // back to itself (companions are their own mount).
+  function loadMountMap(): Record<string, string> {
+    try {
+      const el = document.querySelector('script[data-terminal-mounts]');
+      const parsed: unknown = JSON.parse(el?.textContent ?? '');
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed as Record<string, string>;
+      }
+    } catch {
+      // fall through — degrade to the identity map
+    }
+    return {};
+  }
+  const MOUNT_MAP: Record<string, string> = loadMountMap();
+  const mountOf = (tool: string): string => MOUNT_MAP[tool] ?? tool;
+  const ROUTE_OVERVIEW = (tool: string) => `/${mountOf(tool)}/`;
+  const ROUTE_INSTALL = '/toolkit/install/';
   // Per-tool sibling pages (change 37ng): every tool has all three (verified
   // at intake) — the tool cards' nav line links them all.
-  const ROUTE_README = (tool: string) => `/${tool}/readme/`;
-  const ROUTE_COMMANDS = (tool: string) => `/${tool}/commands/`;
+  const ROUTE_README = (tool: string) => `/${mountOf(tool)}/readme/`;
+  const ROUTE_COMMANDS = (tool: string) => `/${mountOf(tool)}/commands/`;
 
   // Activation-time greeting (change 23xc): one dim line stating what shll is
   // plus the invitation, printed by the island BEFORE the first live prompt so
@@ -748,14 +793,17 @@ const toolHelpJson = JSON.stringify(toolHelp).replace(/</g, '\\u003c');
   ];
   // Alias-of declarations: these COMMANDS keys render with their primary's
   // entry (vim, less, exit — and, since change 37ng, the rk short alias /
-  // fab binary with their tools) and are not listed on their own — but they
-  // still count as covered, so the runtime check never flags them uncategorized.
+  // fab binary with their tools; since change it5d, `hexokit` — the product's
+  // site slug — folds to the run-kit card) and are not listed on their own —
+  // but they still count as covered, so the runtime check never flags them
+  // uncategorized.
   const CHEATSHEET_ALIASES: Record<string, string> = {
     vi: 'vim',
     more: 'less',
     ':q': 'exit',
     rk: 'run-kit',
     fab: 'fab-kit',
+    hexokit: 'run-kit', // the product's site slug (change it5d) — same card
     tour: 'demo', // the guided tour's alias (change 4vkd) — the vi→vim precedent
   };
   // Width budget for the ` · `-joined command lines: 74 joined chars + the
@@ -2501,6 +2549,7 @@ const toolHelpJson = JSON.stringify(toolHelp).replace(/</g, '\\u003c');
       'run-kit': toolCardHandler('run-kit'),
       tu: toolCardHandler('tu'),
       rk: toolCardHandler('run-kit'),
+      hexokit: toolCardHandler('run-kit'), // change it5d — the site slug, same card
       fab: toolCardHandler('fab-kit'),
 
       // ── Shareable session (change tx5p) ────────────────────────────────────
@@ -2521,7 +2570,7 @@ const toolHelpJson = JSON.stringify(toolHelp).replace(/</g, '\\u003c');
         const playHash = buildPlayHash(sessionCommands);
         // The printed/footer link uses location.origin + pathname (works on
         // previews/dev); the lib's `# replayed from` footer stays the
-        // literal https://shll.ai brand copy. Omitted entirely (along with
+        // literal https://hexokit.com brand copy. Omitted entirely (along with
         // the printed link line below) when nothing replayable was recorded.
         const playLink =
           playHash === '' ? undefined : `${location.origin}${location.pathname}${playHash}`;
@@ -2575,16 +2624,18 @@ const toolHelpJson = JSON.stringify(toolHelp).replace(/</g, '\\u003c');
       // #play=play%20wt replays the animation safely — finite and
       // non-navigating (see printPlayClosing).
       play(args, ctx) {
-        const tool = (args[0] ?? '').toLowerCase();
-        if (!tool) {
+        const arg = (args[0] ?? '').toLowerCase();
+        if (!arg) {
           return [{ text: 'usage: play <tool>   (try: ls)', classes: 'shell-out' }];
         }
-        if (!isTool(tool)) return unknownTool(tool);
+        // change it5d: the product's site slug is an accepted alias for its script.
+        const tool = arg === 'hexokit' ? 'run-kit' : arg;
+        if (!isTool(tool)) return unknownTool(arg);
         // Own-property guard (the o33t idiom) — defense in depth behind the
         // isTool check: every TOOLS key has a script today, but a record
         // lookup keyed by user input must never read bare.
         const script = Object.hasOwn(PLAY_SCRIPTS, tool) ? PLAY_SCRIPTS[tool] : undefined;
-        if (!script) return unknownTool(tool);
+        if (!script) return unknownTool(arg);
         // The honesty label prints IMMEDIATELY via ctx.print — the
         // demoHandler precedent: under reduced motion the rest of this
         // handler resolves synchronously, and a returned Line[] would land
@@ -3666,3 +3717,4 @@ const toolHelpJson = JSON.stringify(toolHelp).replace(/</g, '\\u003c');
     own template keeps index.mdx byte-identical (the progressive-enhancement
     source of truth gains nothing visible: data script elements don't render). */}
 <script is:inline type="application/json" data-terminal-help set:html={toolHelpJson} />
+<script is:inline type="application/json" data-terminal-mounts set:html={mountMapJson} />

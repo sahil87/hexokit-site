@@ -7,10 +7,12 @@
  * (a tool ships any number of nested pages), so a static-stub-per-page would need
  * per-page maintenance the dynamic route eliminates.
  *
- * Mount: content/<slug>/site/<path>.md  →  URL /<slug>/<path>   (change 3ke3:
- *   the per-tool namespace moved from /tools/<slug>/ to the site root /<slug>/)
+ * Mount: content/<slug>/site/<path>.md  →  URL /<mount>/<path>  (change 3ke3:
+ *   the per-tool namespace moved from /tools/<slug>/ to the site root; change
+ *   it5d: the URL segment is the roster's `mount`, which differs from the slug
+ *   for HexoKit — content/hexokit/site/** mounts at /docs/)
  *   content/idea/site/install.md         → /idea/install
- *   content/idea/site/advanced/hooks.md  → /idea/advanced/hooks
+ *   content/hexokit/site/skill/mux.md    → /docs/skill/mux
  * The `docs/site/` prefix is collapsed to `site/` in the collector (the CLI), and
  * the `site/` segment is stripped from the URL here; the subtree shape is preserved.
  *
@@ -18,7 +20,7 @@
  * getStaticPaths entries this route emits (`/<slug>/<path>`) as static pages, and
  * they are DISJOINT from Starlight's own root routes — getStaticPaths emits ONLY
  * paths that exist under content/<slug>/site/ (e.g. /idea/install, /idea/workflows),
- * which never collide with /getting-started/*, /reference/*, /workflows/*, or the
+ * which never collide with /toolkit/*, /reference/*, /desktop/, or the
  * per-tool overview/readme/commands pages (Starlight owns those via the slug
  * overrides). A tool with no tree contributes no pages — the build succeeds with
  * nothing emitted (the same degrade-cleanly discipline as a missing README slice;
@@ -30,9 +32,10 @@
  *     NOT a fixed depth (which does not survive `astro build`'s bundling).
  *   - `@astrojs/markdown-remark` `createMarkdownProcessor` (a build-time dep already
  *     pulled by astro core + declared in package.json; Constitution VI — no new dep).
- *   - link resolution: rewriteDocsSiteLinks(raw, slug, mountPath) rewrites relative
- *     link/image targets to the SITE-ABSOLUTE path /<slug>/<resolved> (resolved
- *     against this page's mount path), correct under trailing-slash directory serving.
+ *   - link resolution: rewriteDocsSiteLinks(raw, mount, mountPath) rewrites
+ *     relative link/image targets to the SITE-ABSOLUTE path /<mount>/<resolved>
+ *     (resolved against this page's mount path), correct under trailing-slash
+ *     directory serving.
  * The rendered HTML is wrapped in Starlight's <StarlightPage> so it inherits the
  * sidebar, prose styles, and dark-mode parity (Constitution V) — the documented
  * Starlight pattern for a custom route in a content-collection site.
@@ -44,17 +47,21 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { repoRootFromModuleUrl } from '../../lib/repo-root.ts';
 import { rewriteDocsSiteLinks } from '../../lib/extract-readme.ts';
 import { collectDocsSitePages, stripFirstH1 } from '../../lib/docs-site-tree.ts';
+import { mountFor } from '../../lib/tool-slugs.ts';
 
 export async function getStaticPaths() {
   const repoRoot = repoRootFromModuleUrl(import.meta.url);
-  // One entry per committed docs/site page across all tools. `slug` is the tool,
-  // `path` is the page path under site/ (no leading slash, no `.md`).
+  // One entry per committed docs/site page across all tools. `mount` is the URL
+  // segment (the roster's mount, e.g. `docs` for hexokit), `path` is the page
+  // path under site/ (no leading slash, no `.md`); `slug` rides in props for
+  // the disk read and the rewrite's base dir.
   return collectDocsSitePages(repoRoot).map((page) => ({
-    params: { slug: page.slug, path: page.path },
+    params: { mount: mountFor(page.slug), path: page.path },
     props: {
       absPath: page.absPath,
       title: page.title,
       slug: page.slug,
+      mount: mountFor(page.slug),
       mountPath: page.path,
     },
   }));
@@ -65,14 +72,16 @@ interface Props {
   absPath: string;
   /** Page title (derived from the first H1, falling back to the path tail). */
   title: string;
-  /** Tool slug — names the site-absolute mount root `/<slug>/`. */
+  /** Tool slug — names the on-disk collector `content/<slug>/site/`. */
   slug: string;
+  /** URL mount segment — the site-absolute mount root `/<mount>/`. */
+  mount: string;
   /** This page's path under `site/` (no `.md`, e.g. `advanced/hooks`) — the base
    *  a relative link's `.`/`..` resolve against. */
   mountPath: string;
 }
 
-const { absPath, title, slug, mountPath } = Astro.props as Props;
+const { absPath, title, mount, mountPath } = Astro.props as Props;
 
 // A present-but-unreadable/unrenderable page is a committed defect that must not
 // deploy: let it fail the build (mirrors ReadmeSlice). ENOENT cannot occur here —
@@ -97,14 +106,14 @@ try {
   //      drops out of `rendered.metadata.headings` — harmless, Starlight's
   //      right-rail "On this page" TOC starts at h2.
   //   2. rewriteDocsSiteLinks (R5): rewrite relative link/image targets to a
-  //      SITE-ABSOLUTE path `/<slug>/<resolved>`. Site-absolute (not a relative
+  //      SITE-ABSOLUTE path `/<mount>/<resolved>`. Site-absolute (not a relative
   //      `.md`-strip) because pages are served as trailing-slash directories, so
-  //      a relative target on this page (`/<slug>/<mountPath>/`) would resolve one
+  //      a relative target on this page (`/<mount>/<mountPath>/`) would resolve one
   //      segment too deep. The target is resolved against THIS page's directory
   //      within the docs/site tree (mountPath), so `../install.md` and
   //      `./sibling.md` land on the correct sibling pages.
   const rendered = await processor.render(
-    rewriteDocsSiteLinks(stripFirstH1(raw), slug, mountPath),
+    rewriteDocsSiteLinks(stripFirstH1(raw), mount, mountPath),
   );
   html = rendered.code;
   headings = rendered.metadata.headings;

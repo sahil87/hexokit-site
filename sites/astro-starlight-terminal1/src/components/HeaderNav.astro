@@ -1,0 +1,57 @@
+---
+/**
+ * HeaderNav — the site header nav, registered in Starlight's `SocialIcons`
+ * override slot (`components.SocialIcons` in astro.config.mjs, change it5d).
+ *
+ * Why the SocialIcons slot: Starlight has no nav-links config; overriding this
+ * slot is its documented seam for adding header links without forking
+ * `Header.astro` (which would fork Starlight's layout CSS for four links). The
+ * slot also inherits Starlight's own mobile behavior — social icons are hidden
+ * on narrow viewports, and the sidebar carries the same destinations there.
+ *
+ * The four links: Docs (the product docs at /docs/), Toolkit (the family at
+ * /toolkit/), Desktop (the macOS app at /desktop/), GitHub (the product repo —
+ * sahil87/run-kit via the roster's repoFor('hexokit'); GitHub redirects after
+ * the source-side repo rename).
+ *
+ * Colors come from the site's --c-* tokens (src/styles/terminal.css), which flip
+ * with Starlight's data-theme, so dark-mode parity is automatic (Constitution
+ * V). A visible :focus-visible ring keeps the links keyboard-navigable
+ * (Constitution Accessibility).
+ */
+import { repoFor } from '../lib/tool-slugs.ts';
+
+const links = [
+  { label: 'Docs', href: '/docs/' },
+  { label: 'Toolkit', href: '/toolkit/' },
+  { label: 'Desktop', href: '/desktop/' },
+  { label: 'GitHub', href: `https://github.com/sahil87/${repoFor('hexokit')}` },
+];
+---
+
+<nav class="header-nav not-content" aria-label="Site">
+  {links.map((link) => <a href={link.href}>{link.label}</a>)}
+</nav>
+
+<style>
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    font-family: var(--sl-font-mono);
+    font-size: 0.85rem;
+  }
+  .header-nav a {
+    color: var(--c-fg-dim);
+    text-decoration: none;
+    transition: color 0.12s ease;
+  }
+  .header-nav a:hover {
+    color: var(--c-fg);
+  }
+  /* Visible focus state for keyboard users (Constitution Accessibility). */
+  .header-nav a:focus-visible {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 2px;
+  }
+</style>

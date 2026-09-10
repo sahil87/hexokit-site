@@ -3,36 +3,68 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import mdx from '@astrojs/mdx';
 import { docsSiteSidebarItems, docsSiteRedirectEntries } from './src/lib/docs-site-sidebar.mjs';
+import { TOOL_ROSTER } from './src/lib/tool-roster.mjs';
 
-// The 7 canonical tool slugs, in display order. Kept in step with
-// src/lib/tool-slugs.ts (the runtime roster) — this config-eval copy exists
-// because astro.config.mjs is evaluated before the TS module graph loads.
-const TOOL_SLUGS = ['idea', 'hop', 'fab-kit', 'wt', 'run-kit', 'tu', 'shll'];
+// The single site-authored roster (slug/label/mount/repo/formula/binary —
+// change it5d) lives in src/lib/tool-roster.mjs and is imported directly here:
+// astro.config.mjs is evaluated at config-load time, which loads .mjs cleanly.
+// No config-eval copy — the copy is exactly the drift the roster removes.
+const COMPANIONS = TOOL_ROSTER.filter((t) => t.slug !== 'hexokit');
 
 export default defineConfig({
   site: 'https://hexokit.com',
-  // Change 3ke3: the short per-tool URLs (hexokit.com/wt) are now CANONICAL real
-  // pages (via `slug:` frontmatter overrides — see the tool content files), not
-  // redirect stubs. The redirects are REVERSED: every previously-canonical/shared
-  // deep `/tools/<tool>/*` URL now redirects to its new root path, so old links
-  // still land. Static <meta refresh> pages emitted at build — works on Pages.
-  // (A redirect key that collides with a real route fails the build, which is
-  // why the old short-URL entries had to be removed — those paths are pages now.)
+  // The short per-tool URLs (hexokit.com/wt) are CANONICAL real pages (via
+  // `slug:` frontmatter overrides — see the tool content files), mounted at the
+  // roster's `mount` segment (HexoKit's pages live under /docs/). The redirects
+  // below keep every retired path landing:
+  //   - the change-3ke3 set: old deep `/tools/<slug>/*` URLs → `/<mount>/…`
+  //   - legacy mounts (change it5d): `/run-kit{,/readme,/commands,/<page>}` →
+  //     `/docs/…` (enumerated from the roster's `legacyMounts`)
+  //   - the retired family pages: `/tools`, `/getting-started/*`,
+  //     `/workflows/*` → `/toolkit/…`
+  // Static <meta refresh> pages emitted at build — works on Pages. (A redirect
+  // key that collides with a real route fails the build, which is why retired
+  // routes — e.g. tools/index.mdx — must be removed when the key is added.)
   redirects: {
     ...Object.fromEntries(
-      TOOL_SLUGS.flatMap((t) => [
-        // Bare `/tools/<tool>` (previously a 404) — cheap goodwill entry.
-        [`/tools/${t}`, `/${t}/`],
-        // The three per-tool pages: overview collapses to the tool root.
-        [`/tools/${t}/overview`, `/${t}/`],
-        [`/tools/${t}/readme`, `/${t}/readme/`],
-        [`/tools/${t}/commands`, `/${t}/commands/`],
-      ]),
+      TOOL_ROSTER.flatMap((t) =>
+        // The change-3ke3 set, keyed by every name the /tools/ namespace ever
+        // used for this tool — its slug AND its legacy mounts (change it5d:
+        // the product's old URLs were /tools/run-kit/*, keyed by the old slug).
+        [t.slug, ...(t.legacyMounts ?? [])].flatMap((name) => [
+          // Bare `/tools/<name>` (previously a 404) — cheap goodwill entry.
+          [`/tools/${name}`, `/${t.mount}/`],
+          // The three per-tool pages: overview collapses to the tool root.
+          [`/tools/${name}/overview`, `/${t.mount}/`],
+          [`/tools/${name}/readme`, `/${t.mount}/readme/`],
+          [`/tools/${name}/commands`, `/${t.mount}/commands/`],
+        ]),
+      ),
     ),
-    // One entry per committed docs/site page: `/tools/<tool>/<path>` →
-    // `/<tool>/<path>/`. Enumerated programmatically (static builds can't
-    // wildcard-redirect) by the same collector that generates the sidebar.
+    // Legacy mounts (change it5d): HexoKit's pre-rebrand `/run-kit` namespace.
+    ...Object.fromEntries(
+      TOOL_ROSTER.flatMap((t) =>
+        (t.legacyMounts ?? []).flatMap((legacy) => [
+          [`/${legacy}`, `/${t.mount}/`],
+          [`/${legacy}/readme`, `/${t.mount}/readme/`],
+          [`/${legacy}/commands`, `/${t.mount}/commands/`],
+        ]),
+      ),
+    ),
+    // One entry per committed docs/site page: `/tools/<slug>/<path>` →
+    // `/<mount>/<path>/`, plus one per legacy mount. Enumerated programmatically
+    // (static builds can't wildcard-redirect) by the same collector that
+    // generates the sidebar.
     ...docsSiteRedirectEntries(),
+    // The retired family pages (change it5d): getting-started + workflows moved
+    // under /toolkit/, and the /tools directory page became /toolkit/.
+    '/tools': '/toolkit/',
+    '/getting-started/overview': '/toolkit/',
+    '/toolkit/overview': '/toolkit/',
+    '/getting-started/install': '/toolkit/install/',
+    '/getting-started/philosophy': '/toolkit/philosophy/',
+    '/workflows/daily-flow': '/toolkit/daily-flow/',
+    '/workflows/new-change': '/toolkit/new-change/',
   },
   server: { host: '0.0.0.0' },
   vite: {
@@ -44,8 +76,8 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: 'shll',
-      description: 'The shll AI coding toolkit — 7 CLIs that play well together.',
+      title: 'HexoKit',
+      description: 'Your tmux, in the browser and on your phone.',
       // Explicit hexagon favicon. The .svg is emitted by default, but declaring
       // it documents intent; the by-convention root /favicon.ico fallback (used by
       // headless routes — robots.txt, sitemaps, the <meta refresh> redirect stubs)
@@ -81,16 +113,12 @@ export default defineConfig({
         },
       },
       logo: { src: './src/assets/logo.svg', replacesTitle: false },
-      social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/sahil87' },
-        { icon: 'discord', label: 'Discord', href: 'https://discord.gg/32XHh5mJYn' },
-      ],
       pagination: true,
       lastUpdated: false,
       tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
       // Route-dispatching ToC overrides: the single right-rail (and mobile
-      // dropdown) override slot fans out by route id — `<tool>/commands` pages
-      // get the first-level command list (CommandsToc), `<tool>/readme` pages
+      // dropdown) override slot fans out by route id — `<mount>/commands` pages
+      // get the first-level command list (CommandsToc), `<mount>/readme` pages
       // get a nested H2/H3 list from the README slice (ReadmeToc), and every
       // other page falls through to Starlight's default ToC. See
       // src/components/TocDispatcher.astro / MobileTocDispatcher.astro.
@@ -106,6 +134,12 @@ export default defineConfig({
         // attrs as Astro attributes, which HTML-escapes the JSON quotes to &quot;;
         // this override renders the literal <script> instead — see Head.astro.
         Head: './src/components/Head.astro',
+        // Override the SocialIcons slot with the header nav (Docs · Toolkit ·
+        // Desktop · GitHub) — Starlight has no nav-links config, and the slot is
+        // its documented header-links seam (no Header.astro fork). The `social:`
+        // array is deliberately absent — the override replaces it; Discord moved
+        // to the footer row. See src/components/HeaderNav.astro.
+        SocialIcons: './src/components/HeaderNav.astro',
         // Override the theme picker: a cycling bracket-tag button ([dark] →
         // [light] → [auto]) instead of the native <select>, whose open option
         // list is OS-rendered and unthemable. A hidden real <select> stays as
@@ -115,102 +149,48 @@ export default defineConfig({
       },
       sidebar: [
         {
-          label: 'Getting started',
+          label: 'Docs',
           items: [
-            { label: 'Overview', slug: 'getting-started/overview' },
-            { label: 'Install everything', slug: 'getting-started/install' },
-            { label: 'Philosophy', slug: 'getting-started/philosophy' },
+            { label: 'Overview', slug: 'docs' },
+            { label: 'Readme', slug: 'docs/readme' },
+            { label: 'Commands', slug: 'docs/commands' },
+            // Build-time-generated entries for HexoKit's pulled docs/site tree
+            // (content/hexokit/site/**) — install, boards, notifications, skill
+            // pages, … Empty until the daily pull lands a tree.
+            ...docsSiteSidebarItems('hexokit'),
+          ],
+        },
+        {
+          label: 'Toolkit',
+          items: [
+            { label: 'Overview', slug: 'toolkit' },
+            { label: 'Install', slug: 'toolkit/install' },
+            { label: 'Philosophy', slug: 'toolkit/philosophy' },
+            { label: 'Daily flow', slug: 'toolkit/daily-flow' },
+            { label: 'Start a new change', slug: 'toolkit/new-change' },
+            { label: 'Desktop app', slug: 'desktop' },
           ],
         },
         {
           label: 'Tools',
-          items: [
-            {
-              label: 'idea',
-              collapsed: true,
-              items: [
-                { label: 'Overview', slug: 'idea' },
-                { label: 'Readme', slug: 'idea/readme' },
-                { label: 'Commands', slug: 'idea/commands' },
-                // Build-time-generated entries for the tool's pulled docs/site tree
-                // (content/idea/site/**) — including any install/workflows pages the
-                // tool repo publishes. Empty until the daily pull lands a tree.
-                ...docsSiteSidebarItems('idea'),
-              ],
-            },
-            {
-              label: 'hop',
-              collapsed: true,
-              items: [
-                { label: 'Overview', slug: 'hop' },
-                { label: 'Readme', slug: 'hop/readme' },
-                { label: 'Commands', slug: 'hop/commands' },
-                ...docsSiteSidebarItems('hop'),
-              ],
-            },
-            {
-              label: 'fab-kit',
-              collapsed: true,
-              items: [
-                { label: 'Overview', slug: 'fab-kit' },
-                { label: 'Readme', slug: 'fab-kit/readme' },
-                { label: 'Commands', slug: 'fab-kit/commands' },
-                ...docsSiteSidebarItems('fab-kit'),
-              ],
-            },
-            {
-              label: 'wt',
-              collapsed: true,
-              items: [
-                { label: 'Overview', slug: 'wt' },
-                { label: 'Readme', slug: 'wt/readme' },
-                { label: 'Commands', slug: 'wt/commands' },
-                ...docsSiteSidebarItems('wt'),
-              ],
-            },
-            {
-              label: 'run-kit',
-              collapsed: true,
-              items: [
-                { label: 'Overview', slug: 'run-kit' },
-                { label: 'Readme', slug: 'run-kit/readme' },
-                { label: 'Commands', slug: 'run-kit/commands' },
-                ...docsSiteSidebarItems('run-kit'),
-              ],
-            },
-            {
-              label: 'tu',
-              collapsed: true,
-              items: [
-                { label: 'Overview', slug: 'tu' },
-                { label: 'Readme', slug: 'tu/readme' },
-                { label: 'Commands', slug: 'tu/commands' },
-                ...docsSiteSidebarItems('tu'),
-              ],
-            },
-            {
-              label: 'shll',
-              collapsed: true,
-              items: [
-                { label: 'Overview', slug: 'shll' },
-                { label: 'Readme', slug: 'shll/readme' },
-                { label: 'Commands', slug: 'shll/commands' },
-                ...docsSiteSidebarItems('shll'),
-              ],
-            },
-          ],
+          items: COMPANIONS.map((t) => ({
+            label: t.label,
+            collapsed: true,
+            items: [
+              { label: 'Overview', slug: t.mount },
+              { label: 'Readme', slug: `${t.mount}/readme` },
+              { label: 'Commands', slug: `${t.mount}/commands` },
+              // Build-time-generated entries for the tool's pulled docs/site tree
+              // (content/<slug>/site/**) — including any install/workflows pages the
+              // tool repo publishes. Empty until the daily pull lands a tree.
+              ...docsSiteSidebarItems(t.slug),
+            ],
+          })),
         },
         {
           label: 'Reference',
           items: [
             { label: 'Command index', slug: 'reference/command-index' },
-          ],
-        },
-        {
-          label: 'Workflows',
-          items: [
-            { label: 'Daily flow', slug: 'workflows/daily-flow' },
-            { label: 'Start a new change', slug: 'workflows/new-change' },
           ],
         },
       ],

@@ -232,7 +232,7 @@ test('serializeTranscript: trailing trim is per line (spaces and tabs), leading 
 });
 
 test('serializeTranscript: the link footer rides only when a playLink is given', () => {
-  const link = 'https://shll.ai/#play=ls,fortune';
+  const link = 'https://hexokit.com/#play=ls,fortune';
   const withLink = serializeTranscript(['$ ls'], { playLink: link });
   assert.ok(withLink.endsWith(`${SHARE_FOOTER}\n# replay it: ${link}`));
 
@@ -246,5 +246,5 @@ test('serializeTranscript: an empty body still yields header, bare $, and footer
 });
 
 test('serializeTranscript: the footer is the literal brand line', () => {
-  assert.equal(SHARE_FOOTER, '# replayed from https://shll.ai');
+  assert.equal(SHARE_FOOTER, '# replayed from https://hexokit.com');
 });

@@ -163,6 +163,23 @@ test('buildManifest honors a per-tool formula override', () => {
   assert.equal(manifest.tools.hop.formula, 'hop-cli');
 });
 
+test('buildManifest honors the envelope override (key stays the roster name)', () => {
+  // The run-kit row reads help/hexokit.json while staying keyed `run-kit`
+  // (shll check-updates matches on the roster Name until C1 flips it).
+  const policy = { 'run-kit': { notify: 'minor', envelope: 'hexokit' } };
+  const root = makeRoot({
+    policy,
+    envelopes: { hexokit: envelope('run-kit', 'v3.19.37') },
+  });
+  const manifest = buildManifest(root, policy, new Date('2026-07-19T00:00:00Z'));
+  assert.deepEqual(manifest.tools['run-kit'], {
+    latest: '3.19.37',
+    notify: 'minor',
+    formula: 'run-kit', // formula default stays the policy key, not the envelope
+  });
+  assert.ok(!('hexokit' in manifest.tools), 'no row under the envelope slug');
+});
+
 test('buildManifest skip-degrades a tool with a MISSING envelope', () => {
   const policy = { wt: { notify: 'patch' }, tu: { notify: 'patch' } };
   const root = makeRoot({

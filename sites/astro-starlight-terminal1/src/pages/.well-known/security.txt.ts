@@ -16,7 +16,7 @@
  *     This is also why it lives as an endpoint rather than a static file under
  *     public/.well-known/ (public/ assets are copied verbatim and cannot template).
  *   - Every URL is ABSOLUTE, built from the endpoint context `site` (`Astro.site`
- *     === `https://shll.ai`) — never hardcoded — mirroring the og:image / llms.txt
+ *     === `https://hexokit.com`) — never hardcoded — mirroring the og:image / llms.txt
  *     absolute-URL discipline in docs/memory/conventions/seo-social-meta.md. The
  *     `Canonical` field per RFC 9116 must be the file's own absolute URL.
  */
@@ -30,7 +30,7 @@ const SECURITY_POLICY_URL = 'https://github.com/sahil87/.github/blob/main/SECURI
 const ADVISORY_URL = 'https://github.com/sahil87/.github/security/advisories/new';
 
 export const GET: APIRoute = ({ site }) => {
-  // `site` is guaranteed present — astro.config.mjs sets `site: 'https://shll.ai'`.
+  // `site` is guaranteed present — astro.config.mjs sets `site: 'https://hexokit.com'`.
   const origin = site!;
   const canonical = new URL('/.well-known/security.txt', origin).href;
 

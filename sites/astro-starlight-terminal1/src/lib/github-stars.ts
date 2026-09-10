@@ -2,10 +2,12 @@
  * github-stars — build-time per-repo star-count fetch for GithubButton
  * (change d9qb).
  *
- * `getStarCount(tool)` GETs `https://api.github.com/repos/sahil87/<tool>` at
+ * `getStarCount(tool)` GETs `https://api.github.com/repos/sahil87/<repo>` at
  * BUILD TIME with native fetch (no new dependency — Constitution VI) and
  * resolves to `stargazers_count`; the count renders statically (Constitution
- * I — no client-side fetch). Freshness rides the existing daily scheduled
+ * I — no client-side fetch). The repo name comes from the shared roster
+ * (`repoFor` — slug ≠ repo for hexokit, whose repo stays `run-kit`).
+ * Freshness rides the existing daily scheduled
  * pulls: refresh-help.yml's per-run `captured_at` churn reliably lands a
  * commit every day (refresh-readme.yml commits only when slices changed).
  * That commit only DEPLOYS because each refresh job explicitly dispatches
@@ -27,6 +29,7 @@
  * step (raises the rate limit from shared Actions-runner IPs); local dev
  * goes unauthenticated and simply omits counts when rate-limited.
  */
+import { repoFor } from './tool-slugs.ts';
 
 const GITHUB_API_REPOS = 'https://api.github.com/repos/sahil87';
 
@@ -61,12 +64,16 @@ async function fetchStarCount(tool: string): Promise<number | null> {
     // Bounded wait: a stalled connection must degrade to a missing count in
     // seconds, not hold the build for undici's ~300s default. The abort lands
     // in the catch below — same fail-soft path as any other network error.
-    // The slug is path-encoded so an unexpected character from a future
-    // caller ('?', '/', space) can't rewrite the request path or query.
-    const res = await fetch(`${GITHUB_API_REPOS}/${encodeURIComponent(tool)}`, {
-      headers,
-      signal: AbortSignal.timeout(10_000),
-    });
+    // The repo (from the roster) is path-encoded so an unexpected character
+    // from a future caller ('?', '/', space) can't rewrite the request path
+    // or query.
+    const res = await fetch(
+      `${GITHUB_API_REPOS}/${encodeURIComponent(repoFor(tool) ?? tool)}`,
+      {
+        headers,
+        signal: AbortSignal.timeout(10_000),
+      },
+    );
     if (!res.ok) {
       warnOmitted(tool, `HTTP ${res.status}`);
       return null;

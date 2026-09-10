@@ -54,6 +54,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import { rewriteReadmeDocsSiteLinks } from '../lib/extract-readme.ts';
+import { mountFor, repoFor } from '../lib/tool-slugs.ts';
 
 interface Props {
   /** Tool slug — names the slice at `<repo-root>/content/<tool>/README.md`. */
@@ -101,7 +102,9 @@ function findRepoRoot(startDir: string): string {
 
 let html = '';
 let missing = false;
-const githubUrl = `https://github.com/sahil87/${tool}`;
+// The repo name comes from the roster (slug ≠ repo for hexokit — its repo
+// stays `run-kit` until the source-side rename).
+const githubUrl = `https://github.com/sahil87/${repoFor(tool) ?? tool}`;
 
 // Resolve the slice path. If no `help/` ancestor exists at all (the cross-boundary
 // repo root cannot be located), `findRepoRoot` throws — that is a build-stopping
@@ -135,16 +138,19 @@ if (!missing) {
     // Astro's own markdown processor rather than a hand-rolled slugger.
     const processor = await createMarkdownProcessor({});
     // Resolve README links INTO docs/site/ pages to a SITE-ABSOLUTE path:
-    // `[x](docs/site/install.md)` → `[x](/<tool>/install)` — the mounted
+    // `[x](docs/site/install.md)` → `[x](/<mount>/install)` — the mounted
     // dynamic-route page. Site-absolute (not relative `./install`) because pages
     // are served as trailing-slash directories: this README page lives at
-    // `/<tool>/readme/`, so a relative `./install` would resolve to
-    // `/<tool>/readme/install` (one segment too deep). The slice on disk stays
+    // `/<mount>/readme/`, so a relative `./install` would resolve to
+    // `/<mount>/readme/install` (one segment too deep). The slice on disk stays
     // a verbatim copy of the canonical README; the rewrite is render-side, mirroring
     // the docs/site route's rewriteDocsSiteLinks call ([...path].astro). The guard
     // ensures only relative link/image targets are touched (absolute URLs / prose /
-    // code untouched). The slug is required to build the absolute target.
-    const rendered = await processor.render(rewriteReadmeDocsSiteLinks(raw!, tool));
+    // code untouched). The MOUNT (not the slug — `/docs/` for hexokit, change
+    // it5d) is required to build the absolute target.
+    const rendered = await processor.render(
+      rewriteReadmeDocsSiteLinks(raw!, mountFor(tool) ?? tool),
+    );
     html = rendered.code;
   } catch (err) {
     // A present-but-unrenderable slice is a committed defect that must not

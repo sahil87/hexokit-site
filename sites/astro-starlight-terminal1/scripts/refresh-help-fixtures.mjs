@@ -38,11 +38,10 @@ const FIXTURES = [
   { file: 'hop-root.txt', doc: 'hop', path: 'hop' },
   { file: 'hop-ls.txt', doc: 'hop', path: 'hop ls' },
   { file: 'hop-update.txt', doc: 'hop', path: 'hop update' },
-  // Forward-pointing: run-kit v3.0.0 renamed its root command `rk` → `run-kit`,
-  // so the NEXT corpus pull emits node `run-kit riff` (the committed pre-rename
-  // corpus still says `rk riff` — re-freezing before that pull lands will throw
-  // `node not found`, which is the deliberate signal to refresh the corpus first).
-  { file: 'run-kit-riff.txt', doc: 'run-kit', path: 'run-kit riff' },
+  // The product's help file is hexokit.json (the site's slug, change it5d);
+  // the node's command path stays `run-kit riff` — the binary's path (the
+  // envelope's `tool` field is `run-kit`).
+  { file: 'run-kit-riff.txt', doc: 'hexokit', path: 'run-kit riff' },
 ];
 
 function* walk(node) {
