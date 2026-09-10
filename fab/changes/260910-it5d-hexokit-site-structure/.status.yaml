@@ -9,8 +9,8 @@ progress:
     apply: done
     review: done
     hydrate: done
-    ship: active
-    review-pr: pending
+    ship: done
+    review-pr: active
 plan:
     generated: true
     task_count: 26
@@ -33,18 +33,20 @@ stage_metrics:
     apply: {started_at: "2026-09-10T11:34:44Z", driver: fab-fff, iterations: 3, completed_at: "2026-09-10T11:36:47Z"}
     review: {started_at: "2026-09-10T11:36:47Z", driver: fab-fff, iterations: 3, completed_at: "2026-09-10T11:41:24Z"}
     hydrate: {started_at: "2026-09-10T11:41:24Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T12:04:00Z"}
-    ship: {started_at: "2026-09-10T12:04:00Z", driver: fab-fff, iterations: 1}
-prs: []
+    ship: {started_at: "2026-09-10T12:04:00Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T12:05:25Z"}
+    review-pr: {started_at: "2026-09-10T12:05:25Z", driver: git-pr, iterations: 1}
+prs:
+    - https://github.com/sahil87/hexokit-site/pull/3
 true_impact:
-    added: 0
-    deleted: 0
-    net: 0
+    added: 2020
+    deleted: 788
+    net: 1232
     excluding:
-        added: 0
-        deleted: 0
-        net: 0
-    computed_at: "2026-09-10T12:04:00Z"
-    computed_at_stage: hydrate
+        added: 1088
+        deleted: 627
+        net: 461
+    computed_at: "2026-09-10T12:05:25Z"
+    computed_at_stage: ship
 summary: 'HexoKit site structure: single tool roster (tool-roster.mjs, four-name rule slug/mount/repo/formula+binary), product mounted at /docs/ with legacyMount redirects, /toolkit/ absorbs getting-started+workflows, header nav via SocialIcons slot, HexoKit JSON-LD/OG/llms.txt identity, crons carry hexokit slug map, versions.json run-kit row via envelope override'
 # true_impact: lazily created on first stage-finish that computes it (no placeholder here).
-last_updated: 2026-09-10T12:04:00Z
+last_updated: 2026-09-10T12:05:25Z
