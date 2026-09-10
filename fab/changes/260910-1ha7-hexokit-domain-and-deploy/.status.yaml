@@ -1,0 +1,51 @@
+id: 1ha7
+name: 260910-1ha7-hexokit-domain-and-deploy
+created: 2026-09-10T08:36:32Z
+created_by: sahil-noon
+change_type: chore
+issues: []
+progress:
+    intake: done
+    apply: done
+    review: done
+    hydrate: done
+    ship: active
+    review-pr: pending
+plan:
+    generated: true
+    task_count: 5
+    acceptance_count: 15
+    acceptance_completed: 15
+confidence:
+    certain: 8
+    confident: 1
+    tentative: 1
+    unresolved: 0
+    score: 4.3
+    fuzzy: true
+    dimensions:
+        signal: 79.5
+        reversibility: 86.5
+        competence: 85.5
+        disambiguation: 86.0
+stage_metrics:
+    intake: {started_at: "2026-09-10T08:36:32Z", driver: fab-new, iterations: 1, completed_at: "2026-09-10T09:09:33Z"}
+    apply: {started_at: "2026-09-10T09:34:18Z", driver: fab-fff, iterations: 2, completed_at: "2026-09-10T09:34:18Z"}
+    review: {started_at: "2026-09-10T09:34:18Z", driver: fab-fff, iterations: 2, completed_at: "2026-09-10T09:40:39Z"}
+    hydrate: {started_at: "2026-09-10T09:40:39Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T09:41:59Z"}
+    ship: {started_at: "2026-09-10T09:41:59Z", driver: fab-fff, iterations: 1}
+prs: []
+change_type_source: explicit
+true_impact:
+    added: 3
+    deleted: 3
+    net: 0
+    excluding:
+        added: 3
+        deleted: 3
+        net: 0
+    computed_at: "2026-09-10T09:41:59Z"
+    computed_at_stage: hydrate
+summary: Point the live site at hexokit.com (CNAME, astro site:, robots sitemap), enable GitHub Pages on sahil87/hexokit-site with the custom domain, first deploy green
+# true_impact: lazily created on first stage-finish that computes it (no placeholder here).
+last_updated: 2026-09-10T09:41:59Z
