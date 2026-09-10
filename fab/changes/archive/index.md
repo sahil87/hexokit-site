@@ -1,5 +1,6 @@
 # Archive Index
 
+- **260910-1ha7-hexokit-domain-and-deploy** — HexoKit domain and deploy (rebrand plan row S2)
 - **260608-ng8c-fix-readme-consumer-link-rendering** — Fix consumer-side README/docs-site content-rendering gaps
 - **260608-jf3q-content-accuracy-version-sync** — Website Content Accuracy + Self-Updating Homepage Versions
 - **260608-i2b0-logo-hexagon-copyright-footer** — Run-kit Hexagon Logo, Site-wide Copyright Footer, and Cloudflare Web Analytics
