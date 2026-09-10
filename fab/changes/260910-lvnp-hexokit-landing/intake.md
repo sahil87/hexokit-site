@@ -124,6 +124,8 @@ Followed by the two-row *It is / It isn't* contrast: *It is* — a remote, phone
 
 **Differentiator H2 (2026-09-10, user's line).** "Nothing wraps your agent" → **"Use any agent, untouched"** — plainer than "wraps", and it carries both halves of the thesis (agent-agnostic + no wrapper). The paragraph and the It is / It isn't rows beneath it are unchanged.
 
+**Desktop H2 (2026-09-10, user feedback).** "A native window, and the ⌘ tier back" assumed the reader knew browsers reserve the ⌘ shortcuts. Now **"Not a tab, a window"**, and the body opens with the concrete problem before the fix: "In a browser tab, ⌘W closes the tab and ⌘T opens another — the browser keeps that whole tier of shortcuts for itself. In a window of its own, they all reach your terminal."
+
 ### 3. Assets
 
 Sources are in `/Users/sahil/Desktop/Desktop - Sahil’s MacBook Pro/` (address with globs — U+202F before AM/PM). Outputs go to `public/screenshots/` next to the two existing run-kit webps (constitution v2.1.3: site-owned curated screenshots, `.webp`, meaningful alt text).
