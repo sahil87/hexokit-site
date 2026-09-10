@@ -11,6 +11,9 @@
  *
  *   node scripts/convert-screenshots.mjs
  *
+ * The hexokit-operator.webp source is a local capture whose default path is
+ * machine-specific; set HEXOKIT_OPERATOR_SRC to override it elsewhere.
+ *
  * Sources: the run-kit README's curated GitHub user-attachment PNGs are fetched
  * ONCE and committed as site-owned assets (never hot-linked), plus one local
  * run-kit capture and one crop of the existing console screenshot. Every
@@ -48,7 +51,8 @@ const SOURCES = [
   },
   {
     out: 'hexokit-operator.webp',
-    src: '/home/sahil/code/sahil87/run-kit/.uploads/260907140652-image.png',
+    // Local capture — override with HEXOKIT_OPERATOR_SRC on another machine.
+    src: process.env.HEXOKIT_OPERATOR_SRC ?? '/home/sahil/code/sahil87/run-kit/.uploads/260907140652-image.png',
     maxWidth: 1600,
   },
   {
