@@ -49,3 +49,15 @@ A root `justfile` wraps the live site's toolchain (`just --list`): `setup` (pnpm
 **Playwright is installed per worktree, whenever needed — not by default.** `@playwright/test` is a *devDependency* of the live site (dev-only tooling for visual verification, not a runtime or build dependency — Constitution VI's justification bar applies to those; the static output is unaffected). `pnpm install` brings the npm package; the Chromium browser is fetched only by `just playwright` (copied from run-kit's `just setup`: `pnpm exec playwright install --with-deps chromium`). The recipes are cross-platform (Playwright's installer covers macOS and Linux); the browser build lands in Playwright's per-user cache (`~/Library/Caches/ms-playwright` on macOS, `~/.cache/ms-playwright` on Linux), so a worktree whose build is already cached pays nothing. A fresh worktree has no `node_modules`, so Playwright is absent there until `just setup` / `just playwright` runs — do not go looking for an install in sibling worktrees.
 
 Use it for design review: `just shot <url> <out.png> [width] [height] [scheme]` takes a full-page headless screenshot (default 1440×900, dark) of a dev/preview page or a `file:///abs/path.html`; pass `400 900` for phone width and `light` as the fifth argument for the light theme. The scheme flag drives `prefers-color-scheme`, which Starlight's default `auto` theme follows in a fresh headless context, so both themes (Constitution V) are one recipe call each — no `localStorage` poking needed.
+
+## Copy on this site
+
+Copy added to hexokit.com follows the two studies in `docs/findings/` — [`landing-copy-study.md`](../../docs/findings/landing-copy-study.md) (structure and claims, with a do/don't style sheet in its § 5) and [`landing-copy-study-2-minimal.md`](../../docs/findings/landing-copy-study-2-minimal.md) (volume and register, with measured competitor norms: card blurbs median 14 words, heroes 19). The standing rule:
+
+- **Say it the way you would say it aloud.** Short sentences (aim under 15 words), one claim each. If a section needs 40 words, use four sentences, not two.
+- **Outcome over mechanism.** Name what the reader sees or gets; leave how it works to the docs.
+- **Plain punctuation.** No em-dash chains, no colon-led lists inside sentences, no parenthetical asides, no rhetorical questions.
+- **The reader's words, bare.** tmux, pane, session, window, worktree, board, agent — used without a gloss. Never introduce an insider term on a marketing surface ("pane option", "harness", "liveness", "tier", "substrate" stay in the docs).
+- **Headings make one claim** and never depend on the number of items beneath them. No counts as scope ("six things"), no hedges ("is good at", "helps you"), no adjectives as proof.
+- **Commands only if they exist.** Hand-written prose may name only `rk` verbs present in `help/hexokit.json` (the `vn39` rule). The product is **HexoKit**; the binary is `rk`.
+- **Measure before shipping.** A card body over ~20 words, a hero lead over ~30, or a sentence you would not say to a colleague is a signal to cut.

@@ -1,0 +1,11 @@
+{"action":"enter","driver":"fab-new","event":"stage-transition","stage":"intake","ts":"2026-09-10T15:23:57Z"}
+{"args":"Apply copy study 2 (docs/findings/landing-copy-study-2-minimal.md) to the / landing: minimal, natural copy — 712 to ~525 words; every string in the study's section 5 with two deviations (keep 'Quake-style' once in card 7; keep the GUI display as a third short item in card 6); hexagon blurbs decoupled from /toolkit/ (intentionally shorter on the landing); commit the study file.","cmd":"fab-new","event":"command","ts":"2026-09-10T15:23:57Z"}
+{"delta":"+4.8","event":"confidence","score":4.8,"trigger":"calc-score","ts":"2026-09-10T15:26:01Z"}
+{"cmd":"fab-fff","event":"command","ts":"2026-09-10T15:26:19Z"}
+{"action":"enter","driver":"fab-fff","event":"stage-transition","stage":"apply","ts":"2026-09-10T15:26:19Z"}
+{"action":"enter","driver":"fab-fff","event":"stage-transition","stage":"review","ts":"2026-09-10T15:29:11Z"}
+{"action":"enter","driver":"fab-fff","event":"stage-transition","stage":"hydrate","ts":"2026-09-10T15:34:06Z"}
+{"event":"review","result":"passed","ts":"2026-09-10T15:34:06Z"}
+{"action":"enter","driver":"fab-fff","event":"stage-transition","stage":"ship","ts":"2026-09-10T15:35:20Z"}
+{"action":"enter","driver":"git-pr","event":"stage-transition","stage":"review-pr","ts":"2026-09-10T15:37:30Z"}
+{"event":"review","result":"passed","ts":"2026-09-10T15:44:28Z"}
