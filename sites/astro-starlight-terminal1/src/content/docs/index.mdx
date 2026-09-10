@@ -1,18 +1,19 @@
 ---
 title: shll
 description: The shll AI coding toolkit — 7 CLIs that plan before they code.
-# Homepage-only <head> overrides (change kb1r). Starlight's head-merging gives
+# Homepage-only <head> overrides (change kb1r; HexoKit identity since change
+# it5d). Starlight's head-merging gives
 # these frontmatter entries priority over its defaults and dedupes the singleton
 # <title> and same-`property` metas — so the built homepage carries exactly one
 # of each. Fixes the keyword-free `shll | shll` title and the incorrect
 # `og:type=article` on the landing page (docs pages correctly keep `article`).
 head:
   - tag: title
-    content: 'shll — the AI coding toolkit'
+    content: 'HexoKit — your tmux, in the browser and on your phone'
   - tag: meta
     attrs:
       property: 'og:title'
-      content: 'shll — the AI coding toolkit'
+      content: 'HexoKit — your tmux, in the browser and on your phone'
   - tag: meta
     attrs:
       property: 'og:type'
@@ -22,11 +23,11 @@ hero:
   tagline: Seven small CLIs that force AI agents to plan before they code.
   actions:
     - text: Install everything
-      link: /getting-started/install/
+      link: /toolkit/install/
       icon: right-arrow
       variant: primary
     - text: Explore the tools
-      link: /tools/
+      link: /toolkit/
       icon: open-book
       variant: secondary
     - text: GitHub
@@ -55,20 +56,20 @@ import VersionTable from '../../components/VersionTable.astro';
 <a href="/hop/">hop</a>
 <a href="/fab-kit/">fab-kit</a>
 <a href="/wt/">wt</a>
-<a href="/run-kit/">run-kit</a>
+<a href="/docs/">run-kit</a>
 <a href="/tu/">tu</a>
 <a href="/shll/">shll</a>
-<a class="tools-chips-all" href="/tools/">all tools →</a>
+<a class="tools-chips-all" href="/toolkit/">all tools →</a>
 </nav>
 </section>
 
 {/* Install block (above the fold). Single-sourced: the same InstallOneLiner
     component the tool overviews use — tool="shll" renders the whole-toolkit
     bootstrap as an Expressive Code block with a one-click copy button, plus
-    the note linking to getting-started/install for the full steps. This
+    the note linking to toolkit/install for the full steps. This
     replaced ld0j's hand-copied verbatim command line (and its keep-in-sync
     contract with install.md) — the homepage no longer hand-carries install
-    commands at all; getting-started/install.md is the sole hand-written
+    commands at all; toolkit/install.md is the sole hand-written
     carrier. The component builds the command as a JS string, so the remark
     hazard below does not apply to it.
     Remark hazard (still binding for the other hand-rolled blocks in this
@@ -107,7 +108,7 @@ import VersionTable from '../../components/VersionTable.astro';
 <hr />
 
 {/* What is this — real, indexable HTML prose under a `cat` motif (change ld0j).
-    Copy lifted from getting-started/overview.md + philosophy.md, not invented. */}
+    Copy lifted from toolkit/index.mdx + toolkit/philosophy.md, not invented. */}
 <section class="not-content" aria-label="About the shll toolkit">
 <pre class="shell-session shell-caption not-content">
 <span class="shell-line"><span class="shell-prompt">$</span> cat ABOUT.md</span>
@@ -133,7 +134,7 @@ import VersionTable from '../../components/VersionTable.astro';
 <li><a href="/hop/">hop</a><span class="tool-desc">a personal directory of your git repos — jump anywhere, batch-update from anywhere</span></li>
 <li><a href="/fab-kit/">fab-kit</a><span class="tool-desc">the planning harness — a constitution and a plan before any agent writes code</span></li>
 <li><a href="/wt/">wt</a><span class="tool-desc">disposable git worktrees so each change works in isolation</span></li>
-<li><a href="/run-kit/">run-kit</a><span class="tool-desc">one dashboard to watch every agent session</span></li>
+<li><a href="/docs/">run-kit</a><span class="tool-desc">one dashboard to watch every agent session</span></li>
 <li><a href="/tu/">tu</a><span class="tool-desc">track what your AI coding sessions cost</span></li>
 <li><a href="/shll/">shll</a><span class="tool-desc">the bootstrap — install and update the whole toolkit</span></li>
 </ul>
@@ -153,7 +154,7 @@ import VersionTable from '../../components/VersionTable.astro';
     replacing the two comment-styled one-worder lines (the links move in here).
     Satisfies the constitution's Accessibility SHOULD for decorative diagrams. */}
 <div class="home-prose not-content">
-<p>One idea fans out into parallel agents — each in its own isolated working copy — and converges back into a single dashboard. Inside the loop, <a href="/idea/">idea</a> captures the backlog, <a href="/fab-kit/">fab-kit</a> turns an item into a plan, <a href="/wt/">wt</a> gives each change a disposable worktree, and <a href="/run-kit/">run-kit</a> watches every session. Around the loop, <a href="/hop/">hop</a> jumps between repos, <a href="/tu/">tu</a> tracks what it all costs, and <a href="/shll/">shll</a> keeps the toolkit installed.</p>
+<p>One idea fans out into parallel agents — each in its own isolated working copy — and converges back into a single dashboard. Inside the loop, <a href="/idea/">idea</a> captures the backlog, <a href="/fab-kit/">fab-kit</a> turns an item into a plan, <a href="/wt/">wt</a> gives each change a disposable worktree, and <a href="/docs/">run-kit</a> watches every session. Around the loop, <a href="/hop/">hop</a> jumps between repos, <a href="/tu/">tu</a> tracks what it all costs, and <a href="/shll/">shll</a> keeps the toolkit installed.</p>
 </div>
 
 {/* Author section under a `whoami` motif (change d9qb) — deliberately rhymes

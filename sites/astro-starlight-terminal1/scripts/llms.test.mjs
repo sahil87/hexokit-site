@@ -27,7 +27,14 @@ const { TOOLS, stripToolPrefix, renderCommandTree, flattenMdx, absolutize } = aw
 test('TOOLS lists the canonical seven tools', () => {
   assert.deepEqual(
     [...TOOLS].sort(),
-    ['fab-kit', 'hop', 'idea', 'run-kit', 'shll', 'tu', 'wt'],
+    ['fab-kit', 'hexokit', 'hop', 'idea', 'shll', 'tu', 'wt'],
+  );
+});
+
+test('TOOLS follows the roster display order (product first)', () => {
+  assert.deepEqual(
+    [...TOOLS],
+    ['hexokit', 'fab-kit', 'wt', 'idea', 'tu', 'hop', 'shll'],
   );
 });
 

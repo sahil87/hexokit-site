@@ -2,8 +2,8 @@
 checklist:
     extra_categories: []
 project:
-    description: Landing page for the shll AI coding toolkit — multi-site repo (live build under sites/, experiments in sites/_playground/)
-    name: ai.shll.in
+    description: Product site for HexoKit (hexokit.com) and its companion-CLI toolkit — multi-site repo (live build under sites/, experiments in sites/_playground/)
+    name: hexokit-site
 source_paths:
     - sites/astro-starlight-terminal1/src/
     - sites/astro-starlight-terminal1/scripts/

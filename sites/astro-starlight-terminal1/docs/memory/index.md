@@ -1,6 +1,6 @@
 # Memory Index
 
-> **Site-implementation memory** for `sites/astro-starlight-terminal1/` (the LIVE shll.ai build).
+> **Site-implementation memory** for `sites/astro-starlight-terminal1/` (the LIVE hexokit.com build).
 > Post-implementation artifacts — what actually *shipped* for this one site. Per
 > [`fab/project/context.md`](../../../fab/project/context.md), site-implementation memory lives
 > alongside each site here; the top-level [`docs/memory/`](../../../docs/memory/index.md) is reserved

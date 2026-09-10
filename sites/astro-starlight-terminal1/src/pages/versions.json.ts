@@ -5,7 +5,7 @@
  * `/llms.txt` / `/llms-full.txt` endpoints: a thin page that resolves the repo
  * root and delegates all logic to a lib module (`src/lib/versions-manifest.ts`).
  *
- * Served at `https://shll.ai/versions.json`, it lists each toolkit tool's latest
+ * Served at `https://hexokit.com/versions.json`, it lists each toolkit tool's latest
  * version plus a per-tool notify policy, so run-kit's update checker
  * (`internal/updatecheck`, the cross-repo consumer — change `260718-d15e`) can
  * fetch ONE static CDN file instead of 7 unauthenticated GitHub API calls, and

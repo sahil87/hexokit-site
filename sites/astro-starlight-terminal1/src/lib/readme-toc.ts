@@ -25,12 +25,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import { repoRootFromModuleUrl } from './repo-root.ts';
-import { isToolSlug } from './tool-slugs.ts';
+import { isToolMount, slugForMount } from './tool-slugs.ts';
 
-/** Per-tool readme pages have route id `<tool>/readme` (change 3ke3: the `tools/`
- *  prefix was dropped when the namespace moved to the site root, so the captured
- *  first segment is gated on the tool-slug roster rather than the prefix — a bare
- *  `([^/]+)/readme` would otherwise false-positive on a root route). */
+/** Per-tool readme pages have route id `<mount>/readme` (change 3ke3: the
+ *  `tools/` prefix was dropped when the namespace moved to the site root, so the
+ *  captured first segment is gated on the roster rather than the prefix — a bare
+ *  `([^/]+)/readme` would otherwise false-positive on a root route; change it5d:
+ *  the segment is the tool's MOUNT — `docs/readme` maps to the `hexokit` slice). */
 const README_ROUTE_RE = /^([^/]+)\/readme$/;
 
 /** Top of the ToC depth window — matches `tableOfContents.minHeadingLevel`. */
@@ -50,11 +51,12 @@ export interface TocHeading {
   children: TocHeading[];
 }
 
-/** Tool slug if `id` is a per-tool readme route (`<tool>/readme`, `<tool>` in the
- *  roster), else null. */
+/** Tool slug if `id` is a per-tool readme route (`<mount>/readme`, `<mount>` in
+ *  the roster), else null. The route segment is the mount; the returned SLUG is
+ *  what names `content/<slug>/README.md`. */
 export function toolFromReadmeRouteId(id: string): string | null {
   const m = id.match(README_ROUTE_RE);
-  return m && isToolSlug(m[1]) ? m[1] : null;
+  return m && isToolMount(m[1]) ? slugForMount(m[1]) : null;
 }
 
 /**

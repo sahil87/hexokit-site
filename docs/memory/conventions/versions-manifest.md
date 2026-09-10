@@ -1,6 +1,6 @@
 ---
 type: memory
-description: "The `/versions.json` toolkit version manifest — a build-time static Astro endpoint (the `llms.txt.ts` idiom) whose logic lives in the unit-tested `src/lib/versions-manifest.ts`. The repo-root `versions-policy.json` is the roster (its slug keys are advertised); each `latest` is the `help/<slug>.json` `version` stripped to bare (`stripVersionPrefix`, the inverse of version.ts's display normalizeVersion); `notify`/`formula` come from the policy. Two opposite failure postures: pulled envelopes skip-degrade, the site-authored policy build-stops. Freshness rides the existing refresh→deploy cascade; consumed by run-kit `internal/updatecheck`. Contract: `docs/specs/versions-manifest-contract.md`"
+description: "The `/versions.json` version manifest — logic in `src/lib/versions-manifest.ts`. The repo-root `versions-policy.json` is the roster, keyed by the consumer-facing roster name (matched by `shll check-updates`); `latest` is the envelope `version` stripped to bare, the optional `envelope` naming the help file when it differs from the key (the `run-kit` row reads `help/hexokit.json`). Pulled envelopes skip-degrade; the authored policy build-stops. Contract: `docs/specs/versions-manifest-contract.md`"
 ---
 # Versions Manifest
 
@@ -8,7 +8,7 @@ description: "The `/versions.json` toolkit version manifest — a build-time sta
 
 ## Overview
 
-shll.ai publishes a toolkit **version manifest** at `https://shll.ai/versions.json` — a static JSON document listing each toolkit tool's latest version plus a per-tool notify policy. run-kit's update checker (`internal/updatecheck`, the cross-repo consumer) fetches this ONE static CDN file instead of 7 unauthenticated GitHub Releases API calls, and applies each tool's notify threshold to decide whether a newer release is worth surfacing to the user.
+hexokit.com publishes a toolkit **version manifest** at `https://hexokit.com/versions.json` — a static JSON document listing each toolkit tool's latest version plus a per-tool notify policy. The consumer (run-kit's update check, which runs `shll check-updates --json`; shll matches manifest rows against its roster `Name`) fetches this ONE static CDN file instead of 7 unauthenticated GitHub Releases API calls, and applies each tool's notify threshold to decide whether a newer release is worth surfacing to the user.
 
 This is a thin derivation over two already-committed repo-root data sources — the `help/<slug>.json` envelopes ([help-collection](/conventions/help-collection.md)) and the hand-edited `versions-policy.json` — so it adds no runtime, no fetch, and no new dependency. The **forward contract** (output schema, `notify` semantics, freshness cascade, live-site-swap obligation) lives in the spec [`docs/specs/versions-manifest-contract.md`](../../specs/versions-manifest-contract.md); this file documents how the manifest is derived, not the wire contract.
 
@@ -22,24 +22,29 @@ The live site SHALL emit a static `application/json` document at build time, ser
 - **WHEN** the build completes
 - **THEN** `dist/versions.json` exists, is valid JSON, and parses to an object with `schema` (=== `1`), an ISO-8601 UTC `generated_at`, and a `tools` map
 
-### Requirement: Policy file is the roster; rows derived per slug
-The manifest's roster is the set of tool slugs declared in the repo-root `versions-policy.json` — only tools with a policy entry are advertised (a tool with no policy has no notify semantics, so it should not appear). Each present, valid tool's row is keyed by its **file slug** (the `help/<slug>.json` filename, which equals the shll roster name and the Homebrew formula name for all 7 tools today), carrying `latest`, `notify`, and `formula`.
+### Requirement: Policy file is the roster; rows derived per key
+The manifest's roster is the set of keys declared in the repo-root `versions-policy.json` — only tools with a policy entry are advertised (a tool with no policy has no notify semantics, so it should not appear). Each present, valid tool's row is keyed by its **consumer-facing roster name** — the `Name` in shll's roster, which `shll check-updates` matches against `manifest.Tools[name]` — carrying `latest`, `notify`, and `formula`.
 
-- `latest` = the envelope's `version` passed through `stripVersionPrefix` (bare form, no leading `v`).
+- `latest` = the envelope's `version` passed through `stripVersionPrefix` (bare form, no leading `v`), read from `help/<envelope ?? key>.json`.
 - `notify` = the policy entry's `notify` value.
-- `formula` = the policy entry's optional `formula`, defaulting to the slug.
+- `formula` = the policy entry's optional `formula`, defaulting to the key.
 
-The slug is **NOT** the envelope's `tool` field, which is the *binary* name (`fab` for slug `fab-kit`). Conflating slug / formula / binary is a known real bug class documented in `refresh-help.yml`; the manifest key stays the slug (`fab-kit`, never `fab`).
+The key is **NOT** the envelope's `tool` field, which is the *binary* name (`fab` for key `fab-kit`; `run-kit` for the `run-kit` key). And the key is **not necessarily the help-file slug**: an optional **`envelope`** policy field names which `help/<slug>.json` supplies `latest` when the two differ — the `run-kit` row carries `"envelope": "hexokit"`, so it reads `help/hexokit.json` (the site's `hexokit` slug sources from the run-kit binary) while the row key and the default `formula` stay `run-kit`, byte-shape identical for the consumer. Conflating key / slug / formula / binary is a known real bug class documented in `refresh-help.yml`; see [tool-roster](/conventions/tool-roster.md) for the four-name rule.
 
 #### Scenario: Slug keying, not binary name
 - **GIVEN** `help/fab-kit.json` whose envelope `tool` field is `"fab"`
 - **WHEN** the manifest is built
-- **THEN** the row key is `"fab-kit"` (the slug), never `"fab"`
+- **THEN** the row key is `"fab-kit"` (the roster name), never `"fab"`
 
-#### Scenario: Formula defaults to slug
+#### Scenario: The `envelope` override decouples the key from the help file
+- **GIVEN** `versions-policy.json` with `"run-kit": { "notify": "minor", "envelope": "hexokit" }` and a valid `help/hexokit.json` with version `v3.19.37`
+- **WHEN** the manifest is built
+- **THEN** `tools['run-kit'] == { latest: '3.19.37', notify: 'minor', formula: 'run-kit' }` and no `tools['hexokit']` row exists
+
+#### Scenario: Formula defaults to key
 - **GIVEN** a policy entry with no `formula` key
 - **WHEN** the row is built
-- **THEN** `formula` is the slug; a policy entry with an explicit `"formula"` override wins instead
+- **THEN** `formula` is the key; a policy entry with an explicit `"formula"` override wins instead
 
 ### Requirement: `latest` normalized to bare version
 `latest` SHALL strip a single leading `v` from the envelope `version` via `stripVersionPrefix` in `versions-manifest.ts`. The transform is idempotent. The envelopes are inconsistent — `fab`/`tu` emit `"2.15.4"`, `wt`/`hop`/`idea`/`run-kit`/`shll` emit `"v0.1.1"` — so normalizing at the producer keeps the machine contract clean (`"v3.7.4"` → `"3.7.4"`; `"2.15.4"` → unchanged).
@@ -74,7 +79,7 @@ A missing or Zod-invalid `help/<slug>.json` SHALL omit that tool's row while the
 
 ## The policy file — `versions-policy.json`
 
-Hand-edited, project-level data at the **repo root** (a sibling of `help/`, **NOT** inside it — `refresh-help.yml`'s staleness gate and `validate-help.mjs` glob `help/*.json` and must not see a non-envelope file). It maps each tool slug to `{ "notify": <value> }` with an optional `"formula"` override. Current values: every tool → `minor`, except `shll` → `patch`.
+Hand-edited, project-level data at the **repo root** (a sibling of `help/`, **NOT** inside it — `refresh-help.yml`'s staleness gate and `validate-help.mjs` glob `help/*.json` and must not see a non-envelope file). It maps each consumer-facing roster name to `{ "notify": <value> }` with optional `"formula"` and `"envelope"` overrides (`envelope` names which `help/<slug>.json` supplies `latest` when the help-file slug differs from the key). Current values: `run-kit` → `minor` with `envelope: "hexokit"` (reads `help/hexokit.json`); every other tool → `minor`, except `shll` → `patch`.
 
 These are deliberately **data, not design**: tuning a threshold is a one-line commit here, picked up by deployed run-kit daemons within a poll cycle — no consumer binary update, no shipping a threshold through the very channel being tuned.
 
@@ -84,7 +89,7 @@ The manifest rides the **existing** refresh→deploy cascade — no change to an
 
 ## Consumer
 
-The manifest is consumed cross-repo by run-kit's `internal/updatecheck` (change `260718-d15e-toolkit-manifest-update-notifications`), which fetches `versions.json`, compares each `latest` against the locally-installed version, and applies the tool's `notify` threshold. Merge order is free: this side shipping first activates the consumer; shipping second means the consumer's fetch 404s and its chip stays hidden (its stale-while-revalidate handles it). The full consumer contract and `notify` table live in [`docs/specs/versions-manifest-contract.md`](../../specs/versions-manifest-contract.md).
+The manifest is consumed cross-repo by run-kit's update check (change `260718-d15e-toolkit-manifest-update-notifications`), which shells out to `shll check-updates --json`; **shll matches manifest rows against its roster `Name`** (`manifest.Tools[name]`), compares each `latest` against the locally-installed version, and applies the tool's `notify` threshold. This is why the `run-kit` row keeps its key while reading `help/hexokit.json` via the `envelope` override — renaming the key would silently stop update notices for every installed run-kit until shll's roster is renamed. The full consumer contract and `notify` table live in [`docs/specs/versions-manifest-contract.md`](../../specs/versions-manifest-contract.md).
 
 ## Design Decisions
 
@@ -105,6 +110,12 @@ The manifest is consumed cross-repo by run-kit's `internal/updatecheck` (change 
 **Why**: a tool with no policy has no notify semantics, so it should not be advertised; keying the roster off the policy makes "which tools to advertise" a one-file edit and avoids a third roster to keep in sync.
 **Rejected**: `readdirSync(help/)` (would advertise a tool with no policy) or a hardcoded const (a third roster to drift).
 *Introduced by*: 260718-2lgz-versions-manifest-endpoint
+
+### Manifest key stays the consumer's roster name; `envelope` points at the help file
+**Decision**: `versions-policy.json` keys are the consumer-facing roster names (`shll`'s `Name`), with an optional `envelope` naming the `help/<slug>.json` that supplies `latest`.
+**Why**: `shll check-updates` matches `manifest.Tools[roster Name]` and the name is `run-kit` until shll's roster is renamed; dropping or renaming the row would silently stop update notices for every installed user.
+**Rejected**: renaming the row to `hexokit` (breaks the consumer); keeping the product's help file unrenamed (leaves `hexokit` out of the pull pipeline's one-slug-change design).
+*Introduced by*: 260910-it5d-hexokit-site-structure
 
 ### Opposite failure postures for pulled vs. authored data
 **Decision**: pulled envelopes skip-degrade (`safeParse`, omit the row, continue); the site-authored policy build-stops (`parse`, throw, fail the build).

@@ -11,14 +11,17 @@
  * variable docs/site pages appear automatically with zero per-page maintenance.
  *
  * Mount math matches the dynamic route exactly (content/<slug>/site/<path>.md →
- * link `/<slug>/<path>`; namespace moved to root by change 3ke3). It is a `.mjs`
- * (not `.ts`) so it loads cleanly during Astro config evaluation. Dependency-free
+ * link `/<mount>/<path>`; namespace moved to root by change 3ke3; the URL segment
+ * is the roster's `mount`, NOT the slug, since change it5d — HexoKit's pages live
+ * under /docs/ while its pulled data is keyed `hexokit`). It is a `.mjs` (not
+ * `.ts`) so it loads cleanly during Astro config evaluation. Dependency-free
  * `node:fs` (Constitution VI); a tool with no committed tree yields [] (a missing
  * tree is an expected state).
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { TOOL_ROSTER } from './tool-roster.mjs';
 
 const MAX_ASCENT = 12;
 
@@ -77,50 +80,56 @@ const repoRoot = findRepoRoot(path.dirname(fileURLToPath(import.meta.url)));
  * Return the Starlight sidebar items for a tool's committed docs/site tree, as a
  * flat list of `{ label, link }` entries (one per page). Empty when the tool has
  * no committed `content/<slug>/site/` tree. Labels come from each page's first H1
- * (fallback: titleized path tail); links are absolute site paths `/<slug>/<path>`.
+ * (fallback: titleized path tail); links are absolute site paths `/<mount>/<path>`
+ * (the mount comes from the roster — `hexokit`'s tree links under `/docs/`).
  */
 export function docsSiteSidebarItems(slug) {
   if (!repoRoot) return [];
+  const record = TOOL_ROSTER.find((t) => t.slug === slug);
+  const mount = record?.mount ?? slug;
   const siteDir = path.join(repoRoot, 'content', slug, 'site');
   return walkMarkdown(siteDir).map((rel) => {
     const routePath = rel.replace(/\.md$/i, '');
     const abs = path.join(siteDir, rel);
     const label = firstH1(fs.readFileSync(abs, 'utf8')) ?? titleizeTail(routePath);
-    return { label, link: `/${slug}/${routePath}` };
+    return { label, link: `/${mount}/${routePath}` };
   });
 }
 
 /**
  * Reverse-redirect map for every committed docs/site page, so a previously-shared
  * or -indexed old deep URL still lands after the change-3ke3 namespace move
- * (`/tools/<slug>/<path>` → `/<slug>/<path>/`). Returns an object shaped for Astro's
- * `redirects:` config — `{ '/tools/<slug>/<path>': '/<slug>/<path>/' }` — enumerated
- * programmatically because Astro static builds cannot wildcard-redirect. Walks the
- * SAME committed trees `docsSiteSidebarItems` lists (same `content/<slug>/site/**`
- * collector, same `walkMarkdown`), so the redirect set and the live page set cannot
- * drift. The destination carries a trailing slash to match the dynamic route's
- * trailing-slash directory serving; the source is the bare old path. Empty when no
- * tree is committed (or the repo root is not found). Build-time / config-eval only.
+ * (`/tools/<slug>/<path>` → `/<mount>/<path>/`). Also emits, for each tool's
+ * `legacyMounts` roster entries, one entry per former mount segment
+ * (`/<legacy>/<path>` → `/<mount>/<path>/` — change it5d: `/run-kit/install` →
+ * `/docs/install/`). Returns an object shaped for Astro's `redirects:` config,
+ * enumerated programmatically because Astro static builds cannot
+ * wildcard-redirect. Walks the SAME committed trees `docsSiteSidebarItems` lists
+ * (same `content/<slug>/site/**` collector, same `walkMarkdown`), so the redirect
+ * set and the live page set cannot drift. The destination carries a trailing slash
+ * to match the dynamic route's trailing-slash directory serving; the source is the
+ * bare old path. Empty when no tree is committed (or the repo root is not found).
+ * Build-time / config-eval only.
  */
 export function docsSiteRedirectEntries() {
   if (!repoRoot) return {};
   const contentDir = path.join(repoRoot, 'content');
-  let slugs;
-  try {
-    slugs = fs.readdirSync(contentDir, { withFileTypes: true });
-  } catch (err) {
-    if (err && err.code === 'ENOENT') return {};
-    throw err;
-  }
   /** @type {Record<string, string>} */
   const map = {};
-  for (const slugEntry of [...slugs].sort((a, b) => a.name.localeCompare(b.name))) {
-    if (!slugEntry.isDirectory()) continue;
-    const slug = slugEntry.name;
-    const siteDir = path.join(contentDir, slug, 'site');
+  for (const record of TOOL_ROSTER) {
+    const siteDir = path.join(contentDir, record.slug, 'site');
     for (const rel of walkMarkdown(siteDir)) {
       const routePath = rel.replace(/\.md$/i, '');
-      map[`/tools/${slug}/${routePath}`] = `/${slug}/${routePath}/`;
+      const dest = `/${record.mount}/${routePath}/`;
+      // Keyed by every name the /tools/ namespace ever used for this tool —
+      // the slug AND its legacy mounts (the product's old docs-site URLs were
+      // /tools/run-kit/<path>, keyed by the pre-it5d slug).
+      for (const name of [record.slug, ...(record.legacyMounts ?? [])]) {
+        map[`/tools/${name}/${routePath}`] = dest;
+      }
+      for (const legacy of record.legacyMounts ?? []) {
+        map[`/${legacy}/${routePath}`] = dest;
+      }
     }
   }
   return map;

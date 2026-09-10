@@ -1,6 +1,6 @@
 # astro-starlight-terminal1
 
-The currently-live build of [shll.ai](https://shll.ai). Astro 6 + Starlight 0.39, terminal-themed.
+The currently-live build of [hexokit.com](https://hexokit.com). Astro 6 + Starlight 0.39, terminal-themed.
 
 ## Develop
 
@@ -37,7 +37,7 @@ src/
 │   └── logo.svg         # site logo (run-kit hexagon)
 └── styles/terminal.css  # palette + terminal aesthetic overrides
 public/
-├── CNAME                # shll.ai custom domain
+├── CNAME                # hexokit.com custom domain
 ├── favicon.{svg,ico}    # browser tab icon
 ├── diagrams/loop-{light,dark}.svg
 └── og-image.png

@@ -18,7 +18,7 @@
  *
  * COPY BUTTON PARITY: the block is rendered via Starlight's re-exported
  * Expressive Code `<Code>` component — the same engine behind every fenced
- * code block on the site (getting-started/install, the commands/readme pages)
+ * code block on the site (toolkit/install, the commands/readme pages)
  * — so it carries the identical terminal frame styling (astro.config.mjs
  * expressiveCode styleOverrides) AND the one-click copy button. This replaced
  * the original hand-rolled `.shell-session` markup, whose only copy affordance
@@ -30,8 +30,8 @@
  *
  * SHLL IS SPECIAL: `shll` is the bootstrap meta-CLI, not a roster install
  * target — the script execs `shll install "$@"`, and `shll install shll` hard-
- * errors (shll isn't one of the six installable tools; see getting-started/
- * install and help/shll.json). For `tool === 'shll'` we render the whole-toolkit
+ * errors (shll isn't one of the six installable tools; see toolkit/install
+ * and help/shll.json). For `tool === 'shll'` we render the whole-toolkit
  * one-liner `curl -fsSL https://shll.ai/install | sh` (no `sh -s -- shll`),
  * which is exactly the bootstrap the homepage/install page document.
  *
@@ -50,7 +50,7 @@
  * SINGLE SOURCE: this component is the sole carrier of the per-tool one-liner.
  * It deliberately does NOT add seven hand-copied install blocks. The two
  * documented hand-copy surfaces — the homepage install block (index.mdx) and
- * getting-started/install.md — stay the canonical hand-written carriers of the
+ * toolkit/install.md — stay the canonical hand-written carriers of the
  * whole-toolkit quick-start and are untouched by this component.
  *
  * WHY AN .astro COMPONENT (not inline MDX): the command contains both `--` and
@@ -105,7 +105,7 @@ const isShll = tool === 'shll';
 // READMEs (the constitution's source of truth for tool docs).
 const FULL_TOOLKIT: Record<string, string> = {
   'fab-kit': 'relies on its sibling tools (wt for worktrees, idea for the backlog)',
-  'run-kit': 'relies on its sibling tools (wt for the riff worktree flow)',
+  hexokit: 'relies on its sibling tools (wt for the riff worktree flow)',
 };
 const fullToolkitReason = FULL_TOOLKIT[tool];
 
@@ -121,7 +121,7 @@ const oneLiner =
 // Whole-toolkit follow-on steps (isShll only). Most visitors copy the homepage
 // one-liner and assume they're done — surfacing the post-install steps right
 // under it keeps them from being missed. Wording mirrors the canonical block in
-// getting-started/install.md (the sole hand-written carrier of the full steps).
+// toolkit/install.md (the sole hand-written carrier of the full steps).
 const followOn = [
   'shll shell-setup      # wire your shell integration',
   'shll agent-setup      # optional, once per machine',
@@ -137,20 +137,20 @@ const followOn = [
       <Code code={followOn} lang="bash" />
       <p class="install-one-liner-note">
         Installs <code>shll</code> and the whole toolkit via Homebrew — see the <a
-          href="/getting-started/install/">full install guide</a>.
+          href="/toolkit/install/">full install guide</a>.
       </p>
     </>
   ) : fullToolkitReason ? (
     <p class="install-one-liner-note">
       Installs the entire <code>shll</code> toolkit via Homebrew —
       <code>{tool}</code> {fullToolkitReason}, so the full-toolkit install is
-      the supported path. See the <a href="/getting-started/install/">full
+      the supported path. See the <a href="/toolkit/install/">full
       install guide</a>.
     </p>
   ) : (
     <p class="install-one-liner-note">
       Installs <code>shll</code> + <code>{tool}</code> via Homebrew — or <a
-        href="/getting-started/install/">install the whole toolkit</a>.
+        href="/toolkit/install/">install the whole toolkit</a>.
     </p>
   )}
 </div>

@@ -9,12 +9,14 @@ import path from 'node:path';
 import { HelpDocSchema, type Node } from './schemas.ts';
 import { commandSlug } from './parse-help.ts';
 import { repoRootFromModuleUrl } from './repo-root.ts';
-import { isToolSlug } from './tool-slugs.ts';
+import { isToolMount, slugForMount } from './tool-slugs.ts';
 
-/** Per-tool commands pages have route id `<tool>/commands` (change 3ke3: the
+/** Per-tool commands pages have route id `<mount>/commands` (change 3ke3: the
  *  `tools/` prefix was dropped when the namespace moved to the site root, so the
- *  captured first segment is gated on the tool-slug roster rather than the prefix
- *  — a bare `([^/]+)/commands` would otherwise false-positive on a root route). */
+ *  captured first segment is gated on the roster rather than the prefix — a bare
+ *  `([^/]+)/commands` would otherwise false-positive on a root route; change
+ *  it5d: the segment is the tool's MOUNT, which differs from its slug for
+ *  HexoKit — `docs/commands` maps to the `hexokit` help file). */
 const COMMANDS_ROUTE_RE = /^([^/]+)\/commands$/;
 
 export interface TocCommand {
@@ -24,11 +26,12 @@ export interface TocCommand {
   slug: string;
 }
 
-/** Tool slug if `id` is a per-tool commands route (`<tool>/commands`, `<tool>` in
- *  the roster), else null. */
+/** Tool slug if `id` is a per-tool commands route (`<mount>/commands`, `<mount>`
+ *  in the roster), else null. The route segment is the mount; the returned SLUG
+ *  is what names `help/<slug>.json`. */
 export function toolFromRouteId(id: string): string | null {
   const m = id.match(COMMANDS_ROUTE_RE);
-  return m && isToolSlug(m[1]) ? m[1] : null;
+  return m && isToolMount(m[1]) ? slugForMount(m[1]) : null;
 }
 
 /**

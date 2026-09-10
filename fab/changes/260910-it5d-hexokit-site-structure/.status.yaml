@@ -1,0 +1,52 @@
+id: it5d
+name: 260910-it5d-hexokit-site-structure
+created: 2026-09-10T10:24:58Z
+created_by: sahil-noon
+change_type: fix
+issues: []
+progress:
+    intake: done
+    apply: done
+    review: done
+    hydrate: done
+    ship: done
+    review-pr: done
+plan:
+    generated: true
+    task_count: 26
+    acceptance_count: 36
+    acceptance_completed: 36
+confidence:
+    certain: 10
+    confident: 6
+    tentative: 0
+    unresolved: 0
+    score: 4.5
+    fuzzy: true
+    dimensions:
+        signal: 72.8
+        reversibility: 88.1
+        competence: 84.7
+        disambiguation: 78.1
+stage_metrics:
+    intake: {started_at: "2026-09-10T10:24:58Z", driver: fab-new, iterations: 1, completed_at: "2026-09-10T10:33:00Z"}
+    apply: {started_at: "2026-09-10T11:34:44Z", driver: fab-fff, iterations: 3, completed_at: "2026-09-10T11:36:47Z"}
+    review: {started_at: "2026-09-10T11:36:47Z", driver: fab-fff, iterations: 3, completed_at: "2026-09-10T11:41:24Z"}
+    hydrate: {started_at: "2026-09-10T11:41:24Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T12:04:00Z"}
+    ship: {started_at: "2026-09-10T12:04:00Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-10T12:05:25Z"}
+    review-pr: {started_at: "2026-09-10T12:05:25Z", driver: git-pr, iterations: 1, completed_at: "2026-09-10T12:15:26Z"}
+prs:
+    - https://github.com/sahil87/hexokit-site/pull/3
+true_impact:
+    added: 2020
+    deleted: 788
+    net: 1232
+    excluding:
+        added: 1088
+        deleted: 627
+        net: 461
+    computed_at: "2026-09-10T12:05:25Z"
+    computed_at_stage: ship
+summary: 'HexoKit site structure: single tool roster (tool-roster.mjs, four-name rule slug/mount/repo/formula+binary), product mounted at /docs/ with legacyMount redirects, /toolkit/ absorbs getting-started+workflows, header nav via SocialIcons slot, HexoKit JSON-LD/OG/llms.txt identity, crons carry hexokit slug map, versions.json run-kit row via envelope override'
+# true_impact: lazily created on first stage-finish that computes it (no placeholder here).
+last_updated: 2026-09-10T12:15:26Z

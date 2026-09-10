@@ -2,8 +2,10 @@
 /**
  * GithubButton — a small, labeled "go to the repo" affordance for tool pages.
  *
- * Renders a build-time anchor to `https://github.com/sahil87/<tool>` (no
- * client-side JS — Constitution I). Colors come from the site's --c-* tokens
+ * Renders a build-time anchor to `https://github.com/sahil87/<repo>` (no
+ * client-side JS — Constitution I). The repo name comes from the shared roster
+ * (`repoFor(tool)` — slug ≠ repo for hexokit, whose repo stays `run-kit`).
+ * Colors come from the site's --c-* tokens
  * (src/styles/terminal.css), which flip with Starlight's data-theme, so dark-
  * mode parity is automatic (Constitution V). A visible :focus-visible ring
  * keeps it keyboard-navigable (Constitution Accessibility).
@@ -20,9 +22,10 @@
  * placeholder, never a failed build.
  */
 import { getStarCount, formatStarCount } from '../lib/github-stars.ts';
+import { repoFor } from '../lib/tool-slugs.ts';
 
 interface Props {
-  /** Tool slug — names the repo at `github.com/sahil87/<tool>`. */
+  /** Tool slug — the roster resolves its repo at `github.com/sahil87/<repo>`. */
   tool: string;
 }
 
@@ -35,14 +38,19 @@ if (!tool) {
   throw new Error('GithubButton: a `tool` slug prop is required.');
 }
 
-const href = `https://github.com/sahil87/${tool}`;
+const repo = repoFor(tool);
+if (!repo) {
+  throw new Error(`GithubButton: unknown tool slug \`${tool}\` — not in the roster.`);
+}
+
+const href = `https://github.com/sahil87/${repo}`;
 const stars = await getStarCount(tool);
 ---
 
 <div class="gh-button not-content">
   <a class="gh-link" href={href}>
     <span class="gh-label">View on GitHub</span>
-    <span class="gh-slug">github.com/sahil87/{tool}</span>
+    <span class="gh-slug">github.com/sahil87/{repo}</span>
     {
       /* Rendered ONLY with a real count — null omits the span entirely (no
          placeholder), keeping the no-count markup identical to pre-d9qb. The

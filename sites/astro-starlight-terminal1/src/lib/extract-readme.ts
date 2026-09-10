@@ -1,6 +1,6 @@
 /**
  * extract-readme — a pure, dependency-free build-time transform that deduces the
- * shll.ai site slice from a tool's canonical `README.md`, plus the `vn39`
+ * hexokit.com site slice from a tool's canonical `README.md`, plus the `vn39`
  * divergence reporter that flags fabricated commands/flags in the pulled prose
  * (report-only — it never withholds the canonical slice; see below).
  *
@@ -370,7 +370,7 @@ function stripGhThemeImages(lines: string[]): string[] {
 }
 
 /**
- * Deduce the shll.ai site slice from a raw README (contract §1 head + §2 tail +
+ * Deduce the hexokit.com site slice from a raw README (contract §1 head + §2 tail +
  * §6 strips). Pure and total — any input yields an {@link ExtractedReadme}.
  */
 export function extractReadme(markdown: string): ExtractedReadme {
@@ -631,27 +631,29 @@ export function findUnknownTokens(slice: string, doc: HelpDoc): string[] {
 // exported functions, all dependency-free and build-time (Constitution I/VI),
 // the same single-machine-anchor discipline as extractReadme/findUnknownTokens:
 //
-//   - rewriteDocsSiteLinks(md, slug, mountPath) — a docs/site PAGE: resolve each
+//   - rewriteDocsSiteLinks(md, mount, mountPath) — a docs/site PAGE: resolve each
 //                                      RELATIVE link/image target against the page's
 //                                      own directory within the docs/site tree,
 //                                      strip `.md`, emit the SITE-ABSOLUTE path
-//                                      `/<slug>/<resolved>`.
-//   - rewriteReadmeDocsSiteLinks(md, slug) — the README slice: a relative target
-//                                      `docs/site/<p>.md` → `/<slug>/<p>`.
+//                                      `/<mount>/<resolved>`.
+//   - rewriteReadmeDocsSiteLinks(md, mount) — the README slice: a relative target
+//                                      `docs/site/<p>.md` → `/<mount>/<p>`.
 //   - findClosureViolations(rel, md) — REPORT-ONLY detector: relative link/image
 //                                      targets that escape docs/site (`..` climb)
 //                                      or relative images (must be absolute, §3).
 //
 // SITE-ABSOLUTE rewrite (reworked by change x0br review; namespace moved to root
 // by change 3ke3): every intra-set link target becomes a site-absolute path
-// `/<slug>/<resolved-path>`. This is serving-model-proof — the site serves each
-// page as a trailing-slash directory (`/<slug>/<path>/`, i.e. `<path>/index.html`),
+// `/<mount>/<resolved-path>`. This is serving-model-proof — the site serves each
+// page as a trailing-slash directory (`/<mount>/<path>/`, i.e. `<path>/index.html`),
 // so a RELATIVE rewrite (`./<p>` or a bare `.md`-strip) resolves one segment too
 // deep (a README at `/idea/readme/` + `./install` → `/idea/readme/install`, but the
 // page is at `/idea/install/`). A site-absolute target is immune to trailingSlash
 // and matches Starlight's own sibling links (which are absolute, e.g.
-// `/idea/install/`). Both transforms are therefore SLUG-AWARE (and the
-// docs/site transform is also mount-path-aware to resolve `.`/`..`) — intended.
+// `/idea/install/`). Both transforms are therefore MOUNT-AWARE (the docs/site
+// transform is also mount-path-aware to resolve `.`/`..`) — intended. The `mount`
+// argument is the roster's URL segment, which differs from the slug for HexoKit
+// (`/docs/…`, change it5d); for the companions slug == mount.
 //
 // ALL link-target editing flows through one scanner (`rewriteLinkTargets`) so the
 // rewrite guard (the correctness boundary) lives in exactly one place: we only
@@ -832,16 +834,17 @@ function resolvePath(base: string[], target: string): { segments: string[]; esca
 
 /**
  * Build the site-absolute mount URL for a resolved docs/site page path under a
- * tool slug: `/<slug>/<segments…>` (no trailing slash, no `.md`). An empty
- * resolved path (target resolved to the tool root) yields `/<slug>`.
+ * tool's URL mount: `/<mount>/<segments…>` (no trailing slash, no `.md`). An
+ * empty resolved path (target resolved to the tool root) yields `/<mount>`.
  *
  * Change 3ke3: the per-tool namespace moved from `/tools/<slug>/` to the site
- * root `/<slug>/`, so this emit target dropped its `/tools` prefix. The dynamic
- * route now lives at `src/pages/[slug]/[...path].astro` and serves these URLs.
+ * root. Change it5d: the URL segment is the roster's MOUNT (which differs from
+ * the slug for HexoKit — `/docs/…`). The dynamic route lives at
+ * `src/pages/[mount]/[...path].astro` and serves these URLs.
  */
-function toolMountUrl(slug: string, segments: string[]): string {
+function toolMountUrl(mount: string, segments: string[]): string {
   const tail = segments.join('/');
-  return tail === '' ? `/${slug}` : `/${slug}/${tail}`;
+  return tail === '' ? `/${mount}` : `/${mount}/${tail}`;
 }
 
 /**
@@ -849,18 +852,21 @@ function toolMountUrl(slug: string, segments: string[]): string {
  * link/image target against the page's OWN directory within the docs/site tree
  * (`mountPath`, the page's path under `site/` without `.md`, e.g. `advanced/hooks`),
  * normalize `.`/`..`, strip `.md`, and emit the site-absolute mount URL
- * `/<slug>/<resolved>`. Closure (§9.1.1) guarantees relative targets are
+ * `/<mount>/<resolved>`. Closure (§9.1.1) guarantees relative targets are
  * intra-set; a `..`-escape is flagged by the §closure lint AND, here, rewritten to
- * a non-colliding `/<slug>/__unresolved__/…` marker (R3) — NOT clamped to a
+ * a non-colliding `/<mount>/__unresolved__/…` marker (R3) — NOT clamped to a
  * real page (which would misroute the broken link to a confidently-wrong page).
  * Absolute URLs, prose, and code are untouched; a `#`/`?` suffix is preserved.
  * Pure and total. Example: page `advanced/hooks` linking `../install.md` →
- * `/<slug>/install`; `./sibling.md` → `/<slug>/advanced/sibling`;
- * an escaping `../../x.md` → `/<slug>/__unresolved__/x`.
+ * `/<mount>/install`; `./sibling.md` → `/<mount>/advanced/sibling`;
+ * an escaping `../../x.md` → `/<mount>/__unresolved__/x`.
+ *
+ * `mount` is the roster URL segment (NOT necessarily the slug — HexoKit's docs
+ * pages mount at `/docs/`, change it5d); callers resolve it from the roster.
  */
 export function rewriteDocsSiteLinks(
   markdown: string,
-  slug: string,
+  mount: string,
   mountPath: string,
 ): string {
   // The page's directory segments within the docs/site tree (drop the filename).
@@ -871,22 +877,26 @@ export function rewriteDocsSiteLinks(
     // link is visibly dead (matching the §closure `escape` warning), never a
     // plausible-but-wrong real page.
     const mountSegs = escaped ? [UNRESOLVED_MARKER, ...segments] : segments;
-    return toolMountUrl(slug, mountSegs);
+    return toolMountUrl(mount, mountSegs);
   });
 }
 
 /**
  * R6 — the README SLICE transform (SITE-ABSOLUTE). A relative target of the form
- * `docs/site/<p>.md` → the site-absolute mount URL `/<slug>/<p>` (the
+ * `docs/site/<p>.md` → the site-absolute mount URL `/<mount>/<p>` (the
  * `docs/site/` prefix maps to the tool root, `.md` stripped, nested `<p>` subtree
- * preserved). Example: `[guide](docs/site/install.md)` → `[guide](/<slug>/install)`;
- * `docs/site/advanced/hooks.md` → `/<slug>/advanced/hooks`. Relative targets
+ * preserved). Example: `[guide](docs/site/install.md)` → `[guide](/<mount>/install)`;
+ * `docs/site/advanced/hooks.md` → `/<mount>/advanced/hooks`. Relative targets
  * NOT under `docs/site/` are left as-is (a README's own relative links into
  * non-docs/site files are out of scope and self-heal via the absolute-by-author
  * producer rule). Absolute URLs / prose / code untouched; `#`/`?` suffix preserved.
  * Pure and total.
+ *
+ * `mount` is the roster URL segment (NOT necessarily the slug — HexoKit's README
+ * lives at `/docs/readme/` and its docs-site links must point at `/docs/…`,
+ * change it5d); callers resolve it from the roster.
  */
-export function rewriteReadmeDocsSiteLinks(markdown: string, slug: string): string {
+export function rewriteReadmeDocsSiteLinks(markdown: string, mount: string): string {
   return rewriteLinkTargets(markdown, (path) => {
     // ONLY `docs/site/<p>.md` PAGES are mounted as routes — a non-`.md` docs/site
     // target (e.g. `docs/site/img/logo.png`) is NOT pulled and would 404, so do
@@ -898,7 +908,7 @@ export function rewriteReadmeDocsSiteLinks(markdown: string, slug: string): stri
     // within the sub-path so a (rare) `docs/site/a/../b.md` still normalizes.
     const { segments, escaped } = resolvePath([], sub);
     const mountSegs = escaped ? [UNRESOLVED_MARKER, ...segments] : segments;
-    return toolMountUrl(slug, mountSegs);
+    return toolMountUrl(mount, mountSegs);
   });
 }
 
