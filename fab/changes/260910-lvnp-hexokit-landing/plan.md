@@ -39,7 +39,7 @@ The hero SHALL render, in order: an eyebrow bracket label carrying the run-kit v
 - **THEN** the desktop frame spans the width and the phone frame stacks beneath it, centred, ≤ 260px wide; no horizontal scrollbar
 
 #### R4: Install
-`#install` SHALL render two Expressive Code blocks via Starlight's re-exported `<Code>` (copy-button parity with every other code block): `curl -fsSL hexokit.com/install | sh` and `brew install sahil87/tap/hexokit`; a note line "Installs `shll` and `hexokit`. Want the six companions too? See the [toolkit](/toolkit/)."; and "Requires tmux ≥ 3.4 — `rk doctor` checks." `InstallOneLiner.astro` MUST NOT be used or modified.
+`#install` SHALL render two Expressive Code blocks via Starlight's re-exported `<Code>` (copy-button parity with every other code block): `curl -fsSL hexokit.com/install | sh` and `brew install sahil87/tap/hexokit`; a note line "Installs `shll` (the toolkit manager) and HexoKit. Want the six companions too? See the [toolkit](/toolkit/)." (wording adopted from PR #2 after review); and "Requires tmux ≥ 3.4 — `rk doctor` checks." `InstallOneLiner.astro` MUST NOT be used or modified.
 
 - **GIVEN** `dist/index.html`
 - **WHEN** the install section is inspected

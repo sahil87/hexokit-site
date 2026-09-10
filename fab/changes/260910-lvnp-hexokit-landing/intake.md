@@ -85,7 +85,7 @@ import { FEATURES, TOOLKIT_EDGES, FOOTER_LINKS, INSTALL_LINES, HERO } from '../l
 - Two Expressive Code blocks via Starlight's re-exported `<Code>` (same engine + copy button as every fenced block on the site; the `InstallOneLiner` precedent):
   1. `curl -fsSL hexokit.com/install | sh`
   2. `brew install sahil87/tap/hexokit`
-- One note line: "Installs `shll` and `hexokit`. Want the six companions too? See the [toolkit](/toolkit/)." plus "Requires tmux ≥ 3.4 — `rk doctor` checks."
+- One note line: "Installs `shll` (the toolkit manager) and HexoKit. Want the six companions too? See the [toolkit](/toolkit/)." (wording adopted from PR #2 after review) plus "Requires tmux ≥ 3.4 — `rk doctor` checks."
 - Do **not** reuse `InstallOneLiner.astro`: it hard-codes the `shll.ai/install` URL and the whole-toolkit default; the product-first line is new (D10) and S5 changes the script's default. These two lines are the plan's *target* state — the `/install` product-first default ships in S5 and the `hexokit` formula in C2; the site is unannounced until X1, so printing them now is by design.
 
 **2.3 Features** (`<section id="features">`) — six cards in a responsive grid (3×2 ≥ 60rem, 2 cols ≥ 40rem, 1 col below). Each card = screenshot + title + one or two sentences + a "→ docs" link. Copy names only commands present in `help/hexokit.json` (`root.commands[].name`; vn39 hard rule for hand-written prose; the roster at intake time: agent, code, code-server, cron, daemon, desktop, doctor, mux, notify, operator, present, remote, riff, role, serve, skill, status, tab, tutorial, update, url — "boards" is a UI concept, never backticked as a command).

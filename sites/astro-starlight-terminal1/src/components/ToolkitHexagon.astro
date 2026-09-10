@@ -110,9 +110,20 @@ const edges = TOOLKIT_EDGES.map((edge, i) => ({
       }
     </ul>
   </div>
+
+  {/* The heading already links /toolkit/, but a heading is not read as a
+      call to action; this explicit line is (the same arrow-link pattern the
+      feature cards and the desktop card use). */}
+  <p class="landing-toolkit-more">
+    <a class="landing-card-link" href="/toolkit/">→ See the whole toolkit</a>
+  </p>
 </section>
 
 <style>
+  .landing-toolkit-more {
+    margin: 1.5rem 0 0;
+  }
+
   .landing-toolkit-lead {
     max-width: 62ch;
     margin: 0 0 2rem;
