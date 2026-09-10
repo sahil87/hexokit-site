@@ -12,26 +12,26 @@ progress:
     ship: pending
     review-pr: pending
 plan:
-    generated: false
-    task_count: 0
-    acceptance_count: 0
+    generated: true
+    task_count: 14
+    acceptance_count: 30
     acceptance_completed: 0
 confidence:
-    certain: 10
-    confident: 12
+    certain: 12
+    confident: 10
     tentative: 0
     unresolved: 0
-    score: 3.2
+    score: 3.5
     fuzzy: true
     dimensions:
-        signal: 67.3
-        reversibility: 90.2
-        competence: 80.5
-        disambiguation: 73.0
+        signal: 70.7
+        reversibility: 90.5
+        competence: 82.5
+        disambiguation: 75.9
 stage_metrics:
     intake: {started_at: "2026-09-10T11:24:40Z", driver: fab-new, iterations: 1, completed_at: "2026-09-10T12:20:46Z"}
     apply: {started_at: "2026-09-10T12:20:46Z", driver: fab-fff, iterations: 1}
 prs: []
 change_type_source: explicit
 # true_impact: lazily created on first stage-finish that computes it (no placeholder here).
-last_updated: 2026-09-10T12:20:46Z
+last_updated: 2026-09-10T12:43:05Z

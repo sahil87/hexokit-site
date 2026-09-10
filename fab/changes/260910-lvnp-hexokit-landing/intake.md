@@ -17,6 +17,8 @@ Mid-turn follow-up from Sahil:
 2. **Interactive terminal** (the current homepage's typeable `TerminalPrompt.astro` + 6 `terminal-*.ts` libs + 7 tests + the 746-line `homepage-terminal.md` memory) → *drop from `/`, keep the code in the tree unmounted* so S3 can mount it on `/toolkit/` (or a later `/play` page). Rejected: keeping a compact terminal on the landing (JS weight + extra design surface); deleting it (destroys work S3 may want).
 3. **Hero screenshots** → *A1 desktop app + B1 phone* (see § Assets). Rejected: the existing curated `run-kit-console.webp` as hero (older, pre-July UI); deferring the pick to review.
 
+**Rebased onto S3 (2026-09-10, after intake).** `hexokit-site-structure` (change `it5d`, PR #3) merged to `origin/main` while this intake was being written; this branch was rebased onto it and the facts below were updated: `astro.config.mjs` already carries `title: 'HexoKit'` / `description: 'Your tmux, in the browser and on your phone.'` and a `HeaderNav.astro` (Docs · Toolkit · Desktop · GitHub) in the `SocialIcons` slot; `/docs/<path>/`, `/toolkit/`, and a thin `/desktop/` page exist; `help/run-kit.json` became `help/hexokit.json`; a single roster module `src/lib/tool-roster.mjs` (typed re-export `src/lib/tool-slugs.ts`: `TOOL_ROSTER`, `mountFor`, `labelFor`, `repoFor`, `isToolSlug`) replaced the hardcoded slug lists; the dynamic route is `src/pages/[mount]/[...path].astro`; `Head.astro` already emits HexoKit JSON-LD on `/`. S3 left `index.mdx` in place (still the shll splash with HexoKit head overrides) and mounted the terminal nowhere else.
+
 **Asset triage performed at intake** (so the apply agent does not redo it): the Desktop folder holds 1,197 flat `Screenshot <date> at <time>.png` files (Feb–Sep 2026, no subfolders). They were bucketed by pixel dimensions via Spotlight metadata (`mdls`), OCR'd with a macOS Vision-framework Swift script, keyword-scored against run-kit's UI vocabulary (sidebar labels `SERVER/SESSIONS/BOARDS/PANE/HOST`, `riff-*`, `operator`, `Run Kit`, `cron`, web/code tile terms), and the top candidates were reviewed visually on labelled contact sheets. Two genuine iPhone 16 Pro captures (1206×2622) and a dozen full-screen native-app captures (3024×1964, 14" MacBook Pro) surfaced; the rest of the pool is UI-fragment crops from design iteration and agent transcripts. The final picks are listed under § What Changes → Assets. Two gotchas for anyone re-reading the pool: `mdls -raw` prints attributes alphabetically (Height before Width), and the filenames carry a U+202F narrow no-break space before `AM`/`PM` — address them with globs (`Screenshot 2026-09-03 at 11.05.54*.png`), never a typed space.
 
 ## Why
@@ -46,7 +48,7 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Code } from '@astrojs/starlight/components';
 import '../styles/landing.css';
 import { FEATURES, TOOLKIT_EDGES, FOOTER_LINKS, INSTALL_LINES, HERO } from '../lib/landing-data.ts';
-// version badge: help/run-kit.json `version` via normalizeVersion (skip-degrade if the file is missing)
+// version badge: help/hexokit.json `version` via normalizeVersion (skip-degrade if the file is missing)
 ---
 <StarlightPage
   frontmatter={{
@@ -72,11 +74,11 @@ import { FEATURES, TOOLKIT_EDGES, FOOTER_LINKS, INSTALL_LINES, HERO } from '../l
 ### 2. Sections, in this order (D6 + plan § Site shape)
 
 **2.1 Hero** (`<section id="top">`)
-- Eyebrow: bracket-tag label in the site's shell-comment style, e.g. `[ hexokit · v3.19.37 ]` — the version read at build time from `help/run-kit.json` (`version` field, normalised via the existing `src/lib/version.ts` `normalizeVersion`); if the file is missing, omit the version (skip-degrade, mirroring the terminal tool cards' posture).
+- Eyebrow: bracket-tag label in the site's shell-comment style, e.g. `[ hexokit · v3.19.37 ]` — the version read at build time from `help/hexokit.json` (S3 renamed the collector; the envelope's `tool` field still reads `run-kit`) (`version` field, normalised via the existing `src/lib/version.ts` `normalizeVersion`); if the file is missing, omit the version (skip-degrade, mirroring the terminal tool cards' posture).
 - `<h1>`: **Your tmux, in the browser and on your phone.** (verbatim)
 - Sub-line: *Cockpit for the agent era.* (verbatim)
 - One supporting sentence lifted from the README lead: "HexoKit is a remote console for the machine you actually work on — every tmux session and pane as a live terminal, in a sidebar, from your desk or your couch. Nothing to configure, no database, state read straight from tmux."
-- CTAs: primary **Install** → `#install`; secondary **Read the docs** → `/docs/`; tertiary **GitHub** → `https://github.com/sahil87/run-kit`.
+- CTAs: primary **Install** → `#install`; secondary **Read the docs** → `/docs/`; tertiary **GitHub** → `https://github.com/sahil87/run-kit`, built as `` `https://github.com/sahil87/${repoFor('hexokit')}` `` from the roster — the same idiom as `HeaderNav.astro`.
 - Screenshot pair: desktop (`/screenshots/hexokit-hero-desktop.webp`) with the phone (`/screenshots/hexokit-hero-phone.webp`) overlapping its lower-right corner on wide viewports; stacked (phone below, centred, max 260px wide) under 60rem. Frames are CSS only (1px `--c-border`, radius, `--c-surface` backdrop) — no device-mockup images. Explicit `width`/`height` attributes for CLS; hero images `loading="eager"`, everything below `loading="lazy" decoding="async"`.
 
 **2.2 Install** (`<section id="install">`) — D10
@@ -86,7 +88,7 @@ import { FEATURES, TOOLKIT_EDGES, FOOTER_LINKS, INSTALL_LINES, HERO } from '../l
 - One note line: "Installs `shll` and `hexokit`. Want the six companions too? See the [toolkit](/toolkit/)." plus "Requires tmux ≥ 3.4 — `rk doctor` checks."
 - Do **not** reuse `InstallOneLiner.astro`: it hard-codes the `shll.ai/install` URL and the whole-toolkit default; the product-first line is new (D10) and S5 changes the script's default. These two lines are the plan's *target* state — the `/install` product-first default ships in S5 and the `hexokit` formula in C2; the site is unannounced until X1, so printing them now is by design.
 
-**2.3 Features** (`<section id="features">`) — six cards in a responsive grid (3×2 ≥ 60rem, 2 cols ≥ 40rem, 1 col below). Each card = screenshot + title + one or two sentences + a "→ docs" link. Copy names only commands present in `help/run-kit.json` (vn39 hard rule for hand-written prose; the roster at intake time: agent, code, code-server, cron, daemon, desktop, doctor, mux, notify, operator, present, remote, riff, role, serve, skill, status, tab, tutorial, update, url — "boards" is a UI concept, never backticked as a command).
+**2.3 Features** (`<section id="features">`) — six cards in a responsive grid (3×2 ≥ 60rem, 2 cols ≥ 40rem, 1 col below). Each card = screenshot + title + one or two sentences + a "→ docs" link. Copy names only commands present in `help/hexokit.json` (`root.commands[].name`; vn39 hard rule for hand-written prose; the roster at intake time: agent, code, code-server, cron, daemon, desktop, doctor, mux, notify, operator, present, remote, riff, role, serve, skill, status, tab, tutorial, update, url — "boards" is a UI concept, never backticked as a command).
 
 | # | Title | Copy sketch | Asset | Link |
 |---|-------|-------------|-------|------|
@@ -104,15 +106,15 @@ import { FEATURES, TOOLKIT_EDGES, FOOTER_LINKS, INSTALL_LINES, HERO } from '../l
 Followed by the two-row *It is / It isn't* contrast: *It is* — a remote, phone-first console for your tmux: agent-agnostic, no database, state derived from tmux + filesystem; a spawner (`rk riff`) and a dashboard (`rk serve`) that compose. *It isn't* — an agent wrapper: it doesn't speak any agent's protocol, parse any agent's output, or care what's in the pane.
 
 **2.5 The toolkit hexagon** (`<section id="toolkit">`)
-- Heading "The HexoKit toolkit" → links `/toolkit/`; one sentence: "HexoKit is the cockpit. Six companions sit on its six edges — each a small CLI (or app) that does one job and composes with the rest."
+- Heading "The HexoKit toolkit" → links `/toolkit/`; one sentence: "HexoKit is the cockpit. Six companions sit on its six edges — each a small CLI (or app) that does one job and composes with the rest — and [`shll`](/shll/) installs them all."
 - A decorative inline SVG (`aria-hidden`) of the cube-in-hexagon mark: the flat-top hexagon and cube faces from `src/assets/logo.svg` (viewBox `7 10 50 44`), recoloured to CSS custom properties (border segments `--c-fg-dim` / `--c-fg-faint`, cube faces `--c-fg-faint` / `--c-border` / `--c-surface-2`, accent on hover) so both themes pass (Constitution V).
-- Six **HTML** `<a>` labels positioned around the six edges (absolute positioning over the SVG box, collapsing to a plain 2×3 grid under 40rem) — HTML anchors, not SVG `<a>`, so they are keyboard-navigable with visible focus rings (Accessibility constraint). Proposed clockwise from the top edge: **fab-kit** → `/fab-kit/`, **wt** → `/wt/`, **idea** → `/idea/`, **tu** → `/tu/`, **hop** → `/hop/`, **desktop** → `#desktop`. `shll` is not on an edge (the plan's six); it is named in the install note and the footer as the installer.
-- Adjacent textual list (the constitution's "decorative diagrams SHOULD have a textual explanation adjacent"): one line each, at the "what it's for" level, no commands. Reuse the current homepage one-liners for the five CLIs — fab-kit "the planning harness — a constitution and a plan before any agent writes code"; wt "disposable git worktrees so each change works in isolation"; idea "capture ideas and feed a backlog without breaking flow"; tu "track what your AI coding sessions cost"; hop "a personal directory of your git repos — jump anywhere, batch-update from anywhere"; desktop "the native macOS shell for the dashboard". This list becomes the page's hand-copy drift surface for tool one-liners (record in memory, replacing the retired `ld0j` listing).
+- Six **HTML** `<a>` labels positioned around the six edges (absolute positioning over the SVG box, collapsing to a plain 2×3 grid under 40rem) — HTML anchors, not SVG `<a>`, so they are keyboard-navigable with visible focus rings (Accessibility constraint). Proposed clockwise from the top edge: **fab-kit** → `/fab-kit/`, **wt** → `/wt/`, **idea** → `/idea/`, **tu** → `/tu/`, **hop** → `/hop/`, **desktop** → `/desktop/` (S3's thin desktop page — the same target as the header nav's Desktop item). The five tool hrefs are built from the roster (`` `/${mountFor(slug)}/` ``), never hardcoded. `shll` is not on an edge (the plan's six); it is named in the framing sentence, the install note and the footer as the installer.
+- Adjacent textual list (the constitution's "decorative diagrams SHOULD have a textual explanation adjacent"): one line each, at the "what it's for" level, no commands. Copy the five CLI one-liners **verbatim from `src/content/docs/toolkit/index.mdx` § The six companions** (S3's family page; the two copies are a hand-copy drift surface to record in memory) — fab-kit "the planning harness — a constitution and a plan before any agent writes code"; wt "disposable git worktrees so each change works in isolation"; idea "capture ideas and feed a backlog without breaking flow"; tu "track what your AI coding sessions cost"; hop "a personal directory of your git repos — jump anywhere, batch-update from anywhere"; desktop "the native macOS shell for the dashboard". This list becomes the page's hand-copy drift surface for tool one-liners (record in memory, replacing the retired `ld0j` listing).
 
 **2.6 Desktop app card** (`<section id="desktop">`) — the app has no page anywhere today.
 - Screenshot `hexokit-desktop-app.webp` (F1, macOS menu bar kept — it proves the app is native), copy from the README's *Desktop app (macOS)*: an Electron shell that wraps the dashboard and frees the browser-reserved `⌘` keyboard tier; connects three ways — **This Mac** (one-click daemon start), **over SSH** (`rk remote`), or **a URL**; never starts, stops or updates anything on its own; tmux sessions survive every daemon action.
 - EC block: `rk desktop install` / `rk desktop update`, with the one-liner reason ("the CLI path produces a quarantine-free, digest-verified install; a browser-downloaded DMG trips Gatekeeper").
-- Link → `/docs/install/` (the synced page carries the `#desktop-app-macos` anchor; link to the page, not the anchor, so a heading rename upstream cannot break it).
+- Link → `/docs/install/` (the synced page carries the `#desktop-app-macos` anchor; link to the page, not the anchor, so a heading rename upstream cannot break it). The card keeps `id="desktop"` for in-page anchoring; S3's `/desktop/` page is the hexagon-edge and nav target, this card is the marketing surface.
 
 **2.7 Footer** (`<footer class="landing-footer">`) — the landing's own link row, in the plan's order: **Docs** `/docs/` · **Toolkit** `/toolkit/` · **GitHub** `https://github.com/sahil87/run-kit` · **Discord** `https://discord.gg/32XHh5mJYn` · **versions.json** `/versions.json` · **llms.txt** `/llms.txt`. Starlight's site footer (`Footer.astro` — copyright + author links, change `d9qb`) still renders below it via `StarlightPage`; S4 does not edit `Footer.astro`.
 
@@ -147,12 +149,12 @@ Pipeline: ImageMagick (`magick`, installed) or the site's existing `sharp` depen
 ### 5. Data module + test: `src/lib/landing-data.ts`, `scripts/landing-data.test.mjs`
 
 - `landing-data.ts` exports the page's content as data: `HERO` (tagline, sub-line, lead), `INSTALL_LINES`, `FEATURES` (title, copy, img `{src, alt, width, height}`, href), `TOOLKIT_EDGES` (`{slug|'desktop', label, href, blurb}` in clockwise order), `FOOTER_LINKS`. The `.astro` file renders it; copy edits are data edits.
-- `landing-data.test.mjs` (node `--test`, Node ≥ 22 native `.ts` type-stripping — the same harness as `scripts/terminal-toolcard.test.mjs`): every toolkit edge whose slug is a tool satisfies `isToolSlug` from `src/lib/tool-slugs.ts` and links `/<slug>/`; the `desktop` edge links `#desktop`; every backticked `rk <verb>` token across `FEATURES` copy exists in `help/run-kit.json`'s root children (mechanising the vn39 rule for this page); `FOOTER_LINKS` is exactly the plan's six in order; `INSTALL_LINES` are exactly the two D10 lines.
+- `landing-data.test.mjs` (node `--test`, Node ≥ 22 native `.ts` type-stripping — the same harness as `scripts/terminal-toolcard.test.mjs`): every toolkit edge whose slug is a tool satisfies `isToolSlug` from `src/lib/tool-slugs.ts` and links `/<slug>/`; the `desktop` edge links `#desktop`; every backticked `rk <verb>` token across `FEATURES` copy exists in `help/hexokit.json`'s `root.commands[].name` (mechanising the vn39 rule for this page); the `desktop` edge links `/desktop/` and the five tool edges link `` `/${mountFor(slug)}/` ``; `FOOTER_LINKS` is exactly the plan's six in order; `INSTALL_LINES` are exactly the two D10 lines.
 - CI already runs `node --test scripts/*.test.mjs` (ci.yml) — the new test is picked up without workflow edits.
 
-### 6. Starlight config touch (flagged S3 overlap)
+### 6. Starlight config: no touch
 
-- `astro.config.mjs`: `starlight.title: 'shll'` → `'HexoKit'` and `description` → `'HexoKit — your tmux, in the browser and on your phone. Cockpit for the agent era.'`, so the header on `/` (and every page) reads HexoKit from day one. Two lines. S3 edits the same file (sidebar, nav, slug table, redirects) — expect a trivial rebase; **do not** touch `sidebar`, `redirects`, `components`, `customCss`, `social`, or `logo`.
+- S3 (`it5d`, merged) already set `starlight.title: 'HexoKit'` and `description: 'Your tmux, in the browser and on your phone.'` and registered `HeaderNav.astro` (Docs · Toolkit · Desktop · GitHub) in the `SocialIcons` slot. `astro.config.mjs` MUST NOT change in this change.
 
 ### 7. Docs touch
 
@@ -164,33 +166,33 @@ Removed from the homepage: the seven-tool chip row and `ls -l tools/` listing, t
 
 Kept, unmounted or used elsewhere (**do not delete in this change**): `TerminalPrompt.astro` + `src/lib/terminal-*.ts` + their `scripts/terminal-*.test.mjs` (user decision — S3 may mount the terminal on `/toolkit/`); `Diagram.astro` + `public/diagrams/loop-*.svg` (the loop lives at `/fab-kit/` and `/toolkit/` per the plan); `VersionTable.astro` (`tools/index.mdx`); `InstallOneLiner.astro` (tool overviews); `ThemeSelect.astro`'s hidden `<select>` seam (the terminal's `theme` command still targets it when mounted). The `$ whoami` author block is not re-homed by S4 — `Footer.astro` still carries the same links site-wide (the `d9qb` three-way hand-copy drift surface shrinks to two: Footer + the terminal's `whoami` egg; note it in memory).
 
-### 9. Coordination with S3 (`hexokit-site-structure`) — flag, don't resolve silently
+### 9. Coordination with S3 (`hexokit-site-structure`, merged as PR #3 — this branch is rebased onto it)
 
-- **Files both may touch**: `astro.config.mjs` (S4: `title`/`description` only); `src/content/docs/index.mdx` (S4 deletes — if S3 rewrites its links, the rebase shows a delete/modify conflict; the resolution is *delete*); `src/styles/terminal.css` (S4 avoids it — `landing.css` instead); `docs/memory/conventions/*` (both hydrate — merge both edits).
-- **URL scheme assumed** (D7, S3 implements): `/docs/<run-kit docs/site path>/` (install, workflows, boards, notifications, agent-hooks, status-dot, customizing-tmux, cron-schedule-kinds, skill, skill/{code,display,gui,messaging,mux,tutorial}) and `/toolkit/`. These 404 on this branch until S3 merges — intentional target state; state it in the PR body.
-- **Anchor for S3's nav**: the plan's `Docs · Toolkit · Desktop · GitHub` nav can point *Desktop* at `/#desktop`; S4 guarantees that id.
-- **Head/OG/JSON-LD**: S4 sets only the page-level title/description/og:title/og:type via frontmatter `head:`; `Head.astro`, `og-image.png`, `llms*.txt`, favicon are S3's.
-- **Terminal**: left in the tree for S3 (see § 8).
+- **Landed by S3, inherited by `/` through the StarlightPage wrapper**: `HeaderNav.astro` nav, HexoKit title/description, HexoKit JSON-LD + og-image in `Head.astro`, the Discord link in `Footer.astro`. S4 edits none of these files.
+- **URL scheme is live**: `/docs/<path>/` for every `content/hexokit/site/**` page (install, workflows, boards, notifications, agent-hooks, status-dot, customizing-tmux, cron-schedule-kinds, skill, skill/{code,display,gui,messaging,mux,tutorial}), `/toolkit/`, `/desktop/`. Every landing link resolves on this branch.
+- **`index.mdx`**: S3's version (shll splash with HexoKit head overrides) is what S4 deletes. After the delete, `TerminalPrompt.astro` has no mount — verify by grep; the component stays in the tree (user decision).
+- **Memory**: S3 hydrated `conventions/tool-page-rubric`, `seo-social-meta`, `tool-roster` (new), `site/homepage-terminal`; S4's hydrate merges on top as current truth.
+- **`terminal.css`**: untouched by S4 (`landing.css` instead).
 
 ## Affected Memory
 
 - `site/landing-page`: (new) — lives at `sites/astro-starlight-terminal1/docs/memory/site/landing-page.md` (site-implementation memory per `fab/project/context.md`; hand-maintained index at `sites/astro-starlight-terminal1/docs/memory/site/index.md` gains a row). Covers: the `src/pages/index.astro` + `StarlightPage` splash shell, the section order and `landing-data.ts` data shape, the asset table (sources, crops, targets, alt text), the `landing.css` vocabulary and reduced-motion gate, the vn39 test, and the S3 seams (`/#desktop`, D7 links, `title` flip).
 - `site/homepage-terminal`: (modify) — the terminal is no longer mounted on `/`; component/libs/tests retained unmounted pending S3's `/toolkit/`; the `ThemeSelect` seam and `data-terminal-prompt` contract are unchanged.
 - `conventions/tool-page-rubric`: (modify) — the `ld0j` homepage newcomer blocks (chips, `ls -l` listing, `whoami`, install block) are retired; the toolkit-hexagon list is the new hand-copy surface for five tool one-liners (+ desktop); the `d9qb` author-link drift surface drops to two copies; `/` is no longer an `InstallOneLiner` consumer.
+- `conventions/tool-roster`: (modify) — the landing is a new roster consumer (`mountFor`/`labelFor` for the hexagon edge hrefs, `repoFor('hexokit')` for the GitHub CTA).
 - `conventions/seo-social-meta`: (modify) — the homepage frontmatter `head:` overrides now ride `StarlightPage`'s `frontmatter.head` in `index.astro` (same dedupe semantics); Head.astro's homepage JSON-LD and og-image are unchanged here and are queued for S3.
 
 ## Impact
 
-- **Files**: new `src/pages/index.astro`, `src/styles/landing.css`, `src/lib/landing-data.ts`, `scripts/landing-data.test.mjs`, eight `.webp` under `public/screenshots/`; deleted `src/content/docs/index.mdx`; edited `astro.config.mjs` (2 lines), site `README.md` (2 lines); memory files above. No new dependencies, no workflow edits.
+- **Files**: new `src/pages/index.astro`, `src/styles/landing.css`, `src/lib/landing-data.ts`, `scripts/landing-data.test.mjs`, eight `.webp` under `public/screenshots/`; deleted `src/content/docs/index.mdx`; edited site `README.md` (Layout block); memory files above. `astro.config.mjs` untouched. No new dependencies, no workflow edits.
 - **Verification**: `pnpm install && pnpm build` clean (no route collision, no missing-asset warnings); `node --test scripts/*.test.mjs` green including the new test; `node scripts/validate-help.mjs` unchanged; `pnpm dev` and eyeball `/` at ~1440px and ~400px in **both** themes (Constitution V) with keyboard-only navigation across the hexagon labels and CTAs; Lighthouse-style sanity on image weight (above-the-fold ≤ ~600 KB). If `rk` is available, `rk present :4321` to show the dev server in the run-kit web tile for design review.
 - **Design iteration**: expected (Size L). Apply should produce a first full pass, then iterate on hero composition, hexagon proportions and card density against screenshots of both themes; review is the acceptance gate the plan's Phase 1 waits on.
-- **Risks**: image weight (mitigated by the budgets above); the board source needing a re-capture if the crop is unusable (alternate: reuse a sidebar+dot crop and change the card's image to the status-dot legend `status-dot-reference.svg` from run-kit `docs/img/` — an SVG is theme-safe); dead `/docs/*` and `/toolkit/` links until S3 merges (intentional, documented).
+- **Risks**: image weight (mitigated by the budgets above); the board source needing a re-capture if the crop is unusable (alternate: reuse a sidebar+dot crop and change the card's image to the status-dot legend `status-dot-reference.svg` from run-kit `docs/img/` — an SVG is theme-safe).
 
 ## Open Questions
 
 - Hexagon edge → tool assignment (clockwise from top: fab-kit, wt, idea, tu, hop, desktop is the proposal; apply may reorder for label fit — record the final order in `landing-data.ts` and memory).
 - Final crop bounds for `hexokit-board.webp` (E2 has a large blank area below the window); fall back to the alternates in § 3 if the three pinned panes do not read at card size.
-- Whether S3 wants the nav's *Desktop* item to target `/#desktop` or a dedicated `/desktop/` page — S3's call; S4 provides the anchor either way.
 
 ## Assumptions
 
@@ -203,20 +205,20 @@ Kept, unmounted or used elsewhere (**do not delete in this change**): `TerminalP
 | 5 | Certain | Hero copy verbatim: "Your tmux, in the browser and on your phone." / "Cockpit for the agent era." | Given verbatim in the task and the plan | S:100 R:95 A:95 D:100 |
 | 6 | Certain | Install lines are the D10 target state: the `curl -fsSL hexokit.com/install` one-liner piped to `sh`, and `brew install sahil87/tap/hexokit`, even though `/install`'s default (S5) and the formula (C2) land later | Plan D10 + S4 row; the site is unannounced until X1 | S:90 R:95 A:85 D:90 |
 | 7 | Certain | Hexagon edges = fab-kit, wt, idea, tu, hop, desktop; `shll` named in the install note/footer, not on an edge | Plan § Site shape names exactly these six | S:90 R:85 A:90 D:85 |
-| 8 | Confident | Internal links use the D7 target scheme (`/docs/<path>/`, `/toolkit/`), which 404 on this branch until S3 merges | Plan D7 + S3 row define the scheme; avoids a second link pass at cutover; flagged in § 9 | S:70 R:90 A:80 D:70 |
+| 8 | Certain | Internal links use the D7 scheme (`/docs/<path>/`, `/toolkit/`, `/desktop/`) — all live on this branch after the S3 rebase | Plan D7; S3 (PR #3) merged and this branch is rebased onto it | S:90 R:95 A:95 D:90 |
 | 9 | Confident | Feature-card asset mapping per § 3 (B2, A1-crop, existing agent-session, E2, D1, C1) and F1 for the desktop card | Chosen from the visual review of OCR-ranked candidates; each card's image is a data-file swap | S:60 R:90 A:75 D:65 |
 | 10 | Confident | Assets committed as `public/screenshots/hexokit-*.webp` (q≈80, ≤1600px; hero ≤2400px, phones ≤800px), alt text, width/height attrs | Constitution v2.1.3 third content class + the run-kit precedent; naming by product, not tool slug (the slug flips in S3) | S:60 R:90 A:85 D:75 |
 | 11 | Confident | Landing styles isolated in `src/styles/landing.css` imported by the page; `terminal.css` and `customCss` untouched | Keeps S4 out of S3's files; the page is the only consumer | S:55 R:90 A:85 D:75 |
-| 12 | Confident | `astro.config.mjs` `title` → `HexoKit` and `description` flipped (2 lines), flagged as S3 overlap | The header brand text is part of "on-brand from day one" on `/`; S3 owns the rest of that file | S:50 R:95 A:70 D:55 |
+| 12 | Certain | `astro.config.mjs` untouched — S3 already set `title: 'HexoKit'` / the product description and registered `HeaderNav.astro` | Verified on `origin/main` after the rebase | S:95 R:95 A:95 D:95 |
 | 13 | Certain | `Head.astro` (JSON-LD, og:image), `Footer.astro`, `llms*.txt`, favicon are not edited; page-level title/og via `StarlightPage` `frontmatter.head` | Plan row S3 owns JSON-LD/OG/llms/favicon; the `kb1r` head-merge mechanism is proven | S:70 R:90 A:85 D:80 |
 | 14 | Confident | Hexagon = decorative inline SVG (`aria-hidden`, logo geometry recoloured to tokens) + HTML `<a>` labels positioned around it + adjacent textual list | Accessibility constraint (keyboard focus, textual explanation) and Constitution V (theme parity via tokens) | S:60 R:85 A:80 D:60 |
 | 15 | Confident | Motion vocabulary (bracket labels with caret blink, typed-sweep, CRT glint on the CTA, optional scanlines) is CSS-only and reduced-motion gated; no page JS | Plan asks for run-kit's visual vocabulary; Constitution I + the site's existing reduced-motion section | S:65 R:90 A:75 D:60 |
-| 16 | Confident | Content lives in `src/lib/landing-data.ts` with `scripts/landing-data.test.mjs` checking roster slugs, `#desktop`, footer set, install lines and every `rk <verb>` against `help/run-kit.json` | Mechanises the vn39 hard rule for hand-written prose; follows the existing `scripts/*.test.mjs` harness | S:40 R:90 A:85 D:70 |
-| 17 | Confident | Hero eyebrow shows the run-kit version from `help/run-kit.json` via `normalizeVersion`, omitted if the file is missing | Small, on-brand, single-sourced; skip-degrade mirrors the terminal tool cards | S:25 R:95 A:70 D:45 |
+| 16 | Confident | Content lives in `src/lib/landing-data.ts` with `scripts/landing-data.test.mjs` checking roster mounts, `/desktop/`, footer set, install lines and every `rk <verb>` against `help/hexokit.json` `root.commands` | Mechanises the vn39 hard rule for hand-written prose; follows the existing `scripts/*.test.mjs` harness | S:40 R:90 A:85 D:70 |
+| 17 | Confident | Hero eyebrow shows the product version from `help/hexokit.json` via `normalizeVersion`, omitted if the file is missing | Small, on-brand, single-sourced; skip-degrade mirrors the terminal tool cards | S:25 R:95 A:70 D:45 |
 | 18 | Certain | Differentiator = README ¶2 + the *It is / It isn't* rows, `run-kit` → `HexoKit`, `rk` verbs untouched | Plan: "the agent-agnostic paragraph from the README, verbatim-ish"; D2 keeps `rk` | S:85 R:95 A:90 D:85 |
 | 19 | Confident | Edge assignment clockwise from top: fab-kit, wt, idea, tu, hop, desktop | Cosmetic; apply may reorder for label fit and records the final order | S:30 R:95 A:50 D:30 |
-| 20 | Confident | `/#desktop` is the anchor S3's *Desktop* nav item can target | Plan nav lists Desktop; the card is the only desktop surface today | S:50 R:90 A:75 D:60 |
+| 20 | Confident | The hexagon's desktop edge links S3's `/desktop/` page (same target as the nav); the landing card keeps `id="desktop"` and links `/docs/install/` | A real page like the other five edges; the card stays the marketing surface | S:60 R:90 A:80 D:65 |
 | 21 | Certain | `Diagram.astro`, loop SVGs, `VersionTable`, `InstallOneLiner`, `ThemeSelect` seam stay in the tree | Used by other pages or by S3's `/toolkit/`; deleting is out of S4's scope | S:60 R:95 A:90 D:80 |
 | 22 | Confident | `hexokit-board.webp` is cropped from `Screenshot 2026-07-08 at 8.25.23 PM.png`; if unusable, fall back to the § 3 alternates or the status-dot legend SVG | The source has a large blank area; the board view is the only real one in the pool | S:40 R:90 A:50 D:40 |
 
-22 assumptions (10 certain, 12 confident, 0 tentative, 0 unresolved).
+22 assumptions (12 certain, 10 confident, 0 tentative, 0 unresolved).
