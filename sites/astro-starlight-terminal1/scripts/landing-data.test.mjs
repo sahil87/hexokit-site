@@ -176,7 +176,7 @@ test('the GitHub URL comes from the roster, not a hardcoded repo name', () => {
 });
 
 test('every feature card is complete and links into the product docs', () => {
-  assert.equal(FEATURES.length, 6, 'expected six feature cards');
+  assert.equal(FEATURES.length, 7, 'expected seven feature cards (six + the full-width operator-console card)');
   for (const feature of FEATURES) {
     assert.ok(feature.title.length > 0, 'card without a title');
     assert.ok(feature.copy.length > 0, `card \`${feature.title}\` has no copy`);

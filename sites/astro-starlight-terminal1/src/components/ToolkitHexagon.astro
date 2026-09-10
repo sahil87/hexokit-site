@@ -19,12 +19,12 @@
  * cannot. Its blurbs are the hand-copy drift surface documented in
  * `landing-data.ts` (verbatim from `toolkit/index.mdx`).
  *
- * WHY THE GEOMETRY IS INLINED RATHER THAN <img src="logo.svg">: the committed
- * `src/assets/logo.svg` hard-codes greys (#b4b4b4, #2a2a2a, …) that vanish
- * against one theme or the other. Inlining the same polygon coordinates lets
- * every face take a `--c-*` token instead, so the mark reads correctly in both
- * themes (Constitution V). The coordinates below are copied verbatim from that
- * file — if the brand mark's geometry ever changes, re-copy them.
+ * THE MARK IS THE BRAND ASSET, UNCHANGED: geometry AND colours are copied
+ * verbatim from `src/assets/logo.svg` — the same fixed greys in both themes.
+ * A first cut recoloured the faces to `--c-*` tokens for theme parity, and it
+ * read as a different logo per theme; the user asked for the original mark, as
+ * PR #2's `HkMark.astro` does. Inlined (not `<img>`) only so the edge labels
+ * can be positioned against the same box. If the logo ever changes, re-copy.
  */
 import { TOOLKIT_EDGES } from '../lib/landing-data.ts';
 
@@ -72,18 +72,17 @@ const edges = TOOLKIT_EDGES.map((edge, i) => ({
       <div class="landing-hexagon-mark">
         {/* Decorative: the list beside it carries the meaning. */}
         <svg viewBox="7 10 50 44" aria-hidden="true" focusable="false">
-          {/* Border segments — the two brightness tiers of the source mark
-              mapped onto two tokens so contrast survives both themes. */}
-          <polygon points="44,11.2 56,32 47.5,32 39.5,17.2" fill="var(--c-fg-dim)"></polygon>
-          <polygon points="56,32 44,52.8 39.5,46.8 47.5,32" fill="var(--c-fg-dim)"></polygon>
-          <polygon points="44,52.8 20,52.8 24.5,46.8 39.5,46.8" fill="var(--c-fg-faint)"></polygon>
-          <polygon points="20,52.8 8,32 16.5,32 24.5,46.8" fill="var(--c-fg-faint)"></polygon>
-          <polygon points="8,32 20,11.2 24.5,17.2 16.5,32" fill="var(--c-fg-faint)"></polygon>
-          <polygon points="20,11.2 44,11.2 39.5,17.2 24.5,17.2" fill="var(--c-fg-dim)"></polygon>
-          {/* Inner cube faces — three surface tiers, lightest face on top. */}
-          <polygon points="24.5,17.2 39.5,17.2 47.5,32 32,32" fill="var(--c-surface-2)"></polygon>
-          <polygon points="47.5,32 39.5,46.8 24.5,46.8 32,32" fill="var(--c-border)"></polygon>
-          <polygon points="24.5,46.8 16.5,32 24.5,17.2 32,32" fill="var(--c-surface)"></polygon>
+          {/* Border segments — original colours, verbatim from logo.svg. */}
+          <polygon points="44,11.2 56,32 47.5,32 39.5,17.2" fill="#b4b4b4"></polygon>
+          <polygon points="56,32 44,52.8 39.5,46.8 47.5,32" fill="#b4b4b4"></polygon>
+          <polygon points="44,52.8 20,52.8 24.5,46.8 39.5,46.8" fill="#2a2a2a"></polygon>
+          <polygon points="20,52.8 8,32 16.5,32 24.5,46.8" fill="#2a2a2a"></polygon>
+          <polygon points="8,32 20,11.2 24.5,17.2 16.5,32" fill="#2a2a2a"></polygon>
+          <polygon points="20,11.2 44,11.2 39.5,17.2 24.5,17.2" fill="#b4b4b4"></polygon>
+          {/* Inner cube faces — original colours, verbatim from logo.svg. */}
+          <polygon points="24.5,17.2 39.5,17.2 47.5,32 32,32" fill="#888888"></polygon>
+          <polygon points="47.5,32 39.5,46.8 24.5,46.8 32,32" fill="#737373"></polygon>
+          <polygon points="24.5,46.8 16.5,32 24.5,17.2 32,32" fill="#545454"></polygon>
         </svg>
         {
           edges.map((edge) => (

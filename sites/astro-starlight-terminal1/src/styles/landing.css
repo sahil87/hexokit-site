@@ -440,6 +440,36 @@ body:has(.landing) .right-group {
   outline-offset: 2px;
 }
 
+/* A full-width feature card (the `wide` flag in landing-data.ts): spans the
+   grid and, from the 2-column breakpoint up, lays its screenshot beside the
+   copy instead of above it. The screenshot window is wider (2.2:1) because the
+   capture it holds is a drawer across a whole tab, not a panel. Below 40rem it
+   is an ordinary stacked card. */
+.landing-card-wide {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 40rem) {
+  .landing-card-wide {
+    flex-direction: row;
+  }
+
+  .landing-card-wide .landing-card-shot {
+    flex: 0 0 60%;
+    aspect-ratio: 2.2 / 1;
+    border-bottom: 0;
+    border-right: var(--landing-frame-border);
+  }
+
+  .landing-card-wide .landing-card-shot img {
+    object-position: top left;
+  }
+
+  .landing-card-wide .landing-card-body {
+    justify-content: center;
+  }
+}
+
 /* ── "Nothing wraps your agent" ──────────────────────────────────────── */
 .landing-agnostic p {
   max-width: 70ch;

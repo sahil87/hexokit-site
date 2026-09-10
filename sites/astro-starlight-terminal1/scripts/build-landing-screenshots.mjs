@@ -31,6 +31,17 @@
  * brightness profiles for the real window edges (e.g. the macOS menu bar ends
  * at y=65 on a 3024x1964 14" capture, so the window starts at y=66). Each entry
  * documents what its box keeps and why.
+ *
+ * ZOOM RULE (design review, 2026-09-10): the feature cards render each image in
+ * a 16:10 `object-fit: cover` window a few hundred pixels wide, so a full-window
+ * capture reads as an unreadable thumbnail. Card crops are therefore TIGHT —
+ * roughly 16:10 boxes around the one UI region the card's claim is about, at a
+ * scale where the UI text is still legible in the card. Hero and desktop-card
+ * frames stay wide; they are rendered large.
+ *
+ * A source may also be an already-committed asset: `file: '<path relative to
+ * the site root>'` instead of `prefix:` (used to re-crop `run-kit-agent-session
+ * .webp`, whose original capture is not in the Desktop pool).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -80,39 +91,63 @@ const SOURCES = [
   {
     out: 'hexokit-agent-state.webp',
     prefix: 'Screenshot 2026-09-03 at 11.05.54',
-    // Same source as the hero, cropped to the left ~60%: the SESSIONS list of
-    // riff windows with their status dots, ONE agent pane beside it, and the
-    // bottom status strip reading `agt idle 43s`. This is the "agents are just
-    // panes" card, so it must show both halves of that claim — a sidebar-only
-    // crop (tried first) was an unreadable 0.32-aspect ribbon that showed the
-    // list but not the pane.
-    crop: { left: 0, top: 66, width: 1800, height: 1898 },
-    maxWidth: 1400,
+    // Same source as the hero, a tight 16:10 box on its lower-left: the lower
+    // SESSIONS list (riff windows with status dots and PR glyphs), the left edge
+    // of the agent pane, and the bottom status strip reading `agt idle 43s` —
+    // the "waiting, working, idle" claim in one frame. Earlier boxes (a 0.32
+    // sidebar ribbon, then the whole left 60%) were either unreadable or too
+    // zoomed out at card size.
+    crop: { left: 0, top: 1339, width: 1000, height: 625 },
+    maxWidth: 1000,
   },
   {
     out: 'hexokit-board.webp',
     prefix: 'Screenshot 2026-07-08 at 8.25.23',
-    // 4832x2292, but the app window occupies only the top ~940 rows; the rest
-    // is empty desktop, and a foreign window's bright edge intrudes from
-    // x>=4810. Crop to the board itself — the `Board: bb` header plus the three
-    // pinned panes — dropping the (empty) left sidebar at x<540, which only
-    // stretched the frame wider and shrank the pane text below legibility.
-    crop: { left: 540, top: 0, width: 2960, height: 940 },
+    // 4832x2292, but the app window occupies only the top ~950 rows; the rest
+    // is empty desktop. A 16:10 box on the first two pinned panes (the board's
+    // left edge at x≈560) — three panes across made the pane text illegible at
+    // card size; two panes side by side still say "board" and stay readable.
+    // top: 40 skips the app's light title strip, which read as a white band on
+    // the dark card.
+    crop: { left: 560, top: 40, width: 1480, height: 925 },
     maxWidth: 1400,
   },
   {
     out: 'hexokit-operator.webp',
     prefix: 'Screenshot 2026-09-07 at 2.06.36',
-    // 1618x676 — already a clean crop of the operator popover. Kept whole.
-    crop: null,
-    maxWidth: 1600,
+    // 1618x676 — the operator popover with the tab's Ask box above it. A 16:10
+    // box on its left two thirds keeps the OPERATOR header, the question and
+    // the answer at a legible size; the right third was empty popover.
+    crop: { left: 60, top: 0, width: 1080, height: 675 },
+    maxWidth: 1080,
   },
   {
     out: 'hexokit-web-tile.webp',
     prefix: 'Screenshot 2026-08-19 at 9.02.22',
     // 3024x1898 window capture (no menu bar in this one): terminal on the left,
-    // the web tile rendering an HTML change plan on the right. Kept whole.
-    crop: null,
+    // the web tile rendering an HTML change plan on the right. A 16:10 box on
+    // the tile plus the terminal's right edge — the split is the point, the
+    // sidebar is not.
+    crop: { left: 1300, top: 100, width: 1700, height: 1062 },
+    maxWidth: 1400,
+  },
+  {
+    out: 'hexokit-fleet.webp',
+    file: 'public/screenshots/run-kit-agent-session.webp',
+    // Re-crop of the already-committed curated capture (1800x1395): the SERVER
+    // grid and the SESSIONS list of riff windows with their status dots — the
+    // "one command per parallel agent" fleet view. The whole window was too
+    // zoomed out at card size.
+    crop: { left: 0, top: 260, width: 760, height: 475 },
+    maxWidth: 760,
+  },
+  {
+    out: 'hexokit-operator-console.webp',
+    prefix: 'Screenshot 2026-09-07 at 7.28.15',
+    // 2446x1298: the operator console — a Quake-style drawer — slid down over a
+    // dashboard tab, with the tab's Ask box above it. Wide (2.2:1) box for the
+    // full-width feature card: top bar, the whole drawer, the tab behind it.
+    crop: { left: 0, top: 0, width: 2446, height: 1110 },
     maxWidth: 1600,
   },
   {
@@ -141,7 +176,7 @@ function resolveSource(sourceDir, prefix) {
 }
 
 async function buildOne(sourceDir, entry) {
-  const src = resolveSource(sourceDir, entry.prefix);
+  const src = entry.file ? path.join(SITE_ROOT, entry.file) : resolveSource(sourceDir, entry.prefix);
   let pipeline = sharp(src);
   const meta = await pipeline.metadata();
 

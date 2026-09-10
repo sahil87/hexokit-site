@@ -8,7 +8,7 @@ description: 'The `/` HexoKit product landing page: `src/pages/index.astro` wrap
 
 ## Overview
 
-`/` is the HexoKit product landing page for the live build (`sites/astro-starlight-terminal1`). It is a single-product marketing page — hero, install, six feature cards, the agent-agnostic differentiator, the toolkit hexagon, the desktop-app card and a link footer — hand-written on the site, not synced from any producer repo. It is the only page on the site whose depth is site-authored copy rather than a pulled README slice or generated command reference; the constitution's Tool-Page Depth mechanical-sync rule governs *tool docs*, and its third content class (site-owned curated screenshots, v2.1.3) is what the page's imagery rides.
+`/` is the HexoKit product landing page for the live build (`sites/astro-starlight-terminal1`). It is a single-product marketing page — hero, install, seven feature cards (six in a grid plus one full-width), the agent-agnostic differentiator, the toolkit hexagon, the desktop-app card and a link footer — hand-written on the site, not synced from any producer repo. It is the only page on the site whose depth is site-authored copy rather than a pulled README slice or generated command reference; the constitution's Tool-Page Depth mechanical-sync rule governs *tool docs*, and its third content class (site-owned curated screenshots, v2.1.3) is what the page's imagery rides.
 
 Every string, link and image reference lives in `src/lib/landing-data.ts`; the page templates only lay that data out. The page ships **no client JavaScript of its own** (Constitution I) — the only scripts on it are Starlight's theme/Pagefind and Expressive Code's copy button, both already carried by every page.
 
@@ -34,7 +34,7 @@ In render order:
 |---|---|
 | `#top` hero | `HERO` (tagline and sub-line are verbatim brand strings; the lead is the product README's opening framing). Three CTAs: Install → `#install`, Read the docs → `/docs/`, GitHub → `GITHUB_URL` built from `repoFor('hexokit')`. Two eager `<img>`s with explicit dimensions. |
 | `#install` | `INSTALL_LINES` — two Expressive Code `<Code>` blocks (`curl -fsSL hexokit.com/install \| sh`, `brew install sahil87/tap/hexokit`), then two note lines authored in the template. `InstallOneLiner.astro` is deliberately not used: it carries the `shll.ai/install` whole-toolkit form, and the landing's is the product-first line. |
-| `#features` | `FEATURES` — six cards, each an image + title + copy + a `/docs/…` link. |
+| `#features` | `FEATURES` — seven cards, each an image + title + copy + a `/docs/…` link; the last carries `wide: true` and spans the grid with its screenshot beside the copy (the operator console's Quake-style drawer). |
 | `#agnostic` | The differentiator paragraph and the *It is / It isn't* rows, authored in the template from the product README's agent-agnostic passage. |
 | `#toolkit` | `ToolkitHexagon.astro`, reading `TOOLKIT_EDGES`. |
 | `#desktop` | The card copy is authored in the template from the README's desktop-app section; `DESKTOP_COMMANDS` supplies the `rk desktop install` / `rk desktop update` block. Links `/docs/install/` (the page, not its `#desktop-app-macos` anchor, so an upstream heading rename cannot break it). |
@@ -58,13 +58,13 @@ CI's `node --test scripts/*.test.mjs` picks the file up with no workflow edit.
 
 ## Screenshot pipeline
 
-Eight curated webps ship under `public/screenshots/hexokit-*.webp`: `hero-desktop`, `hero-phone`, `phone-terminal`, `agent-state`, `board`, `operator`, `web-tile`, `desktop-app`. The page also reuses the pre-existing `run-kit-agent-session.webp` for feature card 3.
+Ten curated webps ship under `public/screenshots/hexokit-*.webp`: `hero-desktop`, `hero-phone`, `phone-terminal`, `agent-state`, `fleet`, `board`, `operator`, `web-tile`, `operator-console`, `desktop-app`. `fleet` is a re-crop of the pre-existing committed `run-kit-agent-session.webp` (the generator accepts `file:` sources for exactly this case); the original stays in place for the tool pages.
 
 `scripts/build-landing-screenshots.mjs` is the committed, **unwired** producer (sharp; the `scripts/generate-og-image.mjs` precedent — not referenced from `package.json`, no new dependency). It holds a `SOURCES` map of `{ out, prefix, crop, maxWidth }` so any asset can be re-derived or re-cropped without redoing the visual triage. Only the outputs are committed; the multi-megabyte source PNGs are not.
 
 - **Source pool**: a flat macOS screenshot folder (`--source-dir` overrides the default), holding ~1,200 `Screenshot <date> at <time>.png` captures.
 - **The U+202F gotcha.** macOS puts a NARROW NO-BREAK SPACE (U+202F), not U+0020, before `AM`/`PM` in those filenames, so a typed-space literal never matches. Sources are resolved by `readdirSync` + `startsWith` on the unambiguous date/time prefix, which sidesteps the character entirely. Do not "fix" the prefixes by appending ` AM`/` PM`.
-- **Crop boxes** are sharp `extract` boxes in source pixels, each annotated with what it keeps. `hero-desktop` drops the macOS menu bar (rows 0–65 of a 3024×1964 14" capture). `desktop-app` deliberately **keeps** the menu bar — it is the evidence that the card describes a real native shell. The phone captures and the operator/web-tile crops are kept whole. Two boxes were revised after viewing the first output: `agent-state` widened from a sidebar-only strip (an unreadable 0.32-aspect ribbon that showed the session list but not the pane the card's claim needs) to the left ~60% of the hero source, and `board` was cropped in from `left: 540` to drop the empty sidebar column, which had only stretched the frame and shrunk the pane text below legibility, while also excluding a foreign window's bright edge past `x ≥ 4810`.
+- **Crop boxes** are sharp `extract` boxes in source pixels, each annotated with what it keeps. `hero-desktop` drops the macOS menu bar (rows 0–65 of a 3024×1964 14" capture). `desktop-app` deliberately **keeps** the menu bar — it is the evidence that the card describes a real native shell. The phone captures are kept whole. **Card crops are tight** (the zoom rule): each feature-card asset is a ~16:10 box on the one UI region its claim is about, at a scale where the UI text is still legible inside a card a few hundred pixels wide — `agent-state` on the hero source's lower-left (lower sidebar list + `agt idle` strip, 1000×625), `fleet` on the server grid + session list (760×475), `board` on two pinned panes starting below the app's light title strip (1480×925 → 1400×875), `operator` on the popover's left two thirds (1080×675), `web-tile` on the tile plus the terminal's right edge (1700×1062 → 1400×875), `operator-console` a 2.2:1 box across the whole tab for the wide card (2446×1110 → 1600×726). Full-window captures read as unreadable thumbnails at card size; the hero and desktop-card frames stay wide because they render large.
 - **Budgets**: webp quality 80, metadata stripped, `withoutEnlargement` on the resize; widths ≤ 2400 (hero desktop), ≤ 800 (phones), ≤ 1600 (the rest). Shipped weights are 45–289 KB, under the ≤350 KB hero / ≤150 KB phone / ≤250 KB card ceilings. A crop box exceeding its source throws with the offending geometry.
 
 Every crop is eyeballed for sensitive text (tokens, emails, private hostnames) before commit.
@@ -81,7 +81,7 @@ Imported by `index.astro` only — deliberately not registered in `astro.config.
 
 **Motion vocabulary**, borrowed from the product's own UI (`app/frontend/src/globals.css` in the source repo) so site and app read as one thing: the bracket section label's blinking caret cell (`landing-caret-blink`, 1.06s `steps(1)`), a one-shot typed-sweep inverse-video block across a section label on hover (the CSS-only cousin of the app's per-character typed reveal), a CRT glint — a skewed highlight strip sweeping the primary CTA's face on hover — and a faint static scanline overlay on screenshot frames. **All of it lives inside one `@media (prefers-reduced-motion: no-preference)` block**, so the rest state *is* the reduced-motion state and there is nothing for a `reduce` override to undo.
 
-**Card image framing.** `.landing-card-shot` is a fixed 16/10 window with `object-fit: cover; object-position: top center`, so cards align on a grid row regardless of source aspect (the board shot is 3.1:1, the phone shots 0.46:1) and each image keeps its identifying header row.
+**Card image framing.** `.landing-card-shot` is a fixed 16/10 window with `object-fit: cover; object-position: top center`, so cards align on a grid row regardless of source aspect (the phone shots are 0.46:1) and each image keeps its identifying header row. `.landing-card-wide` spans the grid (`grid-column: 1 / -1`) and from 40rem lays the card out as a row — a 60%-wide 2.2:1 screenshot window beside vertically-centred copy; below 40rem it is an ordinary stacked card.
 
 ### The phone-width header override
 
@@ -93,7 +93,7 @@ Every rule in this block is prefixed `body:has(.landing)`, so no docs page is af
 
 The `#toolkit` section: the cube-in-hexagon brand mark with the six companions on its six edges, plus an adjacent textual list.
 
-- **The SVG is decorative** — `aria-hidden="true"`, `focusable="false"`. Its polygon coordinates are copied verbatim from `src/assets/logo.svg` (viewBox `7 10 50 44`), recoloured so every border segment and cube face takes a `--c-*` token; the committed logo hard-codes greys that vanish against one theme or the other.
+- **The SVG is decorative** — `aria-hidden="true"`, `focusable="false"`. Its polygon coordinates AND fill colours are copied verbatim from `src/assets/logo.svg` (viewBox `7 10 50 44`) — the same fixed greys in both themes; it is inlined only so the edge labels can be positioned against the same box.
 - **The six labels are ordinary HTML `<a>` elements** positioned over the mark by a per-index `EDGE_POSITIONS` entry (`top`/`left`/`translate` custom properties). Side labels are pushed fully clear of the box rather than centred on the edge midpoint, where the label chip and the artwork fought each other and the longest label was clipped. Each has a visible `:focus-visible` ring; tab order follows `TOOLKIT_EDGES`.
 - **Below 40rem** the absolute positioning is dropped entirely: the mark box becomes a two-column grid and the six labels reflow into a plain 2×3 block beneath the svg. Visual reading is then row-major while DOM and keyboard order stay clockwise.
 - **The adjacent `<ul>`** carries one blurb per edge — the constitution's textual-explanation-beside-a-decorative-diagram constraint, and the section's real "what each tool is for" content.
@@ -209,7 +209,7 @@ On `/`, the theme select and the header nav MUST remain visible and clickable at
 ## Key Files
 
 - `src/pages/index.astro` — the route, the `StarlightPage` wrapper and head, the build-time version read, `inlineCode`, and the hero / install / features / agnostic / desktop / footer markup.
-- `src/components/ToolkitHexagon.astro` — the `#toolkit` section: the recoloured inline SVG, `EDGE_POSITIONS`, the six anchors and the blurb list, with its own scoped styles and the sub-40rem collapse.
+- `src/components/ToolkitHexagon.astro` — the `#toolkit` section: the inline brand mark (original colours), `EDGE_POSITIONS`, the six anchors and the blurb list, with its own scoped styles and the sub-40rem collapse.
 - `src/lib/landing-data.ts` — every string, link and image reference on the page, plus `mountHref` and `GITHUB_URL`.
 - `src/styles/landing.css` — the splash-chrome opt-out, the header override, the accent-as-text trio, layout scale, breakpoints and the reduced-motion-gated motion block.
 - `scripts/landing-data.test.mjs` — the copy/link contract (`vn39` tokens, roster mounts, the exact lists, image dimensions against the files on disk).

@@ -48,6 +48,12 @@ export interface FeatureCard {
   image: LandingImage;
   /** Where the card's "→ docs" link goes — always under `/docs/`. */
   href: string;
+  /**
+   * Spans the whole grid row with the screenshot beside the copy (the operator
+   * console card — its capture is a drawer across a whole tab, which no 16:10
+   * thumbnail can show). At most one card should carry this.
+   */
+  wide?: true;
 }
 
 /** One label around the toolkit hexagon. */
@@ -128,7 +134,7 @@ export const INSTALL_LINES = [
 /** The `rk desktop` commands on the desktop card, rendered as one EC block. */
 export const DESKTOP_COMMANDS = ['rk desktop install', 'rk desktop update'] as const;
 
-/** The six feature cards, in render order. */
+/** The feature cards, in render order (the last one is the full-width card). */
 export const FEATURES: readonly FeatureCard[] = [
   {
     title: 'Every pane, a live terminal — from any device',
@@ -146,9 +152,9 @@ export const FEATURES: readonly FeatureCard[] = [
     copy: 'Windows running an agent show active, waiting or idle — a hook stamps a tmux pane option, and Claude Code, Codex, Gemini CLI and Copilot CLI are wired by a one-time setup. HexoKit never speaks an agent’s protocol.',
     image: {
       src: '/screenshots/hexokit-agent-state.webp',
-      alt: 'The session sidebar with per-window status dots beside a running agent pane; the status bar reads agt idle.',
-      width: 1400,
-      height: 1476,
+      alt: 'The lower session sidebar with per-window status dots beside an agent pane; the status bar reads agt idle 43s.',
+      width: 1000,
+      height: 625,
     },
     href: '/docs/agent-hooks/',
   },
@@ -156,10 +162,10 @@ export const FEATURES: readonly FeatureCard[] = [
     title: 'One command per parallel agent',
     copy: '`rk riff` creates a git worktree, opens a tmux window in it and launches your agent. `rk riff -N 3` spawns three at once. The sidebar becomes the fleet view.',
     image: {
-      src: '/screenshots/run-kit-agent-session.webp',
-      alt: 'A HexoKit agent session: a worktree window with the agent working and its status reported in the sidebar.',
-      width: 1800,
-      height: 1395,
+      src: '/screenshots/hexokit-fleet.webp',
+      alt: 'The fleet view: the server grid and a sidebar list of riff worktree windows, each with its status dot.',
+      width: 760,
+      height: 475,
     },
     href: '/docs/workflows/',
   },
@@ -168,9 +174,9 @@ export const FEATURES: readonly FeatureCard[] = [
     copy: 'Pin panes from any server into a named board and they render side by side. Every window carries one status dot: hue = journey, shape = liveness, overlays = flags.',
     image: {
       src: '/screenshots/hexokit-board.webp',
-      alt: 'A HexoKit board named bb showing three pinned agent panes from the same server side by side.',
+      alt: 'A HexoKit board: two pinned agent panes from the same server rendered side by side.',
       width: 1400,
-      height: 445,
+      height: 875,
     },
     href: '/docs/boards/',
   },
@@ -180,8 +186,8 @@ export const FEATURES: readonly FeatureCard[] = [
     image: {
       src: '/screenshots/hexokit-operator.webp',
       alt: 'The operator popover reporting on tracked changes and asking whether to start the next wave of work.',
-      width: 1600,
-      height: 668,
+      width: 1080,
+      height: 675,
     },
     href: '/docs/cron-schedule-kinds/',
   },
@@ -191,10 +197,22 @@ export const FEATURES: readonly FeatureCard[] = [
     image: {
       src: '/screenshots/hexokit-web-tile.webp',
       alt: 'A HexoKit window split between a terminal pane and a web tile rendering a formatted change plan.',
-      width: 1600,
-      height: 1004,
+      width: 1400,
+      height: 875,
     },
     href: '/docs/skill/display/',
+  },
+  {
+    title: 'The operator drops in from any tab',
+    copy: 'The operator is the agent that runs the server, and its console is a Quake-style drawer: one shortcut and it slides down over whatever you are looking at. Ask, answer, resize it, send it back up — your pane never moves.',
+    image: {
+      src: '/screenshots/hexokit-operator-console.webp',
+      alt: 'The operator console slid down as a drawer over a dashboard tab, with the tab’s Ask box above it and the operator’s transcript inside.',
+      width: 1600,
+      height: 726,
+    },
+    href: '/docs/cron-schedule-kinds/',
+    wide: true,
   },
 ];
 

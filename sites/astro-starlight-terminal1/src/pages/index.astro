@@ -173,7 +173,7 @@ const pageDescription =
       <div class="landing-features">
         {
           FEATURES.map((feature) => (
-            <article class="landing-card">
+            <article class:list={['landing-card', feature.wide && 'landing-card-wide']}>
               <div class="landing-card-shot">
                 <img
                   src={feature.image.src}
