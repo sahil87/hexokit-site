@@ -13,9 +13,12 @@
  *      (`mountFor`), never hardcoded — HexoKit's mount (`docs`) already differs
  *      from its slug, so hardcoded `/<slug>/` paths are a known bug class.
  *
- * HAND-COPY DRIFT SURFACE: `TOOLKIT_EDGES[].blurb` is copied VERBATIM from
- * `src/content/docs/toolkit/index.mdx` § The six companions. Those are the only
- * two copies of the companion one-liners on the site; edit both together.
+ * HAND-COPY DRIFT SURFACE: `TOOLKIT_EDGES[].blurb` is a second copy of the
+ * companion one-liners in `src/content/docs/toolkit/index.mdx` § The six
+ * companions. The five TOOL blurbs are VERBATIM; the `desktop` blurb is that
+ * source sentence with its trailing clause dropped ("…around the HexoKit
+ * dashboard." vs. "…, for when the browser tab isn't enough") — intentional,
+ * not upstream drift. Those are the only two copies on the site; edit together.
  *
  * Image `width`/`height` are the REAL pixel dimensions of the committed webps
  * (see `scripts/build-landing-screenshots.mjs`). They are required, not
@@ -55,7 +58,11 @@ export interface ToolkitEdge {
   label: string;
   /** Site-absolute target — a roster mount, or `/desktop/`. */
   href: string;
-  /** One-line "what it's for" — verbatim from `toolkit/index.mdx`. */
+  /**
+   * One-line "what it's for", copied from `toolkit/index.mdx` § The six
+   * companions — verbatim for the five tools; the `desktop` entry drops the
+   * source's trailing "for when the browser tab isn't enough" clause on purpose.
+   */
   blurb: string;
 }
 
