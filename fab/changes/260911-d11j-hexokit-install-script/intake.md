@@ -80,7 +80,7 @@ fi
 if [ "$hexokit_default" -eq 1 ]; then
     echo
     echo "HexoKit is installed (run it: rk). The rest of the toolkit is one command away:"
-    echo "  shll install              # fab-kit, wt, idea, tu, hop"
+    echo "  shll install              # fab-kit, wt, idea, tu, hop, and the desktop app where supported"
     echo "  https://hexokit.com/toolkit/"
 fi
 ```
@@ -151,7 +151,7 @@ Rewrite the hand-authored page (title may stay "Install everything"; the page is
 - Lead block becomes the two-step full install:
   ```bash
   curl -fsSL https://hexokit.com/install | sh     # shll + HexoKit
-  shll install                                     # the six companions: fab-kit, wt, idea, tu, hop
+  shll install                                     # the six companions: fab-kit, wt, idea, tu, hop, and the desktop app where supported
   ```
   with prose: the one-liner bootstraps `shll` (trusts + brew-installs its formula), installs HexoKit, and prints how to add the rest; `shll install` with no arguments installs every roster tool you are missing. Requires Homebrew (the script bootstraps it headlessly when absent — the current page says "exits with a pointer", which is stale since shll PR #81; verify against the fixture and fix).
 - "What the one-liner runs" equivalent-lines block becomes `brew trust --formula sahil87/tap/shll`, `brew install sahil87/tap/shll`, `shll install run-kit`, `shll update run-kit` (the `run-kit` token is the roster name until R1). Link both the canonical source (`github.com/sahil87/shll/blob/main/scripts/install.sh`) and the served, composed file (`https://hexokit.com/install`), stating that hexokit.com appends the product-first default.

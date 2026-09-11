@@ -17,6 +17,6 @@ fi
 if [ "$hexokit_default" -eq 1 ]; then
     echo
     echo "HexoKit is installed (run it: rk). The rest of the toolkit is one command away:"
-    echo "  shll install              # fab-kit, wt, idea, tu, hop"
+    echo "  shll install              # fab-kit, wt, idea, tu, hop, and the desktop app where supported"
     echo "  https://hexokit.com/toolkit/"
 fi

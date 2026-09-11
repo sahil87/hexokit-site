@@ -5,7 +5,7 @@ description: Two steps, the whole toolkit.
 
 ```bash
 curl -fsSL https://hexokit.com/install | sh     # shll + HexoKit
-shll install                                     # the six companions: fab-kit, wt, idea, tu, hop
+shll install                                     # the six companions: fab-kit, wt, idea, tu, hop, and the desktop app where supported
 ```
 
 The one-liner bootstraps `shll` (trusts + brew-installs its formula), installs HexoKit, and prints how to add the rest. `shll install` with no arguments then trusts and installs every roster tool you're missing. Requires [Homebrew](https://brew.sh) — the script bootstraps it headlessly when it's absent. (Only want some of the tools? See [Per-tool install](#per-tool-install).)
