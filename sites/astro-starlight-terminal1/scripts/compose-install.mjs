@@ -52,7 +52,7 @@ export function composeInstall(source, epilogue) {
   const lastLine = lines[anchorIndex].trimEnd();
   if (lastLine !== ANCHOR) {
     throw new Error(
-      `${LOG_PREFIX} expected the upstream script to end with 'main "$@"' (its truncated-download anchor) — got: ${lines[anchorIndex]}`,
+      `${LOG_PREFIX} expected the upstream script to end with 'main "$@"' (its truncated-download anchor) — got: ${JSON.stringify(lines[anchorIndex])}`,
     );
   }
 
