@@ -1,0 +1,53 @@
+id: d11j
+name: 260911-d11j-hexokit-install-script
+created: 2026-09-11T17:17:44Z
+created_by: sahil-noon
+change_type: feat
+issues: []
+progress:
+    intake: done
+    apply: done
+    review: done
+    hydrate: done
+    ship: done
+    review-pr: active
+plan:
+    generated: true
+    task_count: 9
+    acceptance_count: 24
+    acceptance_completed: 24
+confidence:
+    certain: 6
+    confident: 9
+    tentative: 0
+    unresolved: 0
+    score: 4.2
+    fuzzy: true
+    dimensions:
+        signal: 63.3
+        reversibility: 89.0
+        competence: 83.7
+        disambiguation: 76.3
+stage_metrics:
+    intake: {started_at: "2026-09-11T17:17:44Z", driver: fab-new, iterations: 1, completed_at: "2026-09-11T17:24:43Z"}
+    apply: {started_at: "2026-09-11T17:24:43Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-11T17:32:54Z"}
+    review: {started_at: "2026-09-11T17:32:54Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-11T17:36:54Z"}
+    hydrate: {started_at: "2026-09-11T17:36:54Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-11T17:41:56Z"}
+    ship: {started_at: "2026-09-11T17:41:56Z", driver: fab-fff, iterations: 1, completed_at: "2026-09-11T17:43:46Z"}
+    review-pr: {started_at: "2026-09-11T17:43:46Z", driver: git-pr, iterations: 1}
+prs:
+    - https://github.com/sahil87/hexokit-site/pull/8
+change_type_source: explicit
+true_impact:
+    added: 1303
+    deleted: 89
+    net: 1214
+    excluding:
+        added: 645
+        deleted: 79
+        net: 566
+    computed_at: "2026-09-11T17:43:46Z"
+    computed_at_stage: ship
+summary: Created docs/memory/build-deploy/install-endpoint.md (the /install endpoint contract); updated deployment.md (fetch→compose→build), conventions/tool-page-rubric.md (InstallOneLiner product-first forms), and the live site's site/landing-page.md (#install row rationale); indexes regenerated
+# true_impact: lazily created on first stage-finish that computes it (no placeholder here).
+last_updated: 2026-09-11T17:43:46Z

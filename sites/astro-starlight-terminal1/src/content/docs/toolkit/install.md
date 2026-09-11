@@ -1,13 +1,14 @@
 ---
 title: Install everything
-description: One line, the whole toolkit.
+description: Two steps, the whole toolkit.
 ---
 
 ```bash
-curl -fsSL https://shll.ai/install | sh
+curl -fsSL https://hexokit.com/install | sh     # shll + HexoKit
+shll install                                     # the six companions: fab-kit, wt, idea, tu, hop
 ```
 
-The script bootstraps `shll` (trusts + brew-installs its formula), then hands off to `shll install`, which trusts and installs every roster tool you're missing. Requires [Homebrew](https://brew.sh) — the script exits with a pointer if it's absent. (Only want some of the tools? See [Per-tool install](#per-tool-install).)
+The one-liner bootstraps `shll` (trusts + brew-installs its formula), installs HexoKit, and prints how to add the rest. `shll install` with no arguments then trusts and installs every roster tool you're missing. Requires [Homebrew](https://brew.sh) — the script bootstraps it headlessly when it's absent. (Only want some of the tools? See [Per-tool install](#per-tool-install).)
 
 Then wire your shell:
 
@@ -19,25 +20,20 @@ exec $SHELL                             # reload so the shell integration takes 
 
 ## What the one-liner runs
 
-The script is [a few dozen auditable lines](https://github.com/sahil87/shll/blob/main/scripts/install.sh) equivalent to:
+The script is [a few dozen auditable lines](https://github.com/sahil87/shll/blob/main/scripts/install.sh); hexokit.com serves [a copy](https://hexokit.com/install) with the product-first default appended at deploy time. Together they are equivalent to:
 
 ```bash
 brew trust --formula sahil87/tap/shll   # bootstrap: trust shll's formula
 brew install sahil87/tap/shll           # bootstrap: install shll itself
-shll install                            # trusts + brew-installs every roster tool you're missing
+shll install run-kit                    # install HexoKit (roster/formula name: run-kit)
+shll update run-kit                     # bring it current
 ```
 
-The first two lines are a one-time **bootstrap**: shll can't trust its own formula before it exists, so you trust-and-install `shll` directly with brew. From there, `shll install` owns trust for the other six tools — it runs `brew trust --formula sahil87/tap/<formula>` before each install (drop it with `--no-trust` if you manage trust yourself).
+The first two lines are a one-time **bootstrap**: shll can't trust its own formula before it exists, so you trust-and-install `shll` directly with brew. From there, `shll install` owns trust for the other tools — it runs `brew trust --formula sahil87/tap/<formula>` before each install (drop it with `--no-trust` if you manage trust yourself).
 
 That's it. `shll install` is idempotent and safe to re-run: it installs only the roster tools you're missing and does **not** upgrade what's already there. To upgrade installed tools, use `shll update`.
 
 > **Why `brew trust` first?** Homebrew 6.0 made tap-trust a hard install requirement (it defaults `HOMEBREW_REQUIRE_TAP_TRUST=1`). shll's formulae download a binary and run a sandboxed install that re-checks trust against a persisted record, so naming the formula on the CLI isn't enough — you must trust it first. Requires Homebrew ≥ 6.0.4; on 6.0.0–6.0.3, run `brew update` first.
-
-Prefer to pull everything in one shot? The `all` meta-formula installs every roster tool at once:
-
-```bash
-brew trust --formula sahil87/tap/all && brew install sahil87/tap/all
-```
 
 ## Verify
 
@@ -56,7 +52,7 @@ The `shll setup agent` line above is optional and once per machine — it writes
 If you only want a subset of the tools, pass their names to the one-liner (this also installs `shll`, which handles the trust ceremony for you):
 
 ```bash
-curl -fsSL https://shll.ai/install | sh -s -- hop wt
+curl -fsSL https://hexokit.com/install | sh -s -- hop wt
 ```
 
 Or skip the meta-installer entirely — every tool has its own brew formula and you opt in piece by piece:

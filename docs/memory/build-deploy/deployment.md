@@ -10,6 +10,10 @@ The site deploys to GitHub Pages from the `sahil87/hexokit-site` repo via a sing
 
 There is no preview/staging environment. There is no manual deploy path — `dist/` is gitignored and never committed.
 
+## The install-script fetch and compose
+
+The build job fetches the canonical shll installer (`curl -fsSL https://raw.githubusercontent.com/sahil87/shll/main/scripts/install.sh -o public/install` — `-f` fails the deploy on a missing script) and then composes the site-owned product-first default onto the fetched copy's last line (`node scripts/compose-install.mjs public/install`), so the step order is fetch → compose → build. The composed copy is served at `hexokit.com/install`; the fetched file stays gitignored. The endpoint contract, the fail-loud postures, and the tests live in [install-endpoint](/build-deploy/install-endpoint.md).
+
 ## Requirements
 
 - Deployments MUST go through the GitHub Pages workflow on push to `main`. Manual deploys (uploading `dist/` to anywhere) SHALL NOT be performed.
