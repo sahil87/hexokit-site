@@ -33,7 +33,7 @@ In render order:
 | Section | Source of copy |
 |---|---|
 | `#top` hero | `HERO` (tagline and sub-line are verbatim brand strings; the lead is a three-sentence, 31-word version of the README's opening framing — copy study 2). Three CTAs: Install → `#install`, Read the docs → `/docs/`, GitHub → `GITHUB_URL` built from `repoFor('hexokit')`. Two eager `<img>`s with explicit dimensions. |
-| `#install` | `INSTALL_LINES` — two Expressive Code `<Code>` blocks (`curl -fsSL hexokit.com/install \| sh`, `brew install sahil87/tap/hexokit`), then two note lines authored in the template. `InstallOneLiner.astro` is deliberately not used: it carries the `shll.ai/install` whole-toolkit form, and the landing's is the product-first line. |
+| `#install` | `INSTALL_LINES` — two Expressive Code `<Code>` blocks (`curl -fsSL hexokit.com/install \| sh`, `brew install sahil87/tap/hexokit`), then two note lines authored in the template. `InstallOneLiner.astro` is not used: `INSTALL_LINES` carries two lines (the curl bootstrap and the brew formula) as one typed list, while the component renders a single command block per tool class. |
 | `#features` | `FEATURES` — seven cards, each an image + title + copy + a `/docs/…` link; the last carries `wide: true` and spans the grid with its screenshot beside the copy (the operator console's Quake-style drawer). |
 | `#agnostic` | The differentiator paragraph and the *It is / It isn't* rows, authored in the template from the product README's agent-agnostic passage. |
 | `#toolkit` | `ToolkitHexagon.astro`, reading `TOOLKIT_EDGES`. |

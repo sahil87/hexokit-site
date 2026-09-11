@@ -2,19 +2,42 @@
 /**
  * InstallOneLiner — the per-tool one-step install one-liner for tool overviews.
  *
- * Renders the toolkit's real one-step installer as an Expressive Code terminal
- * block. Most tools get the installer scoped to that single tool:
+ * Renders hexokit.com's installer as an Expressive Code terminal block. The
+ * bare one-liner is product-first (change d11j, D10): with no arguments it
+ * installs shll + HexoKit and prints how to add the rest:
  *
- *     curl -fsSL https://shll.ai/install | sh -s -- <tool>
+ *     curl -fsSL https://hexokit.com/install | sh
  *
- * while `shll` and the FULL_TOOLKIT tools (see below) render the whole-toolkit
- * form instead (no `sh -s --` suffix):
+ * Tool-scoped forms append the tool names via `sh -s --`:
  *
- *     curl -fsSL https://shll.ai/install | sh
+ *     curl -fsSL https://hexokit.com/install | sh -s -- <tool>
  *
- * plus one short site-authored sentence pointing at the whole-toolkit story.
- * The `shll.ai/install` script (PR #84) accepts a tool subset via `sh -s --`,
- * so the scoped line is accurate and copy-pasteable per tool.
+ * The same upstream script (sahil87/shll scripts/install.sh) serves both
+ * forms — hexokit-site composes the product-first default onto its last line
+ * at deploy time (scripts/compose-install.mjs), so the scoped line is
+ * accurate and copy-pasteable per tool.
+ *
+ * THREE TOOL CLASSES:
+ *
+ * 1. `hexokit` (the product) renders the bare bootstrap line alone — its form
+ *    IS the D10 default, matching the landing page. It is NOT in FULL_TOOLKIT:
+ *    riff's `wt` dependency is probed at run time (install-composition
+ *    Policy A), not pre-installed.
+ * 2. `shll` renders the bootstrap line plus a follow-on block (`shll install`
+ *    for the six companions, `shll setup shell`, `shll setup agent`,
+ *    `exec $SHELL`). `shll` is the bootstrap meta-CLI, not a roster install
+ *    target — `shll install shll` hard-errors (see toolkit/install and
+ *    help/shll.json), so `sh -s -- shll` would be wrong.
+ * 3. FULL_TOOLKIT tools (`fab-kit`) render a two-line block — the bootstrap
+ *    line, then `shll install` — because their canonical READMEs (the
+ *    constitution's source of truth — Tool-Page Depth) document the
+ *    whole-toolkit install as the supported path: the tool relies on its
+ *    siblings, so `sh -s -- <tool>` — while functional — would yield a
+ *    degraded setup. Unlike `shll` they get no follow-on steps block; the
+ *    note's link carries the visitor to the full guide.
+ *
+ * Every other tool (`idea`, `wt`, `tu`, `hop`) renders the `sh -s -- <tool>`
+ * subset form.
  *
  * COPY BUTTON PARITY: the block is rendered via Starlight's re-exported
  * Expressive Code `<Code>` component — the same engine behind every fenced
@@ -28,30 +51,11 @@
  * (Constitution I's build-time discipline: the block is fully rendered at
  * build; EC's copy script is progressive enhancement the site already carries).
  *
- * SHLL IS SPECIAL: `shll` is the bootstrap meta-CLI, not a roster install
- * target — the script execs `shll install "$@"`, and `shll install shll` hard-
- * errors (shll isn't one of the six installable tools; see toolkit/install
- * and help/shll.json). For `tool === 'shll'` we render the whole-toolkit
- * one-liner `curl -fsSL https://shll.ai/install | sh` (no `sh -s -- shll`),
- * which is exactly the bootstrap the homepage/install page document.
- *
- * FULL-TOOLKIT TOOLS: some tools' canonical READMEs (the constitution's source
- * of truth — Tool-Page Depth) document the WHOLE-toolkit one-liner as the
- * supported install path, because the tool relies on its sibling tools and
- * `sh -s -- <tool>` — while still functional — would yield a degraded setup.
- * The FULL_TOOLKIT map below carries those slugs with their per-tool reason;
- * each renders the whole-toolkit one-liner plus a note mirroring the canonical
- * README wording. Unlike `shll`, these tools do NOT get the follow-on steps
- * block — the overview install section stays light and the note's link carries
- * the visitor to the full guide. The sibling dependency is a property of the
- * tool, not of the page that renders it, which is why the branch lives here
- * (next to the shll carve-out) and not as a page-authored prop.
- *
  * SINGLE SOURCE: this component is the sole carrier of the per-tool one-liner.
- * It deliberately does NOT add seven hand-copied install blocks. The two
- * documented hand-copy surfaces — the homepage install block (index.mdx) and
- * toolkit/install.md — stay the canonical hand-written carriers of the
- * whole-toolkit quick-start and are untouched by this component.
+ * It deliberately does NOT add seven hand-copied install blocks. The other
+ * documented hand-written carriers — the homepage install block and
+ * toolkit/install.md — describe the same two-step story (bootstrap, then
+ * `shll install` for the rest) and are single-sourced separately.
  *
  * WHY AN .astro COMPONENT (not inline MDX): the command contains both `--` and
  * a bare URL. MDX runs remark plugins over JSX text — smartypants turns `--`
@@ -72,7 +76,7 @@ import { Code } from '@astrojs/starlight/components';
 import { isToolSlug } from '../lib/tool-slugs.ts';
 
 interface Props {
-  /** Tool slug — selects the install form (whole-toolkit for shll/full-toolkit tools, else the `sh -s -- <tool>` subset). */
+  /** Tool slug — selects the install form (bare bootstrap for hexokit, bootstrap + follow-on for shll, two-step for FULL_TOOLKIT tools, else the `sh -s -- <tool>` subset). */
   tool: string;
 }
 
@@ -94,8 +98,10 @@ if (!isToolSlug(tool)) {
   );
 }
 
-// `shll` bootstraps the whole toolkit — it is NOT a `shll install` target, so
-// `sh -s -- shll` would hard-error. Render the whole-toolkit bootstrap instead.
+// `hexokit` is the product — the bare bootstrap line already installs it.
+// `shll` bootstraps the toolkit — it is NOT a `shll install` target, so
+// `sh -s -- shll` would hard-error.
+const isProduct = tool === 'hexokit';
 const isShll = tool === 'shll';
 
 // Tools whose canonical README documents the WHOLE-toolkit install as the
@@ -105,41 +111,51 @@ const isShll = tool === 'shll';
 // READMEs (the constitution's source of truth for tool docs).
 const FULL_TOOLKIT: Record<string, string> = {
   'fab-kit': 'relies on its sibling tools (wt for worktrees, idea for the backlog)',
-  hexokit: 'relies on its sibling tools (wt for the riff worktree flow)',
 };
 const fullToolkitReason = FULL_TOOLKIT[tool];
 
 // The one-liner is built here (not in markdown) so the `--` and the URL
-// never pass through any markdown/remark transform. The whole-toolkit form is
+// never pass through any markdown/remark transform. The bootstrap line is
 // single-sourced: the subset form appends `sh`'s args to the same base string.
-const WHOLE_TOOLKIT_ONE_LINER = 'curl -fsSL https://shll.ai/install | sh';
-const oneLiner =
-  isShll || fullToolkitReason
-    ? WHOLE_TOOLKIT_ONE_LINER
-    : `${WHOLE_TOOLKIT_ONE_LINER} -s -- ${tool}`;
+const BOOTSTRAP_ONE_LINER = 'curl -fsSL https://hexokit.com/install | sh'; // installs shll + HexoKit
 
-// Whole-toolkit follow-on steps (isShll only). Most visitors copy the homepage
-// one-liner and assume they're done — surfacing the post-install steps right
-// under it keeps them from being missed. Wording mirrors the canonical block in
-// toolkit/install.md (the sole hand-written carrier of the full steps).
-const followOn = [
-  'shll shell-setup      # wire your shell integration',
-  'shll agent-setup      # optional, once per machine',
-  'exec $SHELL           # reload your shell',
-].join('\n');
+let codeBlock = BOOTSTRAP_ONE_LINER;
+if (isShll) {
+  // Follow-on steps after the bootstrap. Most visitors copy the one-liner and
+  // assume they're done — surfacing the post-install steps right under it
+  // keeps them from being missed. Command spellings follow help/shll.json
+  // (`setup`, not the hidden shell-setup/agent-setup aliases); wording mirrors
+  // the canonical block in toolkit/install.md.
+  codeBlock = [
+    BOOTSTRAP_ONE_LINER,
+    '',
+    'shll install              # the six companions',
+    'shll setup shell           # wire your shell integration',
+    'shll setup agent           # optional, once per machine',
+    'exec $SHELL                # reload your shell',
+  ].join('\n');
+} else if (fullToolkitReason) {
+  // Two-step whole-toolkit install: one copy button copies both commands.
+  codeBlock = `${BOOTSTRAP_ONE_LINER}\nshll install`;
+} else if (!isProduct) {
+  codeBlock = `${BOOTSTRAP_ONE_LINER} -s -- ${tool}`;
+}
 ---
 
 <div class="install-one-liner not-content">
-  <Code code={oneLiner} lang="bash" />
-  {isShll ? (
-    <>
-      <p class="install-one-liner-note">then wire your shell:</p>
-      <Code code={followOn} lang="bash" />
-      <p class="install-one-liner-note">
-        Installs <code>shll</code> and the whole toolkit via Homebrew — see the <a
-          href="/toolkit/install/">full install guide</a>.
-      </p>
-    </>
+  <Code code={codeBlock} lang="bash" />
+  {isProduct ? (
+    <p class="install-one-liner-note">
+      Installs <code>shll</code> and HexoKit via Homebrew — the six companions
+      are one <code>shll install</code> away. See the <a
+        href="/toolkit/install/">full install guide</a>.
+    </p>
+  ) : isShll ? (
+    <p class="install-one-liner-note">
+      Installs <code>shll</code> and HexoKit; <code>shll install</code> adds the
+      rest of the toolkit — see the <a href="/toolkit/install/">full install
+      guide</a>.
+    </p>
   ) : fullToolkitReason ? (
     <p class="install-one-liner-note">
       Installs the entire <code>shll</code> toolkit via Homebrew —

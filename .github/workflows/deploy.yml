@@ -43,12 +43,23 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # The canonical script lives in sahil87/shll (versioned next to the CLI
-      # it bootstraps); the site serves a deploy-time copy at hexokit.com/install.
-      # -f is deliberate: if the script is missing upstream, fail the deploy
-      # rather than ship a site whose documented one-liner 404s.
+      # it bootstraps); the site serves a deploy-time COPY of it at
+      # hexokit.com/install, with the product-first default composed onto its
+      # last line by the next step. -f is deliberate: if the script is missing
+      # upstream, fail the deploy rather than ship a site whose documented
+      # one-liner 404s.
       - name: Fetch install script (served at hexokit.com/install)
         working-directory: ${{ env.SITE_DIR }}
         run: curl -fsSL https://raw.githubusercontent.com/sahil87/shll/main/scripts/install.sh -o public/install
+
+      # hexokit.com serves a deploy-time COPY of the canonical script with a
+      # product-first default composed onto its last line (no args → shll +
+      # HexoKit; tool args pass through). The composer fails the deploy if the
+      # upstream no longer ends in `main "$@"` — a served installer must never
+      # be half-composed. See docs/memory/build-deploy/install-endpoint.md.
+      - name: Compose the product-first default onto the install script
+        working-directory: ${{ env.SITE_DIR }}
+        run: node scripts/compose-install.mjs public/install
 
       - name: Build with Astro
         working-directory: ${{ env.SITE_DIR }}
