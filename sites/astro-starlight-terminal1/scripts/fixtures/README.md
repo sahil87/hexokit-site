@@ -4,6 +4,15 @@ Frozen `-h` text specimens (`Node.text` blobs from `help/<slug>.json`) that
 `scripts/parse-help.test.mjs` pins exact parser behavior against — specific
 flags, placeholders, usage lines, prose boundaries.
 
+**Exception: `shll-ai-paths.txt` is not a parser fixture.** It is the shll.ai
+URL floor for the cross-site redirect-map checker
+(`scripts/check-shll-ai-redirects.mjs`, change
+260912-1u4q-hexokit-site-cutover-prep): the 75-path sitemap fetched 2026-09-12
+plus the historical `/tools/<slug>/*` set generated from it. Unlike the parser
+specimens it DOES carry an in-file header comment (the checker ignores `#`
+lines); the fetch date and command live there. Re-freezing it is an X2-cutover
+act: re-fetch shll.ai's final sitemap, regenerate, re-run the checker.
+
 **Why frozen, not live.** The committed `help/*.json` corpus is refreshed daily
 by `.github/workflows/refresh-help.yml`, and tool releases legitimately change
 commands/flags. Expectations pinned against the *live* corpus therefore rot on

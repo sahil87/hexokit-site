@@ -18,6 +18,8 @@ name: CI
 #      extract-readme contract pins, terminal island units.
 #   3. astro build — the full static build, so a PR that would break the
 #      post-merge deploy build fails HERE instead.
+#   4. check-shll-ai-redirects.mjs — the cross-site redirect map against the
+#      committed shll.ai URL floor (post-build; reads dist/).
 #
 # Running on push to main also covers the scheduled pullers' direct commits
 # (refresh-help.yml / refresh-readme.yml bypass PRs): a corpus refresh that
@@ -83,3 +85,11 @@ jobs:
           # (github-stars.ts) — same step-scoped plumbing as deploy.yml.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm build
+
+      # Every old shll.ai URL must land on a real hexokit.com page — the
+      # redirect-map checker reads dist/shll-ai-redirects.json + the committed
+      # fixture floor, so a roster/route change that strands an old URL fails
+      # the PR (change 260912-1u4q-hexokit-site-cutover-prep).
+      - name: Check shll.ai redirect map
+        working-directory: sites/astro-starlight-terminal1
+        run: node scripts/check-shll-ai-redirects.mjs
