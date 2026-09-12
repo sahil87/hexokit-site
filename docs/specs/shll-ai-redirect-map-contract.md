@@ -36,7 +36,7 @@ The endpoint emits a single JSON object (`application/json; charset=utf-8`), pre
     "/tools/wt/overview/": "https://hexokit.com/wt/",
     "/getting-started/install/": "https://hexokit.com/toolkit/install/",
     "/wt/readme/": "https://hexokit.com/wt/readme/",
-    "/llms.txt": "https://hexokit.com/llms.txt"
+    "/llms.txt": "https://hexokit.com/llms.txt",
     // … every live page (identity entries) ∪ every in-site redirect key
   },
   "rules": [["^/tools/?$", "/toolkit/"], ["^/(?:tools/)?run-kit(/.*)?$", "/docs$1"], "…"]
@@ -106,13 +106,15 @@ Pages cannot wildcard-redirect, so the enumeration is the artifact X2 consumes; 
 
 **Producer** (this repo): `src/pages/shll-ai-redirects.json.ts` at build time; the page set from `getCollection('docs')` + `collectDocsSitePages(repoRoot)`, the in-site table from `siteRedirects()`, the origin from `Astro.site`. Ships via the normal push-to-`main` deploy cascade — no workflow change (the same ride-along model as `versions.json`).
 
-**Consumer** (X2, in `sahil87/shll.ai`): a stub generator that, per `redirects` entry, writes `<key>/index.html` carrying:
+**Consumer** (X2, in `sahil87/shll.ai`): a stub generator that, per **page-like** `redirects` entry, writes `<key>/index.html` carrying:
 
 - `<meta http-equiv="refresh" content="0; url=<value>">`
 - `<link rel="canonical" href="<value>">`
 - a `location.replace(<value>)` script fallback
 
 plus a `404.html` that applies `rules` to the requested path, and serves each `keep` path as a byte copy refreshed by the stub's CI (the same copy step that fetches this map, `/install`, and `/versions.json` from hexokit.com).
+
+**File-like keys are byte copies, not stub pages.** A `redirects` key whose last segment contains a `.` (the agent endpoints `/llms.txt` and `/llms-full.txt`) cannot be a `<key>/index.html` stub: GitHub Pages resolves `/llms.txt` to a literal file and never to `llms.txt/index.html`, and an HTML payload served at a `.txt` path gets a `text/plain` content type, so neither the meta-refresh nor the script fallback would execute. X2 serves these as byte copies refreshed by the stub's CI — the same treatment as `keep` (this is the choice intake assumption #7 left to X2; the map stays correct either way).
 
 A reader authoring X2 needs ONLY this spec and the live endpoint — not this repo's source.
 

@@ -242,3 +242,15 @@ test('R6: rules handle the fixed point — live pages map to themselves', () => 
   assert.equal(applyRules(rules, '/llms.txt'), '/llms.txt');
   assert.equal(applyRules(rules, '/toolkit/overview/'), '/toolkit/');
 });
+
+test('R6: applyRules canonicalizes the request path before matching (spec §4)', () => {
+  const rules = buildRules();
+  // A duplicate-slash request still hits the /tools/<name> rules, not identity.
+  assert.equal(applyRules(rules, '/tools//wt/readme'), '/wt/readme/');
+  assert.equal(applyRules(rules, '/run-kit//skill/cron'), '/docs/skill/cron/');
+  // A missing leading slash or trailing slash is repaired before matching.
+  assert.equal(applyRules(rules, 'tools/wt/readme'), '/wt/readme/');
+  assert.equal(applyRules(rules, '/tools/wt/readme'), '/wt/readme/');
+  // File-like requests stay bare through the identity catch-all.
+  assert.equal(applyRules(rules, '/llms.txt/'), '/llms.txt');
+});

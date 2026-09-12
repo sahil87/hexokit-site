@@ -41,7 +41,9 @@ export const SHLL_AI_ORIGIN = 'https://shll.ai';
 export const KEEP_ON_SHLL_AI = ['/install', '/versions.json'] as const;
 
 /** The agent-discovery endpoints — build-time static files, not collection
- *  pages, so they are treated as live and mapped by identity. */
+ *  pages, so they are treated as live and mapped by identity. On the X2 side
+ *  they are served as byte copies (spec §5): a file-like path cannot be a
+ *  `<key>/index.html` meta-refresh stub on GitHub Pages. */
 export const AGENT_ENDPOINTS = ['/llms.txt', '/llms-full.txt'] as const;
 
 /** Bound on in-site redirect chain length (a site-authored table deeper than
@@ -195,14 +197,18 @@ export function buildRules(): [string, string][] {
 
 /**
  * Apply the first matching rule to `pathname` and canonicalize the result.
- * The identity catch-all guarantees a rule always matches.
+ * The request path is canonicalized BEFORE matching (the spec §4 consumer
+ * algorithm), so a duplicate-slash or unslashed request such as
+ * `/tools//wt/readme` still hits the `/tools/<name>` rules instead of falling
+ * through to identity. The identity catch-all guarantees a rule always matches.
  */
 export function applyRules(rules: readonly [string, string][], pathname: string): string {
+  const request = canonicalPath(pathname);
   for (const [source, replacement] of rules) {
     const re = new RegExp(source);
-    if (re.test(pathname)) return canonicalPath(pathname.replace(re, replacement));
+    if (re.test(request)) return canonicalPath(request.replace(re, replacement));
   }
-  return canonicalPath(pathname);
+  return request;
 }
 
 /**
