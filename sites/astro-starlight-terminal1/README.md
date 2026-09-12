@@ -12,6 +12,15 @@ pnpm build      # static output → ./dist/
 pnpm preview    # preview the build locally
 ```
 
+Verify (the same commands `.github/workflows/ci.yml` runs):
+
+```sh
+node scripts/validate-help.mjs              # help/*.json against the contract schema
+node --test scripts/*.test.mjs              # unit suite
+pnpm build                                  # full static build
+node scripts/check-shll-ai-redirects.mjs    # every old shll.ai URL lands (post-build)
+```
+
 Node ≥ 22.12 and pnpm 10. The `dist/` directory is gitignored — never commit it; CI is the single source of truth for what's live.
 
 ## Stack

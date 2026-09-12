@@ -2,7 +2,8 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import mdx from '@astrojs/mdx';
-import { docsSiteSidebarItems, docsSiteRedirectEntries } from './src/lib/docs-site-sidebar.mjs';
+import { docsSiteSidebarItems } from './src/lib/docs-site-sidebar.mjs';
+import { siteRedirects } from './src/lib/site-redirects.mjs';
 import { TOOL_ROSTER } from './src/lib/tool-roster.mjs';
 
 // The single site-authored roster (slug/label/mount/repo/formula/binary —
@@ -15,57 +16,15 @@ export default defineConfig({
   site: 'https://hexokit.com',
   // The short per-tool URLs (hexokit.com/wt) are CANONICAL real pages (via
   // `slug:` frontmatter overrides — see the tool content files), mounted at the
-  // roster's `mount` segment (HexoKit's pages live under /docs/). The redirects
-  // below keep every retired path landing:
-  //   - the change-3ke3 set: old deep `/tools/<slug>/*` URLs → `/<mount>/…`
-  //   - legacy mounts (change it5d): `/run-kit{,/readme,/commands,/<page>}` →
-  //     `/docs/…` (enumerated from the roster's `legacyMounts`)
-  //   - the retired family pages: `/tools`, `/getting-started/*`,
-  //     `/workflows/*` → `/toolkit/…`
-  // Static <meta refresh> pages emitted at build — works on Pages. (A redirect
-  // key that collides with a real route fails the build, which is why retired
-  // routes — e.g. tools/index.mdx — must be removed when the key is added.)
-  redirects: {
-    ...Object.fromEntries(
-      TOOL_ROSTER.flatMap((t) =>
-        // The change-3ke3 set, keyed by every name the /tools/ namespace ever
-        // used for this tool — its slug AND its legacy mounts (change it5d:
-        // the product's old URLs were /tools/run-kit/*, keyed by the old slug).
-        [t.slug, ...(t.legacyMounts ?? [])].flatMap((name) => [
-          // Bare `/tools/<name>` (previously a 404) — cheap goodwill entry.
-          [`/tools/${name}`, `/${t.mount}/`],
-          // The three per-tool pages: overview collapses to the tool root.
-          [`/tools/${name}/overview`, `/${t.mount}/`],
-          [`/tools/${name}/readme`, `/${t.mount}/readme/`],
-          [`/tools/${name}/commands`, `/${t.mount}/commands/`],
-        ]),
-      ),
-    ),
-    // Legacy mounts (change it5d): HexoKit's pre-rebrand `/run-kit` namespace.
-    ...Object.fromEntries(
-      TOOL_ROSTER.flatMap((t) =>
-        (t.legacyMounts ?? []).flatMap((legacy) => [
-          [`/${legacy}`, `/${t.mount}/`],
-          [`/${legacy}/readme`, `/${t.mount}/readme/`],
-          [`/${legacy}/commands`, `/${t.mount}/commands/`],
-        ]),
-      ),
-    ),
-    // One entry per committed docs/site page: `/tools/<slug>/<path>` →
-    // `/<mount>/<path>/`, plus one per legacy mount. Enumerated programmatically
-    // (static builds can't wildcard-redirect) by the same collector that
-    // generates the sidebar.
-    ...docsSiteRedirectEntries(),
-    // The retired family pages (change it5d): getting-started + workflows moved
-    // under /toolkit/, and the /tools directory page became /toolkit/.
-    '/tools': '/toolkit/',
-    '/getting-started/overview': '/toolkit/',
-    '/toolkit/overview': '/toolkit/',
-    '/getting-started/install': '/toolkit/install/',
-    '/getting-started/philosophy': '/toolkit/philosophy/',
-    '/workflows/daily-flow': '/toolkit/daily-flow/',
-    '/workflows/new-change': '/toolkit/new-change/',
-  },
+  // roster's `mount` segment (HexoKit's pages live under /docs/). The redirect
+  // table — the change-3ke3 `/tools/<slug>/*` set, the it5d legacy mounts, the
+  // docs/site reverse map, and the retired family pages — is single-sourced in
+  // src/lib/site-redirects.mjs (extracted by 260912-1u4q so the cross-site
+  // shll.ai redirect map composes the same object). Static <meta refresh>
+  // pages emitted at build — works on Pages. (A redirect key that collides
+  // with a real route fails the build, which is why retired routes — e.g.
+  // tools/index.mdx — must be removed when the key is added.)
+  redirects: siteRedirects(),
   server: { host: '0.0.0.0' },
   vite: {
     server: {
