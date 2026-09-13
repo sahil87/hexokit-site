@@ -138,9 +138,19 @@ body:has(.landing) .right-group {
   --landing-accent-fill: #7a5310;
 }
 
-.landing {
+/* The column width and gutter live on <body> for the landing route, not on
+   `.landing`: the page's own footer (`.landing-footer`) and the site-wide
+   copyright row (`Footer.astro`'s `.site-copyright`) are SIBLINGS of `.landing`,
+   rendered after it by StarlightPage, and both must align to the same column.
+   Defined on `.landing` alone, `var(--landing-max)` was undefined for them, the
+   `max-width`/`padding` declarations became invalid, and the footer fell back
+   to the full panel width — the left-hugging, edge-to-edge rule bug. */
+body:has(.landing) {
   --landing-max: 72rem;
   --landing-gutter: 1.25rem;
+}
+
+.landing {
   --landing-section-gap: 4.5rem;
   --landing-radius: 6px;
   /* Card/frame chrome */
@@ -583,6 +593,27 @@ body:has(.landing) .right-group {
 .landing-footer a:focus-visible {
   outline: 2px solid var(--c-accent);
   outline-offset: 2px;
+}
+
+/* Starlight renders its own <footer> (edit link, last-updated, prev/next
+   pagination) after the page body. On the splash landing every slot is empty
+   but the block keeps its margins — a ~140px hole between the landing's link
+   row and the site copyright row. Hidden on this route only; docs pages keep
+   their pagination. */
+body:has(.landing) footer.sl-flex {
+  display: none;
+}
+
+/* The site-wide copyright row (`Footer.astro`) sits in the content column on
+   docs pages; on the full-width splash panel it hugged the panel edge. Give it
+   the landing column and sit it directly under the link row, so the two read
+   as one footer: a navigation line, then a legal line. Specificity: this
+   `body:has(.landing) .site-copyright` (0,2,1) beats the component's scoped
+   `.site-copyright:where(.astro-*)` (0,1,0). */
+body:has(.landing) .site-copyright {
+  max-width: var(--landing-max);
+  margin: 0.75rem auto 0;
+  padding: 0 var(--landing-gutter) 2.5rem;
 }
 
 /* ── Breakpoints ─────────────────────────────────────────────────────────
