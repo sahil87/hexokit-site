@@ -1,7 +1,7 @@
 {
   "tool": "run-kit",
-  "version": "v3.19.59",
-  "captured_at": "2026-09-13T12:43:15Z",
+  "version": "v3.19.66",
+  "captured_at": "2026-09-15T12:39:48Z",
   "schema_version": 1,
   "root": {
     "name": "run-kit",
@@ -640,8 +640,8 @@
         "name": "operator",
         "path": "run-kit operator",
         "short": "Open the operator — the server-wide orchestrator agent tab (singleton)",
-        "usage": "run-kit operator [--workers <provider>] [-L <server>] [flags]",
-        "text": "Usage:\n  run-kit operator [--workers <provider>] [-L <server>] [flags]\n  run-kit operator [command]\n\nAvailable Commands:\n  request     Hand the server's operator agent a templated work item\n\nFlags:\n      --json             emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string    address the named tmux server (no $TMUX required; the window opens in the home directory; an existing operator tab is reported, not switched to)\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"run-kit operator [command] --help\" for more information about a command.\n",
+        "usage": "run-kit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]",
+        "text": "Usage:\n  run-kit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]\n  run-kit operator [command]\n\nAvailable Commands:\n  request     Hand the server's operator agent a templated work item\n\nFlags:\n      --dir string       pin the operator window's working directory (absolute path to an existing directory; also drives agent resolution)\n      --json             emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string    address the named tmux server (no $TMUX required; the window opens in a derived project root, falling back to the home directory; an existing operator tab is reported, not switched to)\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"run-kit operator [command] --help\" for more information about a command.\n",
         "commands": [
           {
             "name": "request",
