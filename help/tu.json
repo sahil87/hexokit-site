@@ -1,7 +1,7 @@
 {
   "tool": "tu",
-  "version": "0.12.1",
-  "captured_at": "2026-09-24T12:43:01Z",
+  "version": "0.12.2",
+  "captured_at": "2026-09-25T12:45:21Z",
   "schema_version": 1,
   "root": {
     "name": "tu",
