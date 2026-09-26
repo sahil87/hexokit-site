@@ -98,7 +98,7 @@ See the [riff guide](docs/site/workflows.md) for the full reference.
 
 ## `rk serve` — the HTTP server
 
-Start the HTTP server in the foreground. Configurable via `RK_HOST` (default `127.0.0.1`) and `RK_PORT` (default `3000`).
+Start the HTTP server in the foreground. Configurable via `RK_HOST` (default `127.0.0.1`) and `RK_PORT` (default `3000`). The port also has a durable home: set `port: 4000` in `~/.config/run-kit/config.yaml` and run `rk daemon restart` — `RK_PORT` still wins when set (precedence: default 3000 < config.yaml < `RK_PORT`).
 
 ```bash
 rk serve                                # foreground on 127.0.0.1:3000
@@ -206,6 +206,7 @@ eval "$(rk shell-init zsh)"   # in ~/.zshrc — also: bash, fish, powershell
 | `rk daemon` | Manage the background daemon (`start`, `restart`, `stop`, `status`). |
 | `rk status` | Show a tmux session summary. |
 | `rk url` | Print the HexoKit server URL (config-derived; a heuristic for agents, not a liveness probe). `--mcp` prints the `/mcp` MCP endpoint. |
+| `rk ports` | Print the port policy — reserved blocks, daemon default, effective port, and collision warnings (not a listing of listening ports). |
 | `rk skill` | Print the agent skill bundle — a static usage briefing for agents operating HexoKit. |
 | `rk mcp` | MCP server over stdio — an allowlisted proxy over rk verbs for chat clients with no shell on the box (Claude Desktop connector command: `ssh <box> rk mcp`). |
 | `rk notify` | Send a Web Push notification to your subscribed devices. Fail-silent. |
