@@ -55,9 +55,9 @@ export type Tool = (typeof TOOLS)[number];
 
 /**
  * Strip a redundant leading `{bin} — ` (the binary's own name) from a short
- * description — run-kit's `root.short` is `"run-kit — tmux session manager with
+ * description — hexokit's `root.short` is `"hexokit — tmux session manager with
  * web UI"`, and the index bullet's link text already carries the tool name, so
- * without this the bullet would read `[run-kit]: run-kit — tmux …`. The binary
+ * without this the bullet would read `[hexokit]: hexokit — tmux …`. The binary
  * name lives in the help doc's `tool` field (passed as `bin`). Idempotent; a short
  * without the prefix is returned untouched. Mirrors terminal-toolcard.ts's
  * stripToolPrefix exactly.

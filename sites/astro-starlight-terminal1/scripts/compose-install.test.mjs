@@ -44,6 +44,28 @@ function composeStub(body) {
   return composeInstall(`#!/bin/sh\nset -eu\n${body}\nmain "$@"\n`, epilogue);
 }
 
+// A PATH prefix holding (or not holding) a stub `shll`, so the epilogue's
+// `command -v shll` + `shll install --dry-run hexokit` probe is controlled by
+// the test, not by whatever shll happens to be installed on this box.
+function shllStubDir(kind) {
+  const dir = mkdtempSync(join(tmpdir(), 'compose-install-shll-'));
+  if (kind === 'accept') {
+    writeFileSync(join(dir, 'shll'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  } else if (kind === 'reject') {
+    // Mirrors shll <= v0.1.33: `hexokit` is an unknown target, `run-kit` is fine.
+    writeFileSync(join(dir, 'shll'), '#!/bin/sh\n[ "$3" = "hexokit" ] && exit 1\nexit 0\n', { mode: 0o755 });
+  }
+  return dir;
+}
+
+function envWithShll(kind) {
+  // Only POSIX tools the script needs live in /usr/bin:/bin; a real shll
+  // elsewhere on this box's PATH stays out of the probe.
+  const base = '/usr/bin:/bin';
+  const path = kind === 'absent' ? base : `${shllStubDir(kind)}:${base}`;
+  return { ...process.env, PATH: path };
+}
+
 test('composes the frozen upstream: verbatim prefix, epilogue tail, one subshell anchor', () => {
   const composed = composeInstall(fixture, epilogue);
 
@@ -68,17 +90,40 @@ test('sh -n parses the composed real fixture (valid POSIX sh)', (t) => {
   assert.equal(result.status, 0, result.stderr);
 });
 
-test('default path: no args installs run-kit and prints the toolkit hint', (t) => {
+test('default path: no args and no shll on PATH installs hexokit and prints the toolkit hint', (t) => {
   if (!SH_AVAILABLE) {
     t.skip('sh is not on PATH');
     return;
   }
   const composed = writeTmp('install', composeStub("main() { printf 'main:%s\\n' \"$*\"; }"));
-  const result = spawnSync('sh', [composed], { encoding: 'utf8' });
+  const result = spawnSync('sh', [composed], { encoding: 'utf8', env: envWithShll('absent') });
   assert.equal(result.status, 0, result.stderr);
-  assert.ok(result.stdout.includes('main:run-kit'), `no default in stdout: ${result.stdout}`);
+  assert.ok(result.stdout.includes('main:hexokit'), `no default in stdout: ${result.stdout}`);
   assert.ok(result.stdout.includes('shll install'), `no hint in stdout: ${result.stdout}`);
   assert.ok(result.stdout.includes('https://hexokit.com/toolkit/'), `no hint URL: ${result.stdout}`);
+});
+
+test('default path: a shll that accepts hexokit installs hexokit', (t) => {
+  if (!SH_AVAILABLE) {
+    t.skip('sh is not on PATH');
+    return;
+  }
+  const composed = writeTmp('install', composeStub("main() { printf 'main:%s\\n' \"$*\"; }"));
+  const result = spawnSync('sh', [composed], { encoding: 'utf8', env: envWithShll('accept') });
+  assert.equal(result.status, 0, result.stderr);
+  assert.ok(result.stdout.includes('main:hexokit'), `expected hexokit default: ${result.stdout}`);
+});
+
+test('default path: a stale shll that rejects hexokit falls back to run-kit', (t) => {
+  if (!SH_AVAILABLE) {
+    t.skip('sh is not on PATH');
+    return;
+  }
+  const composed = writeTmp('install', composeStub("main() { printf 'main:%s\\n' \"$*\"; }"));
+  const result = spawnSync('sh', [composed], { encoding: 'utf8', env: envWithShll('reject') });
+  assert.equal(result.status, 0, `failing probe tripped set -e: ${result.stderr}`);
+  assert.ok(result.stdout.includes('main:run-kit'), `no run-kit fallback: ${result.stdout}`);
+  assert.ok(result.stdout.includes('one command away'), `no hint in stdout: ${result.stdout}`);
 });
 
 test('explicit args pass through verbatim and print no hint', (t) => {
@@ -87,7 +132,7 @@ test('explicit args pass through verbatim and print no hint', (t) => {
     return;
   }
   const composed = writeTmp('install', composeStub("main() { printf 'main:%s\\n' \"$*\"; }"));
-  const result = spawnSync('sh', [composed, 'fab-kit', 'wt'], { encoding: 'utf8' });
+  const result = spawnSync('sh', [composed, 'fab-kit', 'wt'], { encoding: 'utf8', env: envWithShll('reject') });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('main:fab-kit wt'), `args not passed through: ${result.stdout}`);
   assert.ok(!result.stdout.includes('one command away'), `hint leaked: ${result.stdout}`);

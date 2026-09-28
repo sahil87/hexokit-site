@@ -41,12 +41,12 @@ test('every record carries the four-name rule fields', () => {
   }
 });
 
-test('hexokit is the slug≠mount≠repo tool (source stays run-kit)', () => {
+test('hexokit is the slug≠mount≠repo tool (only the repo stays run-kit)', () => {
   const hexokit = TOOL_ROSTER.find((t) => t.slug === 'hexokit');
   assert.equal(hexokit.mount, 'docs');
   assert.equal(hexokit.repo, 'run-kit');
-  assert.equal(hexokit.formula, 'run-kit');
-  assert.equal(hexokit.binary, 'run-kit');
+  assert.equal(hexokit.formula, 'hexokit');
+  assert.equal(hexokit.binary, 'hexokit');
   assert.deepEqual(hexokit.legacyMounts, ['run-kit']);
 });
 

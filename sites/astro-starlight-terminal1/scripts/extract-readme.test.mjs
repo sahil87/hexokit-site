@@ -934,15 +934,15 @@ test('715p R1: a longer outer fence masks a shorter inner fence as one block (Co
 
 test('715p R2: a flag after a bare `--` is NOT attributed to the tool', async () => {
   const rk = await loadHelp('hexokit');
-  // run-kit's README example: `run-kit riff -- --worktree-name pacing-canyon`
-  // forwards `--worktree-name` to `wt` — it is NOT a run-kit flag.
-  const slice = ['```bash', 'run-kit riff -- --worktree-name pacing-canyon', '```'].join('\n');
+  // HexoKit's README example: `hexokit riff -- --worktree-name pacing-canyon`
+  // forwards `--worktree-name` to `wt` — it is NOT a hexokit flag.
+  const slice = ['```bash', 'hexokit riff -- --worktree-name pacing-canyon', '```'].join('\n');
   assert.ok(!findUnknownTokens(slice, rk).includes('--worktree-name'), 'post-`--` flag not attributed');
 });
 
 test('715p R2: a fabricated flag BEFORE the `--` is STILL flagged', async () => {
   const rk = await loadHelp('hexokit');
-  const slice = ['```bash', 'run-kit riff --bogus -- --passthrough', '```'].join('\n');
+  const slice = ['```bash', 'hexokit riff --bogus -- --passthrough', '```'].join('\n');
   const unknown = findUnknownTokens(slice, rk);
   assert.ok(unknown.includes('--bogus'), 'pre-`--` fabricated flag still flagged');
   assert.ok(!unknown.includes('--passthrough'), 'post-`--` passthrough flag not attributed');
@@ -980,11 +980,11 @@ test('715p R3: a `[optional]` bracket does NOT stop the scan (real flags still c
 test('715p R4: `completion` / `help` subcommands are NOT flagged (universal seed)', async () => {
   const rk = await loadHelp('hexokit');
   const fk = await loadHelp('fab-kit');
-  // README command-table style: `run-kit completion`, `run-kit help riff`,
+  // README command-table style: `hexokit completion`, `hexokit help riff`,
   // `fab completion bash`. help-dump excludes these (contract §4), but they are
   // real on every cobra tool → seeded valid; their tails are positional args.
-  const rkSlice = ['```bash', 'run-kit completion', 'run-kit help riff', '```'].join('\n');
-  assert.deepEqual(findUnknownTokens(rkSlice, rk), [], 'run-kit completion/help clean');
+  const rkSlice = ['```bash', 'hexokit completion', 'hexokit help riff', '```'].join('\n');
+  assert.deepEqual(findUnknownTokens(rkSlice, rk), [], 'hexokit completion/help clean');
   const fkSlice = ['```bash', 'fab completion bash', 'fab help init', '```'].join('\n');
   assert.deepEqual(findUnknownTokens(fkSlice, fk), [], 'fab completion/help clean');
 });
