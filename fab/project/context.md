@@ -8,7 +8,7 @@ Product site for **HexoKit** at [hexokit.com](https://hexokit.com) — *your tmu
 2. **Site-authored docs** (`sites/*/src/content/docs/`) — the `/docs/` product stubs, the `/toolkit/` family pages, `/desktop/`.
 3. **Site chrome & identity** — components, nav, JSON-LD/OG, llms.txt, versions.json.
 
-The roster wiring these together is **one module**: `sites/astro-starlight-terminal1/src/lib/tool-roster.mjs` — the four-name rule: `slug` (pulled-data key) vs `mount` (URL segment; HexoKit mounts at `docs`) vs `repo` vs `formula`/`binary`. HexoKit is the first tool where these differ (`hexokit` / `docs` / `run-kit` / `run-kit`); consumers never hardcode `/<slug>/` or `sahil87/<slug>`.
+The roster wiring these together is **one module**: `sites/astro-starlight-terminal1/src/lib/tool-roster.mjs` — the four-name rule: `slug` (pulled-data key) vs `mount` (URL segment; HexoKit mounts at `docs`) vs `repo` vs `formula`/`binary`. HexoKit is the first tool where these differ (`hexokit` / `docs` / `hexokit` / `hexokit` — slug ≠ mount, with `run-kit` surviving only as a legacy mount); consumers never hardcode `/<slug>/` or `sahil87/<slug>`.
 
 ## Repo layout
 

@@ -1,6 +1,6 @@
 ---
 type: memory
-description: "The single site-authored tool roster (`src/lib/tool-roster.mjs`, plain ESM for config-eval; `tool-slugs.ts` is its typed re-export): one record per tool with the four names — slug (pulled-data key), mount (URL segment), repo (GitHub), formula/binary — plus `legacyMounts` and the `mountFor`/`slugForMount`/`repoFor`/`labelFor`/`isToolSlug`/`isToolMount` helpers. HexoKit is the first slug≠mount≠repo tool (`hexokit`/`docs`/`run-kit`); no consumer hardcodes `/<slug>/` or `sahil87/<slug>`."
+description: "The single site-authored tool roster (`src/lib/tool-roster.mjs`, plain ESM for config-eval; `tool-slugs.ts` is its typed re-export): one record per tool with the four names — slug (pulled-data key), mount (URL segment), repo (GitHub), formula/binary — plus `legacyMounts` and the `mountFor`/`slugForMount`/`repoFor`/`labelFor`/`isToolSlug`/`isToolMount` helpers. HexoKit is the first slug≠mount tool (`hexokit`/`docs`; repo `hexokit` — `run-kit` survives only in `legacyMounts`); no consumer hardcodes `/<slug>/` or `sahil87/<slug>`."
 ---
 # Tool Roster
 
