@@ -2835,7 +2835,7 @@ const mountMapJson = JSON.stringify(Object.fromEntries(mountEntries)).replace(/<
     // by name.
     function toolNavLine(slug: string): Line {
       return {
-        text: `docs: <a href="${ROUTE_OVERVIEW(slug)}">/${slug}</a> · <a href="${ROUTE_README(slug)}">readme</a> · <a href="${ROUTE_COMMANDS(slug)}">commands</a>     get it: <a href="${ROUTE_INSTALL}">install</a>`,
+        text: `docs: <a href="${ROUTE_OVERVIEW(slug)}">${ROUTE_OVERVIEW(slug)}</a> · <a href="${ROUTE_README(slug)}">readme</a> · <a href="${ROUTE_COMMANDS(slug)}">commands</a>     get it: <a href="${ROUTE_INSTALL}">install</a>`,
         classes: 'shell-out shell-dim',
         html: true,
       };
