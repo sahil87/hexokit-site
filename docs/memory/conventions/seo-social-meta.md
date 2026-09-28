@@ -52,7 +52,7 @@ JSON-LD is authored as a **route dispatcher** in `src/components/Head.astro` —
 
 ### Homepage branch — WebSite + SoftwareApplication
 
-One block on the homepage only (gated on `Astro.url.pathname === '/'`), carrying a `@graph` of two entities: `WebSite` (name `HexoKit`, url from `Astro.site` origin) and `SoftwareApplication` (name `HexoKit`, description `Your tmux, in the browser and on your phone.`, `applicationCategory: DeveloperApplication`, `operatingSystem: macOS, Linux`, a free `Offer`, url `https://github.com/sahil87/run-kit` via the roster's `repoFor('hexokit')`).
+One block on the homepage only (gated on `Astro.url.pathname === '/'`), carrying a `@graph` of two entities: `WebSite` (name `HexoKit`, url from `Astro.site` origin) and `SoftwareApplication` (name `HexoKit`, description `Your tmux, in the browser and on your phone.`, `applicationCategory: DeveloperApplication`, `operatingSystem: macOS, Linux`, a free `Offer`, url `https://github.com/sahil87/hexokit` via the roster's `repoFor('hexokit')`).
 
 ### Per-tool branch — SoftwareApplication + BreadcrumbList (mount-gated)
 
@@ -64,7 +64,7 @@ Every **per-tool page** emits its own inert `application/ld+json` `@graph` of tw
   - **overview** — 1 segment `/<mount>/`, `<mount>` ∈ mounts → no page crumb.
   - **readme/commands** — 2 segments `/<mount>/<page>/`, `<mount>` ∈ mounts AND `<page>` ∈ `{readme, commands}` (a small `PAGE_LABELS` map) → page crumb present.
   This keeps the **same pathname-gate idiom** as the homepage branch (`pathname === '/'`) in this same file — one consistent gate idiom, not a mix with the `TocDispatcher`'s `starlightRoute.id` regexes.
-- **`SoftwareApplication` node**: `name` = the roster **label** via `labelFor(slug)` (`HexoKit` for the `/docs/` pages, the slug-cased label for companions) — the entity names the software product, matching the route + breadcrumb label + GitHub url. `description` = `root.short` read from `help/<slug>.json` (single-sourced; see below). `applicationCategory: DeveloperApplication`, `operatingSystem: 'macOS, Linux'`, a free `Offer`, `url: https://github.com/sahil87/<repoFor(slug)>` — the same shape as the homepage `SoftwareApplication` node for graph consistency (all seven are free macOS+Linux CLIs; HexoKit's url resolves to `sahil87/run-kit`).
+- **`SoftwareApplication` node**: `name` = the roster **label** via `labelFor(slug)` (`HexoKit` for the `/docs/` pages, the slug-cased label for companions) — the entity names the software product, matching the route + breadcrumb label + GitHub url. `description` = `root.short` read from `help/<slug>.json` (single-sourced; see below). `applicationCategory: DeveloperApplication`, `operatingSystem: 'macOS, Linux'`, a free `Offer`, `url: https://github.com/sahil87/<repoFor(slug)>` — the same shape as the homepage `SoftwareApplication` node for graph consistency (all seven are free macOS+Linux CLIs; HexoKit's url resolves to `sahil87/hexokit`).
 - **`BreadcrumbList` node** (crumb depth splits by tool kind and page shape): **all `item` URLs absolute, derived from `Astro.site`** (`new URL(path, Astro.site).href`) — never hardcoded, the same absolute-URL discipline `kb1r` established for og:image (`site: 'https://hexokit.com'` is the single origin source). The crumb items:
   - Position 1 `Home` → `/`.
   - Position 2 `Docs` → **`/docs/`** for the product (`hexokit`), or `Toolkit` → **`/toolkit/`** for the companions.

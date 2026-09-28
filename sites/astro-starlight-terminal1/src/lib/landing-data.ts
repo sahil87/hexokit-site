@@ -85,8 +85,7 @@ function mountHref(slug: string): string {
 
 /**
  * The product's GitHub URL, built from the roster the way `HeaderNav.astro`
- * does. The repo is still named `run-kit`; GitHub redirects after the
- * source-side rename, and nothing here has to change when it happens.
+ * does, so a repo rename flows through the roster, not through this page.
  */
 const hexokitRepo = repoFor('hexokit');
 if (!hexokitRepo) {

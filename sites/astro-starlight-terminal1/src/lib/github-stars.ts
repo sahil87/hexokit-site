@@ -6,7 +6,7 @@
  * BUILD TIME with native fetch (no new dependency — Constitution VI) and
  * resolves to `stargazers_count`; the count renders statically (Constitution
  * I — no client-side fetch). The repo name comes from the shared roster
- * (`repoFor` — slug ≠ repo for hexokit, whose repo stays `run-kit`).
+ * (`repoFor`).
  * Freshness rides the existing daily scheduled
  * pulls: refresh-help.yml's per-run `captured_at` churn reliably lands a
  * commit every day (refresh-readme.yml commits only when slices changed).

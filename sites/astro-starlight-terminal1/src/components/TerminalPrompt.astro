@@ -44,8 +44,7 @@ interface SlimToolHelp {
 const helpDir = path.join(repoRootFromModuleUrl(import.meta.url), 'help');
 
 // Keyed by tool slug (the file name — the product's payload lives in
-// help/hexokit.json; its formula/binary are `hexokit` since the R1 formula
-// rename, only the GitHub repo stays `run-kit` until R2).
+// help/hexokit.json; its repo/formula/binary are all `hexokit`).
 // Enumerating the directory rather than a roster const: the island's TOOLS
 // list is unreachable from this frontmatter, and the help/ collection IS the
 // roster (a stray extra file would add an unreferenced entry, harmless).

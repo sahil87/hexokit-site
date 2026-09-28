@@ -19,10 +19,11 @@
  *   legacyMounts  former URL segments that now redirect to `mount`
  *                 (HexoKit: `run-kit` — the pre-rebrand mount)
  *
- * Of the source-side names, only the repo stays `run-kit` for HexoKit (the
- * GitHub repo slug flips in a later change, R2); formula and binary are
- * `hexokit` since the R1 formula rename. Substrate identifiers (`rk`, `RK_*`,
- * …) are never part of this table.
+ * HexoKit's source-side names (repo, formula, binary) all read `hexokit` —
+ * the GitHub repo `sahil87/run-kit` was renamed to `sahil87/hexokit` (R2), the
+ * formula/binary in the R1 formula rename — so only its mount (`docs`) differs
+ * from its slug. Substrate identifiers (`rk`, `RK_*`, …) are never part of
+ * this table.
  *
  * Plain ESM (`.mjs`, no TS types) so astro.config.mjs and docs-site-sidebar.mjs
  * can import it at config-evaluation time (the docs-site-sidebar precedent: the
@@ -48,7 +49,7 @@
 
 /** @type {ToolRecord[]} */
 export const TOOL_ROSTER = [
-  { slug: 'hexokit', label: 'HexoKit', mount: 'docs', repo: 'run-kit', formula: 'hexokit', binary: 'hexokit', legacyMounts: ['run-kit'] },
+  { slug: 'hexokit', label: 'HexoKit', mount: 'docs', repo: 'hexokit', formula: 'hexokit', binary: 'hexokit', legacyMounts: ['run-kit'] },
   { slug: 'fab-kit', label: 'fab-kit', mount: 'fab-kit', repo: 'fab-kit', formula: 'fab-kit', binary: 'fab' },
   { slug: 'wt',      label: 'wt',      mount: 'wt',      repo: 'wt',      formula: 'wt',      binary: 'wt' },
   { slug: 'idea',    label: 'idea',    mount: 'idea',    repo: 'idea',    formula: 'idea',    binary: 'idea' },

@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-Source for **[hexokit.com](https://hexokit.com)** — the product site for **HexoKit** (your tmux, in the browser and on your phone) and its toolkit of companion CLIs (`fab-kit`, `wt`, `idea`, `tu`, `hop`, `shll`) from [@sahil87](https://github.com/sahil87). The product's own source repo stays [sahil87/run-kit](https://github.com/sahil87/run-kit) — this repo is the site.
+Source for **[hexokit.com](https://hexokit.com)** — the product site for **HexoKit** (your tmux, in the browser and on your phone) and its toolkit of companion CLIs (`fab-kit`, `wt`, `idea`, `tu`, `hop`, `shll`) from [@sahil87](https://github.com/sahil87). The product's own source repo is [sahil87/hexokit](https://github.com/sahil87/hexokit) — this repo is the site.
 
 ## Layout
 

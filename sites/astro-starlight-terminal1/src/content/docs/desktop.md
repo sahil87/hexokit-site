@@ -11,4 +11,4 @@ rk desktop update     # same, but a no-op when already current
 rk desktop status     # report the installed app and its version
 ```
 
-Builds land on [GitHub Releases](https://github.com/sahil87/run-kit/releases); prerequisites and troubleshooting live in the [install guide](/docs/install/#desktop-app-macos).
+Builds land on [GitHub Releases](https://github.com/sahil87/hexokit/releases); prerequisites and troubleshooting live in the [install guide](/docs/install/#desktop-app-macos).

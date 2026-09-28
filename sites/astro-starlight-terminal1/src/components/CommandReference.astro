@@ -100,8 +100,7 @@ if (!node) {
     );
   }
   const slug = tool;
-  // The repo name comes from the roster (slug ≠ repo for hexokit — its repo
-  // stays `run-kit` until the source-side rename). An unknown slug fails the
+  // The repo name comes from the roster (`repoFor`). An unknown slug fails the
   // build loudly (GithubButton's guard), never a `sahil87/null` link.
   const repo = repoFor(slug);
   if (!repo) {
