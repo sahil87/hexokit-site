@@ -44,12 +44,14 @@ export type Notify = (typeof NOTIFY_VALUES)[number];
 
 /**
  * One tool's policy entry: the required notify threshold plus optional
- * `formula` / `envelope` overrides. `formula` defaults to the policy key (key ==
- * Homebrew formula name for all 7 tools today, so the override exists only for
- * a future divergence). `envelope` names which `help/<slug>.json` supplies
- * `latest` when the help-file slug differs from the consumer-facing key — e.g.
- * the `run-kit` row reads `help/hexokit.json` (the site's hexokit slug sources
- * from the run-kit binary) until the roster rename flips the key.
+ * `formula` / `envelope` overrides. `formula` defaults to the policy key; the
+ * override is in use for the `run-kit` row, whose Homebrew formula is now
+ * `hexokit` (the formula rename landed ahead of the manifest-key flip).
+ * `envelope` names which `help/<slug>.json` supplies `latest` when the
+ * help-file slug differs from the consumer-facing key — e.g. the `run-kit`
+ * row reads `help/hexokit.json`. The KEY stays `run-kit` for consumer
+ * compatibility: run-kit's update checker and shll ≤ v0.1.33 look the row up
+ * by that key, so flipping it needs a dual-read on the consumer side first.
  */
 export const PolicyEntrySchema = z
   .object({
@@ -87,7 +89,7 @@ export interface Manifest {
  * Strip a single leading `v` from a version string — the inverse of
  * `version.ts`'s display `normalizeVersion` (which PREPENDS `v`). The manifest
  * contract advertises bare versions (`"3.7.4"`), because the envelopes are
- * inconsistent — fab/tu emit `"2.15.4"`, wt/hop/idea/run-kit/shll emit
+ * inconsistent — fab/tu emit `"2.15.4"`, wt/hop/idea/hexokit/shll emit
  * `"v0.1.1"`. Idempotent; a bare version is returned untouched.
  */
 export function stripVersionPrefix(version: string): string {

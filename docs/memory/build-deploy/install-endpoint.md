@@ -1,6 +1,6 @@
 ---
 type: memory
-description: "The `/install` endpoint: hexokit.com serves a deploy-time copy of `sahil87/shll`'s `scripts/install.sh` (fetched with `curl -fsSL`; a missing script fails the deploy) with a site-owned epilogue composed onto its last-line `main \"$@\"` anchor by `scripts/compose-install.mjs` — product-first default `run-kit`, subshell + hint on the default path only, tool args passed through; fail-loud on a changed anchor or an HTML body; a frozen fixture pins the upstream so CI never fetches it."
+description: "The `/install` endpoint: hexokit.com serves a deploy-time copy of `sahil87/shll`'s `scripts/install.sh` (a missing script fails the deploy) with a site-owned epilogue composed onto its last-line `main \"$@\"` anchor by `scripts/compose-install.mjs` — product-first default `hexokit` with a stale-shll `run-kit` fallback, subshell + hint on the default path only, tool args passed through; fail-loud on a changed anchor or HTML body; a frozen fixture pins the upstream so CI never fetches it."
 ---
 # Install Endpoint
 
@@ -26,18 +26,18 @@ Immediately after the fetch, the build job runs `node scripts/compose-install.mj
 ### Requirement: The epilogue (`scripts/install-epilogue.sh`)
 The site-owned fragment that replaces `main "$@"`:
 
-- With no arguments it `set -- run-kit` (the roster/formula name) and records that the default fired.
+- With no arguments it defaults to `hexokit` (the roster/formula name) and records that the default fired — with one compatibility guard: when a `shll` is already on `PATH` and `shll install --dry-run hexokit` fails (shll ≤ v0.1.33 predates the roster rename and rejects `hexokit` as an unknown target), it hands the old shll the legacy `run-kit` name it knows. The probe sits in an `if` condition with stdout+stderr silenced, so a failing probe never trips `set -e`; a fresh box (no shll) skips it and gets `hexokit` via the current shll the bootstrap installs.
 - It runs `( main "$@" )` in a subshell — `main` ends in `exec shll update`, which would replace the process before the hint could print; `set -e` still propagates a failure out of the subshell (non-zero exit, no hint).
 - After a successful `main` it prints the toolkit hint only when the default fired.
-- Tool arguments pass through to `main` unchanged.
+- Tool arguments pass through to `main` unchanged (no probe, no hint).
 
-The hint names only `shll install`, `rk`, and `https://hexokit.com/toolkit/` — every command exists in `help/shll.json` / `help/hexokit.json` (the `vn39` rule holds). `rk-desktop` is not part of the default; the desktop app is its own opt-in (`rk desktop install`). The `run-kit` token appears only where the command needs the roster/formula name; the prose (comments, hint) says HexoKit. The fragment opens with a comment block stating that everything above it is `sahil87/shll scripts/install.sh` fetched verbatim and that the default is composed at deploy by `sahil87/hexokit-site`.
+The hint names only `shll install`, `rk`, and `https://hexokit.com/toolkit/` — every command exists in `help/shll.json` / `help/hexokit.json` (the `vn39` rule holds). `rk-desktop` is not part of the default; the desktop app is its own opt-in (`rk desktop install`). The prose (comments, hint) says HexoKit; `run-kit` appears only on the stale-shll fallback path. The fragment opens with a comment block stating that everything above it is `sahil87/shll scripts/install.sh` fetched verbatim and that the default is composed at deploy by `sahil87/hexokit-site`.
 
 #### Scenario: Served behaviour
 
 | Invocation | `shll install` receives | `shll update` receives | Hint |
 |------------|-------------------------|------------------------|------|
-| `curl -fsSL https://hexokit.com/install \| sh` | `run-kit` | `run-kit` | printed after the update pass |
+| `curl -fsSL https://hexokit.com/install \| sh` | `hexokit` (`run-kit` when an installed shll ≤ v0.1.33 rejects `hexokit`) | same | printed after the update pass |
 | `curl … \| sh -s -- fab-kit wt` | `fab-kit wt` | `fab-kit wt` | not printed (user chose explicitly) |
 | `curl … \| sh -s -- run-kit --no-agent-setup` | `run-kit --no-agent-setup` | `run-kit` (upstream strips `-*` flags) | not printed |
 | any failure inside `main` | — | — | not printed; script exits non-zero |
@@ -50,7 +50,7 @@ The hint names only `shll install`, `rk`, and `https://hexokit.com/toolkit/` —
 
 ## The two-domain window and downstream consumers
 
-Until X2 the two domains diverge by design: `shll.ai/install` serves the upstream with its everything-default (no args installs the whole roster); `hexokit.com/install` serves the composed product-first copy (`shll` + HexoKit). X2's shll.ai stub byte-copies the composed `hexokit.com/install`, converging both domains onto the file this repo produces. The R1 flip (the formula rename) is a one-token edit in this repo — `run-kit` → `hexokit` inside the epilogue only — plus un-hiding the landing's `brew install sahil87/tap/hexokit` line (R1(d)'s scope).
+Until X2 the two domains diverge by design: `shll.ai/install` serves the upstream with its everything-default (no args installs the whole roster); `hexokit.com/install` serves the composed product-first copy (`shll` + HexoKit). X2's shll.ai stub byte-copies the composed `hexokit.com/install`, converging both domains onto the file this repo produces.
 
 The site's hand-authored install surfaces describe the composed behaviour: `InstallOneLiner.astro` (see [tool-page-rubric](/conventions/tool-page-rubric.md)) and `src/content/docs/toolkit/install.md` both quote `https://hexokit.com/install`. The Policy B patch note for the shll repo's `install-composition` standard (applied by shll change `ttoa`, C1) lives at [`docs/findings/install-composition-policy-b-patch.md`](../../findings/install-composition-policy-b-patch.md).
 
@@ -69,7 +69,13 @@ The site's hand-authored install surfaces describe the composed behaviour: `Inst
 *Introduced by*: 260911-d11j-hexokit-install-script
 
 ### Hint only on the default path
-**Decision**: Print the toolkit hint only when the epilogue supplied the default `run-kit`.
+**Decision**: Print the toolkit hint only when the epilogue supplied the default.
 **Why**: A user who named tools made a choice; the hint exists to tell the product-only installer that more exists.
 **Rejected**: Always printing (noise for subset installs).
 *Introduced by*: 260911-d11j-hexokit-install-script
+
+### Probe an installed shll and fall back to `run-kit` when it rejects `hexokit`
+**Decision**: On the no-arg path, when `shll` is on `PATH`, probe it with `shll install --dry-run hexokit`; on failure pass `run-kit`, otherwise `hexokit`.
+**Why**: The upstream bootstrap hands the args to an already-installed shll without upgrading it first, and shll ≤ v0.1.33's roster predates the rename, so a plain `hexokit` default would abort every `curl … | sh` re-run by an existing user (`unknown target "hexokit"`, exit 1). A capability probe beats a version-string compare (brittle). The guard is transitional: it is droppable once the upstream shll bootstrap upgrades an installed shll before running `shll install` (a shll-side follow-up).
+**Rejected**: Plain `set -- hexokit` (breaks re-runs for every shll ≤ v0.1.33 install); keeping `run-kit` (the site would keep naming the old tool and new shll prints a rename note on every fresh install).
+*Introduced by*: 260928-u7sp-hexokit-r1d-install-surfaces

@@ -14,7 +14,7 @@ Then wire your shell:
 
 ```bash
 shll setup shell                        # wire your shell integration
-shll setup agent                        # optional, once per machine: agent context + run-kit dashboard state
+shll setup agent                        # optional, once per machine: agent context + HexoKit dashboard state
 exec $SHELL                             # reload so the shell integration takes effect
 ```
 
@@ -25,8 +25,8 @@ The script is [a few dozen auditable lines](https://github.com/sahil87/shll/blob
 ```bash
 brew trust --formula sahil87/tap/shll   # bootstrap: trust shll's formula
 brew install sahil87/tap/shll           # bootstrap: install shll itself
-shll install run-kit                    # install HexoKit (roster/formula name: run-kit)
-shll update run-kit                     # bring it current
+shll install hexokit                    # install HexoKit
+shll update hexokit                     # bring it current
 ```
 
 The first two lines are a one-time **bootstrap**: shll can't trust its own formula before it exists, so you trust-and-install `shll` directly with brew. From there, `shll install` owns trust for the other tools — it runs `brew trust --formula sahil87/tap/<formula>` before each install (drop it with `--no-trust` if you manage trust yourself).
@@ -43,9 +43,9 @@ shll version
 
 `version` prints a paste-friendly dump of every installed tool and its version — handy for confirming the install worked and for bug reports.
 
-## Optional: run-kit agent state
+## Optional: HexoKit agent state
 
-The `shll setup agent` line above is optional and once per machine — it writes the toolkit's agent-context stanza into your installed agent harnesses (v1: Claude Code), teaching agents the `shll skill` two-step. It also **delegates** run-kit's hook installation to `run-kit agent setup` (now hooks-only), which is what lights up live agent state in [HexoKit](/docs/)'s dashboard: **active** / **waiting** / **idle** for every pane running a coding agent. Details on the dashboard and the hooks it installs are in the [install guide](/docs/install/).
+The `shll setup agent` line above is optional and once per machine — it writes the toolkit's agent-context stanza into your installed agent harnesses (v1: Claude Code), teaching agents the `shll skill` two-step. It also **delegates** HexoKit's hook installation to `rk agent setup` (now hooks-only), which is what lights up live agent state in [HexoKit](/docs/)'s dashboard: **active** / **waiting** / **idle** for every pane running a coding agent. Details on the dashboard and the hooks it installs are in the [install guide](/docs/install/).
 
 ## Per-tool install
 

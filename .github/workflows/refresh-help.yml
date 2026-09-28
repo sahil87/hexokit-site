@@ -103,8 +103,9 @@ jobs:
 
       # Capture each tool independently. FOUR distinct names per tool, which are
       # NOT always equal — conflating them is a real bug (fab-kit's formula/slug
-      # is `fab-kit` but its binary is `fab`; hexokit's slug is `hexokit` but its
-      # formula/binary/repo are `run-kit` until the source-side rename):
+      # is `fab-kit` but its binary is `fab`; hexokit's repo is still `run-kit`
+      # until the GitHub-slug rename, but its formula/binary are `hexokit` since
+      # the formula rename):
       #   - file slug     → names the output file help/<slug>.json
       #   - formula name  → the Homebrew formula to `brew install sahil87/tap/<formula>`
       #   - binary name   → the executable to invoke `<binary> help-dump`
@@ -114,8 +115,8 @@ jobs:
       # Mapping (verified against the committed help/*.json `tool` fields and the
       # `sahil87/tap` formula names):
       #   slug       formula   binary
-      #   hexokit -> run-kit-> run-kit (the site's product slug; sources stay
-      #                                 run-kit until the source-side rename)
+      #   hexokit -> hexokit-> hexokit (the site's product slug; only the repo
+      #                                 stays run-kit until the slug rename)
       #   idea    -> idea   -> idea
       #   hop     -> hop    -> hop
       #   fab-kit -> fab-kit-> fab     (binary is `fab`, NOT `fab-kit`)
@@ -140,7 +141,7 @@ jobs:
             "hop:hop:hop"
             "fab-kit:fab-kit:fab"
             "wt:wt:wt"
-            "hexokit:run-kit:run-kit"
+            "hexokit:hexokit:hexokit"
             "tu:tu:tu"
             "shll:shll:shll"
           )

@@ -7,7 +7,7 @@
  * Usage:
  *   node scripts/extract-readme-cli.mjs <slug> <raw-readme-path> [--out <path>]
  *
- *   <slug>             the help/file slug (e.g. run-kit, fab-kit, shll). Names
+ *   <slug>             the help/file slug (e.g. hexokit, fab-kit, shll). Names
  *                      both help/<slug>.json (the §7 reporter's truth) and the output.
  *   <raw-readme-path>  path to the fetched raw README.md to extract from.
  *   --out <path>       where to write the slice on success. Omit to write the

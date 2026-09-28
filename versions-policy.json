@@ -1,5 +1,5 @@
 {
-  "run-kit": { "notify": "minor", "envelope": "hexokit" },
+  "run-kit": { "notify": "minor", "envelope": "hexokit", "formula": "hexokit" },
   "fab-kit": { "notify": "minor" },
   "shll": { "notify": "patch" },
   "tu": { "notify": "minor" },
