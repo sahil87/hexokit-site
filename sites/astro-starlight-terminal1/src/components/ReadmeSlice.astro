@@ -102,8 +102,7 @@ function findRepoRoot(startDir: string): string {
 
 let html = '';
 let missing = false;
-// The repo name comes from the roster (slug ≠ repo for hexokit — its repo
-// stays `run-kit` until the source-side rename).
+// The repo name comes from the roster (`repoFor`).
 const githubUrl = `https://github.com/sahil87/${repoFor(tool) ?? tool}`;
 
 // Resolve the slice path. If no `help/` ancestor exists at all (the cross-boundary

@@ -138,7 +138,7 @@ if (toolPage) {
   const { slug, mount, page } = toolPage;
 
   // SoftwareApplication: name is the roster LABEL (HexoKit for /docs/ pages);
-  // url is the roster repo (hexokit's stays run-kit until the source rename).
+  // url is the roster repo (`repoFor`).
   // description is single-sourced from help/<slug>.json `root.short`.
   const softwareApplication: Record<string, unknown> = {
     '@type': 'SoftwareApplication',

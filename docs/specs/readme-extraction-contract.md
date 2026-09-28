@@ -370,8 +370,9 @@ verifier (§7 command/flag cross-check, a report-only reporter — not Zod-schem
   §closure lint) → **always commit** the slice to `content/<slug>/README.md` (a divergence or a link
   violation emits a `::warning::` but is committed; a missing `help/<slug>.json` commits with an
   "unverified" warning). The `slug:repo` pair's **slug is the site's file slug and may differ from the
-  source repo** — the product's pair is `hexokit:run-kit` (`content/hexokit/` sources from
-  `sahil87/run-kit`), and the README step and the docs/site step below carry the same pairs in lockstep.
+  source repo** (today every pair matches — the product's is `hexokit:hexokit`, `content/hexokit/`
+  sourcing from `sahil87/hexokit`), and the README step and the docs/site step below carry the same
+  pairs in lockstep.
 - **Per-tool `docs/site/` tree pipeline** (sibling step, change `x0br`): in the same run, fetch the
   repo **tarball** (`https://codeload.github.com/sahil87/<repo>/tar.gz/<branch>`, main→master fallback)
   and untar **only** the `docs/site/` subtree → run the §closure lint per page (non-fatal `::warning::`
@@ -932,6 +933,7 @@ The single **machine-anchored** definition of the deduction + strip + verify beh
 
 | Date | Change |
 |------|--------|
+| 2026-09-28 | Repo update (change `260928-9cha`): after the R2 GitHub rename, the product's `slug:repo` pair is `hexokit:hexokit` (`content/hexokit/` sources from `sahil87/hexokit`) in both steps. No producer-facing change. |
 | 2026-09-10 | Slug≠repo note (change `it5d`): §8 records that the site's file slug may differ from the source repo — the product's `slug:repo` pair is `hexokit:run-kit` (`content/hexokit/` sources from `sahil87/run-kit`), and the README step and the docs/site step carry the same pairs in lockstep. No producer-facing change. |
 | 2026-07-18 | Reconciled prose to consumer-code fixes (change `715p` — drift-checker false positives). New **§7.1 "Detection mechanics — the false-positive guards"**: `findUnknownTokens` now (1) stops the flag scan at a bare `--` end-of-options separator, (2) stops it at an angle-bracket `<placeholder>` token (angle-only — `[optional]` does not stop), (3) seeds cobra `completion`/`help` as valid leaf root-children (excluded from every dump by `help-dump-contract.md` §4) — **gated on the root already being a cobra parent** (≥1 real subcommand) so a leaf-root dump like `tu` (`commands: []`) is not falsely turned into a non-leaf that flags its own real tails, and (4) applies a checker-only `UNDUMPED_TOKENS` allowlist for tokens real-but-undumped (the fab-kit sibling-binary command set + hop's hidden `--shim-plan`; hiddenness is not representable in `help/<tool>.json`). Merged dumps rejected (upstream-blocked + changes rendered surfaces). **§closure lint** + the §8 **README-slice link lint** now scan **code-masked** text (fenced blocks + inline `` `code` `` spans blanked, reusing the CommonMark fence discipline) so an illustrative link/image inside a code sample is not flagged; the render-side rewriter is unchanged (its no-fence-tracking over-reach stays, rendering frozen). Remaining warning classes (hop launcher positionals, wt aliases, shll legacy/historical/fenced artifacts, `run-kit url`) stay warned — out of scope. `help-dump-contract.md` untouched (no dump-side change). Code-side change; the machine anchor `extract-readme.ts` stays authoritative and the prose is reconciled to it. |
 | 2026-07-18 | Link refresh: the producer-facing standards moved into `docs/site/standards/` in the shll repo (sahil87/shll#42 — the same change also added the fourth standard, `skill`, and a scope column to `shll standards`). Banner + §Producer conformance directive links updated to `docs/site/standards/readme-extraction.md` / `shll.ai/shll/standards/readme-extraction` (+ the principles link). Historical changelog rows keep the old paths. No content or mechanical change. |

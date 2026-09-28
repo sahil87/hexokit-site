@@ -57,7 +57,7 @@ Each `tools[slug]` row carries three fields:
 - **`notify`** = looked up from `versions-policy.json` (§Policy file). One of `"never" | "patch" | "minor"`.
 - **`formula`** = the Homebrew formula name, **defaulting to the key**; the policy file MAY override it per tool via an optional `"formula"` key.
 
-**Keys are the consumer-facing roster names** — the `Name` in shll's roster, which the consumer (`shll check-updates`) matches against `manifest.Tools[name]`. They are **NOT** the envelope's `tool` field (the *binary* name — `fab` for key `fab-kit`), and they are **not necessarily the `help/<slug>.json` filename**: the site's file slug may differ from the consumer-facing key, repo, formula, and binary (the product's help file is `help/hexokit.json`, sourced from repo `sahil87/run-kit` with formula/binary `hexokit`, while its manifest row stays keyed `run-kit` — the roster name — via the `envelope` override below; see `docs/memory/conventions/tool-roster.md` for the four-name rule). The slug/formula/binary distinction is documented in `refresh-help.yml`; conflating them is a known real bug class. `help/fab-kit.json` carries binary `fab`, but the manifest key stays `fab-kit`.
+**Keys are the consumer-facing roster names** — the `Name` in shll's roster, which the consumer (`shll check-updates`) matches against `manifest.Tools[name]`. They are **NOT** the envelope's `tool` field (the *binary* name — `fab` for key `fab-kit`), and they are **not necessarily the `help/<slug>.json` filename**: the site's file slug may differ from the consumer-facing key, repo, formula, and binary (the product's help file is `help/hexokit.json`, sourced from repo `sahil87/hexokit` with formula/binary `hexokit`, while its manifest row stays keyed `run-kit` — the roster name — via the `envelope` override below; see `docs/memory/conventions/tool-roster.md` for the four-name rule). The slug/formula/binary distinction is documented in `refresh-help.yml`; conflating them is a known real bug class. `help/fab-kit.json` carries binary `fab`, but the manifest key stays `fab-kit`.
 
 ### GIVEN/WHEN/THEN
 
@@ -148,5 +148,6 @@ Envelope validation reuses `HelpDocSchema` from `src/lib/schemas.ts` (the single
 
 ## Changelog
 
+- **2026-09-28 (change `260928-9cha`)**: Present-truth repo for the product's help file is `sahil87/hexokit` (R2 GitHub rename). The `run-kit` row key is unchanged — shll ≤ v0.1.33 looks it up by exact key.
 - **2026-09-28 (change `260928-u7sp`)**: The `run-kit` row's policy entry gains `"formula": "hexokit"` (the R1 formula rename) — the served row now advertises `formula: "hexokit"` while the row key and `envelope: "hexokit"` stay unchanged. §1 example, §2 keying paragraph + envelope-override scenario, and the §Policy file example updated.
 - **2026-07-19 (change `2lgz`)**: Initial contract. The `versions.json` endpoint, `versions-policy.json`, slug-keying + `formula` rule, `v`-strip normalization, the pulled-skip-degrade / site-authored-build-stop split, the `notify` consumer semantics, the freshness cascade (no workflow change), and the live-site-swap obligation. Consumed by run-kit change `260718-d15e`.

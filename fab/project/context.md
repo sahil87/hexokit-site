@@ -1,6 +1,6 @@
 # Project Context
 
-Product site for **HexoKit** at [hexokit.com](https://hexokit.com) — *your tmux, in the browser and on your phone*. The site presents the product (docs at `/docs/`) plus its toolkit of six companion CLIs: `fab-kit`, `wt`, `idea`, `tu`, `hop`, `shll` (each at its root slug). The product's source repo stays [sahil87/run-kit](https://github.com/sahil87/run-kit) — this repo (`sahil87/hexokit-site`) is the site only. (This site began as a copy of shll.ai, the toolkit's previous landing page.)
+Product site for **HexoKit** at [hexokit.com](https://hexokit.com) — *your tmux, in the browser and on your phone*. The site presents the product (docs at `/docs/`) plus its toolkit of six companion CLIs: `fab-kit`, `wt`, `idea`, `tu`, `hop`, `shll` (each at its root slug). The product's source repo is [sahil87/hexokit](https://github.com/sahil87/hexokit) (renamed from `sahil87/run-kit`) — this repo (`sahil87/hexokit-site`) is the site only. (This site began as a copy of shll.ai, the toolkit's previous landing page.)
 
 ## Three content layers
 
@@ -37,7 +37,7 @@ GitHub Pages via `.github/workflows/deploy.yml` on push to `main`, serving `hexo
 
 ## What this project is NOT
 
-- Not the product's source — HexoKit's code lives in `sahil87/run-kit`; this repo hosts the site and the pulled documentation mirrors.
+- Not the product's source — HexoKit's code lives in `sahil87/hexokit`; this repo hosts the site and the pulled documentation mirrors.
 - Not a monorepo with shared dependencies — each site under `sites/` owns its own `package.json` and stack. Sharing is opt-in, not the default.
 - Not server-rendered.
 

@@ -25,7 +25,7 @@ Each `ToolRecord` carries:
 | `formula` / `binary` | `brew install sahil87/tap/<formula>` then `<binary> help-dump` | `refresh-help.yml` (carried in the roster for the one-table-of-truth reading) |
 | `legacyMounts` | former URL segments that redirect to `mount` | the in-site redirect enumeration (`site-redirects.mjs`) and the cross-site map's `rules` (`run-kit` → `docs`; see [redirect-map](/conventions/redirect-map.md)) |
 
-HexoKit's record is `{ slug: 'hexokit', label: 'HexoKit', mount: 'docs', repo: 'run-kit', formula: 'hexokit', binary: 'hexokit', legacyMounts: ['run-kit'] }` — the product's pulled data is keyed `hexokit`, its pages mount at `/docs/`, and its formula/binary are `hexokit` since the R1 formula rename; only the source repo stays `run-kit` until the GitHub-slug rename (R2). For the six companions slug == mount == repo; `fab-kit`'s binary is `fab`. Substrate identifiers (`rk`, `RK_*`, …) are never part of this table.
+HexoKit's record is `{ slug: 'hexokit', label: 'HexoKit', mount: 'docs', repo: 'hexokit', formula: 'hexokit', binary: 'hexokit', legacyMounts: ['run-kit'] }` — the product's pulled data is keyed `hexokit`, its source repo is `sahil87/hexokit`, its formula/binary are `hexokit`, and only its pages mount elsewhere (`/docs/`); `run-kit` survives only as the legacy mount. For the six companions slug == mount == repo; `fab-kit`'s binary is `fab`. Substrate identifiers (`rk`, `RK_*`, …) are never part of this table.
 
 ## Helpers and display order
 

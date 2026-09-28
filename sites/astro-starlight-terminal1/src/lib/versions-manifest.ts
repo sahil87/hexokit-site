@@ -50,8 +50,10 @@ export type Notify = (typeof NOTIFY_VALUES)[number];
  * `envelope` names which `help/<slug>.json` supplies `latest` when the
  * help-file slug differs from the consumer-facing key — e.g. the `run-kit`
  * row reads `help/hexokit.json`. The KEY stays `run-kit` for consumer
- * compatibility: run-kit's update checker and shll ≤ v0.1.33 look the row up
- * by that key, so flipping it needs a dual-read on the consumer side first.
+ * compatibility: shll ≤ v0.1.33 looks the row up by exact key `run-kit`
+ * (shll ≥ v0.1.34 tries `hexokit`, then its legacy names `rk`, `run-kit`), so
+ * flipping it would drop the row for every older shll. run-kit's own update
+ * checker reads `shll check-updates --json`, not this manifest.
  */
 export const PolicyEntrySchema = z
   .object({

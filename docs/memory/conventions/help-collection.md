@@ -38,7 +38,7 @@ A single JSON document per tool — an **envelope** (`{tool, version, captured_a
 
 > **Forward contract**: [`docs/specs/help-dump-contract.md`](../../specs/help-dump-contract.md) — §1 invocation, §3 output schema, §4 filter rules, §5 discovery, §6 version, §7 the `tu` exception, §8 schema evolution.
 
-The **file** is named by the tool's site slug — one of the **four names** a tool carries on this site (slug / mount / repo / formula+binary — see [tool-roster](/conventions/tool-roster.md); the roster lives in `src/lib/tool-roster.mjs`). Two tools diverge somewhere: `help/fab-kit.json` holds binary `fab`, and `help/hexokit.json` — the product's pulled-data key — sources from the GitHub repo `run-kit` (until R2) while its formula/binary are `hexokit`. The `tool` field inside always carries the binary name; `HelpDocSchema` allows slug ≠ tool.
+The **file** is named by the tool's site slug — one of the **four names** a tool carries on this site (slug / mount / repo / formula+binary — see [tool-roster](/conventions/tool-roster.md); the roster lives in `src/lib/tool-roster.mjs`). Two tools diverge somewhere: `help/fab-kit.json` holds binary `fab`, and `help/hexokit.json` — the product's pulled-data key — shares its name with its repo and formula/binary (`hexokit`) but mounts at `/docs/`. The `tool` field inside always carries the binary name; `HelpDocSchema` allows slug ≠ tool.
 
 ## Zod Schema Module (the machine-checkable contract)
 

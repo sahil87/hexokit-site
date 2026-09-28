@@ -170,9 +170,10 @@ test('footer links are exactly the six specified, in order', () => {
 });
 
 test('the GitHub URL comes from the roster, not a hardcoded repo name', () => {
-  // The repo is still `run-kit`; the point is that the value is DERIVED, so a
-  // source-side rename flows through the roster rather than through this page.
+  // The value is DERIVED, so a source-side rename (run-kit → hexokit, R2) flows
+  // through the roster rather than through this page.
   assert.match(GITHUB_URL, /^https:\/\/github\.com\/sahil87\/[\w.-]+$/);
+  assert.equal(GITHUB_URL, 'https://github.com/sahil87/hexokit');
 });
 
 test('every feature card is complete and links into the product docs', () => {
