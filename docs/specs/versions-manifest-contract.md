@@ -35,6 +35,7 @@ The endpoint emits a single JSON object (`application/json; charset=utf-8`), pre
     "idea":    { "latest": "0.1.1",  "notify": "minor", "formula": "idea" },
     "tu":      { "latest": "0.9.1",  "notify": "minor", "formula": "tu" },
     "run-kit": { "latest": "3.7.4",  "notify": "minor", "formula": "hexokit" },
+    "hexokit": { "latest": "3.7.4",  "notify": "minor", "formula": "hexokit" },
     "hop":     { "latest": "0.2.1",  "notify": "minor", "formula": "hop" },
     "fab-kit": { "latest": "2.15.4", "notify": "minor", "formula": "fab-kit" }
   }
@@ -57,12 +58,13 @@ Each `tools[slug]` row carries three fields:
 - **`notify`** = looked up from `versions-policy.json` (§Policy file). One of `"never" | "patch" | "minor"`.
 - **`formula`** = the Homebrew formula name, **defaulting to the key**; the policy file MAY override it per tool via an optional `"formula"` key.
 
-**Keys are the consumer-facing roster names** — the `Name` in shll's roster, which the consumer (`shll check-updates`) matches against `manifest.Tools[name]`. They are **NOT** the envelope's `tool` field (the *binary* name — `fab` for key `fab-kit`), and they are **not necessarily the `help/<slug>.json` filename**: the site's file slug may differ from the consumer-facing key, repo, formula, and binary (the product's help file is `help/hexokit.json`, sourced from repo `sahil87/hexokit` with formula/binary `hexokit`, while its manifest row stays keyed `run-kit` — the roster name — via the `envelope` override below; see `docs/memory/conventions/tool-roster.md` for the four-name rule). The slug/formula/binary distinction is documented in `refresh-help.yml`; conflating them is a known real bug class. `help/fab-kit.json` carries binary `fab`, but the manifest key stays `fab-kit`.
+**Keys are the consumer-facing roster names** — the `Name` in shll's roster, which the consumer (`shll check-updates`) matches against `manifest.Tools[name]`. They are **NOT** the envelope's `tool` field (the *binary* name — `fab` for key `fab-kit`), and they are **not necessarily the `help/<slug>.json` filename**: the site's file slug may differ from the consumer-facing key, repo, formula, and binary (the product's help file is `help/hexokit.json`, sourced from repo `sahil87/hexokit` with formula/binary `hexokit`, and is published under two manifest keys — `hexokit` (the present roster name, key-defaulted) and the legacy `run-kit`, which reads it via the `envelope` override below; see `docs/memory/conventions/tool-roster.md` for the four-name rule). The slug/formula/binary distinction is documented in `refresh-help.yml`; conflating them is a known real bug class. `help/fab-kit.json` carries binary `fab`, but the manifest key stays `fab-kit`.
 
 ### GIVEN/WHEN/THEN
 
 - **Slug keying, not binary name** — GIVEN `help/fab-kit.json` whose envelope `tool` is `"fab"`; WHEN the manifest is built; THEN the row key is `"fab-kit"` (the roster name), never `"fab"`.
-- **Envelope override** — GIVEN a policy entry `"run-kit": { "notify": "minor", "envelope": "hexokit", "formula": "hexokit" }` and a valid `help/hexokit.json`; WHEN the manifest is built; THEN the row key is `"run-kit"` with `formula` `"hexokit"`, `latest` read from `help/hexokit.json`, and no `hexokit` row exists.
+- **Envelope override** — GIVEN a policy entry `"run-kit": { "notify": "minor", "envelope": "hexokit", "formula": "hexokit" }` and a valid `help/hexokit.json`; WHEN the manifest is built; THEN the row key is `"run-kit"` with `formula` `"hexokit"` and `latest` read from `help/hexokit.json`. The override itself creates no row under the envelope slug — a `hexokit` row exists only because the policy also declares a `hexokit` key.
+- **Product under two keys** — GIVEN the live policy's `"run-kit"` entry above plus `"hexokit": { "notify": "minor" }`; WHEN the manifest is built; THEN `tools.hexokit` and `tools["run-kit"]` are identical rows (`latest` from `help/hexokit.json`, `notify` `"minor"`, `formula` `"hexokit"`).
 - **Formula default + override** — GIVEN a policy entry with no `formula`; WHEN the row is built; THEN `formula` is the key. GIVEN a policy entry with `"formula": "x"`; THEN `formula` is `"x"`.
 
 ## §3 Version normalization
@@ -92,6 +94,7 @@ Hand-edited, project-level data at the **repo root** (a sibling of `help/`, **NO
 ```json
 {
   "run-kit": { "notify": "minor", "envelope": "hexokit", "formula": "hexokit" },
+  "hexokit": { "notify": "minor" },
   "fab-kit": { "notify": "minor" },
   "shll":    { "notify": "patch" },
   "tu":      { "notify": "minor" },
@@ -104,7 +107,8 @@ Hand-edited, project-level data at the **repo root** (a sibling of `help/`, **NO
 - **The policy file is the manifest ROSTER**: only tools declared here are advertised. A tool with no policy has no notify semantics, so it does not appear.
 - **`notify`** (required) — one of `"never" | "patch" | "minor"`.
 - **`formula`** (optional) — overrides the key-defaulted Homebrew formula name.
-- **`envelope`** (optional) — names which `help/<slug>.json` supplies `latest` when the site's file slug differs from the consumer-facing key (default: the key). The `run-kit` row reads `help/hexokit.json` while staying keyed `run-kit` so `shll check-updates` keeps matching it.
+- **`envelope`** (optional) — names which `help/<slug>.json` supplies `latest` when the site's file slug differs from the consumer-facing key (default: the key). The `run-kit` row reads `help/hexokit.json` so shll ≤ v0.1.33 — which looks the product up only by the exact key `run-kit` — keeps matching it.
+- **The product has two rows**: `hexokit` (present-truth key; `envelope`/`formula` default to it, so it reads `help/hexokit.json` with formula `hexokit` — shll ≥ v0.1.34 tries this key first, then its legacy names `rk`, `run-kit`) and the legacy `run-kit` row above. Both MUST stay while shll ≤ v0.1.33 installs remain in the field; the rows are identical, so a consumer sees the same verdict whichever it matches.
 
 These values are deliberately **data, not design**: tuning them is a one-line commit here, picked up by deployed daemons within a poll cycle. Seed values (per the design discussion): `run-kit`/`fab-kit` → `minor`; the small tools (`shll`/`tu`/`wt`/`idea`/`hop`) → `patch`.
 
@@ -148,6 +152,7 @@ Envelope validation reuses `HelpDocSchema` from `src/lib/schemas.ts` (the single
 
 ## Changelog
 
+- **2026-09-29 (change `260929-x2a2`)**: The policy gains `"hexokit": { "notify": "minor" }`, so the product is published under both `hexokit` and `run-kit` (identical rows from `help/hexokit.json`); `run-kit` is kept unchanged for shll ≤ v0.1.33. §1 example, §2 keying paragraph + scenarios, and §Policy file updated.
 - **2026-09-28 (change `260928-9cha`)**: Present-truth repo for the product's help file is `sahil87/hexokit` (R2 GitHub rename). The `run-kit` row key is unchanged — shll ≤ v0.1.33 looks it up by exact key.
 - **2026-09-28 (change `260928-u7sp`)**: The `run-kit` row's policy entry gains `"formula": "hexokit"` (the R1 formula rename) — the served row now advertises `formula: "hexokit"` while the row key and `envelope: "hexokit"` stay unchanged. §1 example, §2 keying paragraph + envelope-override scenario, and the §Policy file example updated.
 - **2026-07-19 (change `2lgz`)**: Initial contract. The `versions.json` endpoint, `versions-policy.json`, slug-keying + `formula` rule, `v`-strip normalization, the pulled-skip-degrade / site-authored-build-stop split, the `notify` consumer semantics, the freshness cascade (no workflow change), and the live-site-swap obligation. Consumed by run-kit change `260718-d15e`.

@@ -7,9 +7,7 @@
  * script then rewrites that copy's last line — the upstream's
  * truncated-download anchor, `main "$@"` — with the site-owned epilogue
  * (`scripts/install-epilogue.sh`): no args defaults to `hexokit` (shll +
- * HexoKit — with a fallback to the legacy `run-kit` target when an already-
- * installed shll predates the roster rename and rejects `hexokit`), `main`
- * runs in a subshell so the toolkit hint can print after
+ * HexoKit), `main` runs in a subshell so the toolkit hint can print after
  * `main`'s `exec shll update`, and tool arguments pass through unchanged.
  *
  * The anchor check is deliberately strict: if the upstream's last non-empty

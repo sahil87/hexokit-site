@@ -180,6 +180,29 @@ test('buildManifest honors the envelope override (key stays the roster name)', (
   assert.ok(!('hexokit' in manifest.tools), 'no row under the envelope slug');
 });
 
+test('buildManifest publishes the product under both `hexokit` and `run-kit` from one envelope', () => {
+  // shll >= v0.1.34 matches the `hexokit` row; shll <= v0.1.33 looks up only
+  // the exact key `run-kit` — both keys read help/hexokit.json.
+  const policy = {
+    'run-kit': { notify: 'minor', envelope: 'hexokit', formula: 'hexokit' },
+    hexokit: { notify: 'minor' },
+  };
+  const root = makeRoot({ policy, envelopes: { hexokit: envelope('hexokit', 'v3.20.23') } });
+  const manifest = buildManifest(root, policy, new Date('2026-09-29T00:00:00Z'));
+  const row = { latest: '3.20.23', notify: 'minor', formula: 'hexokit' };
+  assert.deepEqual(manifest.tools.hexokit, row);
+  assert.deepEqual(manifest.tools['run-kit'], row);
+});
+
+test('the committed versions-policy.json keeps the legacy `run-kit` row next to `hexokit`', () => {
+  // Site-authored data (not the daily-refreshed corpus), so pinning the live
+  // file is stable: removing or renaming `run-kit` would silently drop update
+  // notices for every shll <= v0.1.33 install.
+  const policy = readPolicy(path.resolve(import.meta.dirname, '../../..'));
+  assert.deepEqual(policy['run-kit'], { notify: 'minor', envelope: 'hexokit', formula: 'hexokit' });
+  assert.deepEqual(policy.hexokit, { notify: 'minor' });
+});
+
 test('buildManifest skip-degrades a tool with a MISSING envelope', () => {
   const policy = { wt: { notify: 'patch' }, tu: { notify: 'patch' } };
   const root = makeRoot({

@@ -1,6 +1,6 @@
 ---
 type: memory
-description: "The `/versions.json` version manifest — logic in `src/lib/versions-manifest.ts`. Repo-root `versions-policy.json` is the roster of consumer-facing names; `latest` is the envelope version stripped to bare; `envelope`/`formula` overrides decouple key from help file and formula (the `run-kit` row reads `help/hexokit.json`, advertises formula `hexokit`, keeps its key for consumers). Pulled envelopes skip-degrade; authored policy build-stops. Contract: `docs/specs/versions-manifest-contract.md`"
+description: "The `/versions.json` version manifest — logic in `src/lib/versions-manifest.ts`. Repo-root `versions-policy.json` is the roster of consumer-facing names; `latest` is the envelope version stripped to bare; `envelope`/`formula` overrides decouple key from help file and formula; the product has identical `hexokit` and legacy `run-kit` rows. Pulled envelopes skip-degrade; authored policy build-stops. Contract: `docs/specs/versions-manifest-contract.md`"
 ---
 # Versions Manifest
 
@@ -29,7 +29,7 @@ The manifest's roster is the set of keys declared in the repo-root `versions-pol
 - `notify` = the policy entry's `notify` value.
 - `formula` = the policy entry's optional `formula`, defaulting to the key.
 
-The key is **NOT** the envelope's `tool` field, which is the *binary* name (`fab` for key `fab-kit`; `hexokit` for the `run-kit` key). And the key is **not necessarily the help-file slug**: an optional **`envelope`** policy field names which `help/<slug>.json` supplies `latest` when the two differ — the `run-kit` row carries `"envelope": "hexokit"`, so it reads `help/hexokit.json` while the row key stays `run-kit` for the consumer. The same row carries `"formula": "hexokit"`, advertising the renamed Homebrew formula without touching the key. Conflating key / slug / formula / binary is a known real bug class documented in `refresh-help.yml`; see [tool-roster](/conventions/tool-roster.md) for the four-name rule.
+The key is **NOT** the envelope's `tool` field, which is the *binary* name (`fab` for key `fab-kit`). And the key is **not necessarily the help-file slug**: an optional **`envelope`** policy field names which `help/<slug>.json` supplies `latest` when the two differ. The product is published under **two keys** reading the one `help/hexokit.json`: `hexokit` (`{ "notify": "minor" }` — envelope and formula default to the key) and the legacy `run-kit` (`"envelope": "hexokit"`, `"formula": "hexokit"`), so both rows are identical. Conflating key / slug / formula / binary is a known real bug class documented in `refresh-help.yml`; see [tool-roster](/conventions/tool-roster.md) for the four-name rule.
 
 #### Scenario: Slug keying, not binary name
 - **GIVEN** `help/fab-kit.json` whose envelope `tool` field is `"fab"`
@@ -37,9 +37,14 @@ The key is **NOT** the envelope's `tool` field, which is the *binary* name (`fab
 - **THEN** the row key is `"fab-kit"` (the roster name), never `"fab"`
 
 #### Scenario: The `envelope` override decouples the key from the help file
-- **GIVEN** `versions-policy.json` with `"run-kit": { "notify": "minor", "envelope": "hexokit", "formula": "hexokit" }` and a valid `help/hexokit.json` with version `v3.19.37`
+- **GIVEN** a policy with only `"run-kit": { "notify": "minor", "envelope": "hexokit" }` and a valid `help/hexokit.json` with version `v3.19.37`
 - **WHEN** the manifest is built
-- **THEN** `tools['run-kit'] == { latest: '3.19.37', notify: 'minor', formula: 'hexokit' }` and no `tools['hexokit']` row exists
+- **THEN** `tools['run-kit'] == { latest: '3.19.37', notify: 'minor', formula: 'run-kit' }` and the override creates no `tools['hexokit']` row
+
+#### Scenario: The product is published under both keys
+- **GIVEN** the live policy — `"run-kit": { "notify": "minor", "envelope": "hexokit", "formula": "hexokit" }` and `"hexokit": { "notify": "minor" }` — and `help/hexokit.json` at `v3.20.23`
+- **WHEN** the manifest is built
+- **THEN** `tools.hexokit` and `tools['run-kit']` both equal `{ latest: '3.20.23', notify: 'minor', formula: 'hexokit' }`
 
 #### Scenario: Formula defaults to key
 - **GIVEN** a policy entry with no `formula` key
@@ -79,7 +84,7 @@ A missing or Zod-invalid `help/<slug>.json` SHALL omit that tool's row while the
 
 ## The policy file — `versions-policy.json`
 
-Hand-edited, project-level data at the **repo root** (a sibling of `help/`, **NOT** inside it — `refresh-help.yml`'s staleness gate and `validate-help.mjs` glob `help/*.json` and must not see a non-envelope file). It maps each consumer-facing roster name to `{ "notify": <value> }` with optional `"formula"` and `"envelope"` overrides (`envelope` names which `help/<slug>.json` supplies `latest` when the help-file slug differs from the key). Current values: `run-kit` → `minor` with `envelope: "hexokit"` and `formula: "hexokit"` (reads `help/hexokit.json`, advertises the renamed formula); every other tool → `minor`, except `shll` → `patch`.
+Hand-edited, project-level data at the **repo root** (a sibling of `help/`, **NOT** inside it — `refresh-help.yml`'s staleness gate and `validate-help.mjs` glob `help/*.json` and must not see a non-envelope file). It maps each consumer-facing roster name to `{ "notify": <value> }` with optional `"formula"` and `"envelope"` overrides (`envelope` names which `help/<slug>.json` supplies `latest` when the help-file slug differs from the key). Current values: `hexokit` → `minor` (key defaults: `help/hexokit.json`, formula `hexokit`); `run-kit` → `minor` with `envelope: "hexokit"` and `formula: "hexokit"` (the identical legacy row); every other tool → `minor`, except `shll` → `patch`. A test pins the committed file's `run-kit` and `hexokit` entries.
 
 These are deliberately **data, not design**: tuning a threshold is a one-line commit here, picked up by deployed run-kit daemons within a poll cycle — no consumer binary update, no shipping a threshold through the very channel being tuned.
 
@@ -89,13 +94,13 @@ The manifest rides the **existing** refresh→deploy cascade — no change to an
 
 ## Consumer
 
-The manifest is consumed cross-repo by run-kit's update check (change `260718-d15e-toolkit-manifest-update-notifications`), which shells out to `shll check-updates --json`; **shll matches manifest rows against its roster `Name`** (`manifest.Tools[name]`), compares each `latest` against the locally-installed version, and applies the tool's `notify` threshold. This is why the `run-kit` row keeps its key while reading `help/hexokit.json` via the `envelope` override: shll ≤ v0.1.33's roster names the product `run-kit` and looks up only that exact key, so renaming it would silently drop the row (and every update notice) for older shll installs; shll ≥ v0.1.34 names it `hexokit` and falls back through its legacy names (`rk`, `run-kit`), so it finds the row under either key. run-kit's updatecheck never reads the manifest itself — it matches `shll check-updates --json` rows by shll's roster name — so the key is a shll-compatibility concern only. The full consumer contract and `notify` table live in [`docs/specs/versions-manifest-contract.md`](../../specs/versions-manifest-contract.md).
+The manifest is consumed cross-repo by run-kit's update check (change `260718-d15e-toolkit-manifest-update-notifications`), which shells out to `shll check-updates --json`; **shll matches manifest rows against its roster `Name`** (`manifest.Tools[name]`), compares each `latest` against the locally-installed version, and applies the tool's `notify` threshold. This is why the product has two rows: shll ≥ v0.1.34 names it `hexokit` and tries that key first (then its legacy names `rk`, `run-kit`), while shll ≤ v0.1.33's roster names it `run-kit` and looks up only that exact key — dropping the `run-kit` row would silently stop every update notice for older shll installs. run-kit's updatecheck never reads the manifest itself — it matches `shll check-updates --json` rows by self-name `hexokit` with legacy fallbacks `rk`, `run-kit` — so the keys are a shll-compatibility concern only. The full consumer contract and `notify` table live in [`docs/specs/versions-manifest-contract.md`](../../specs/versions-manifest-contract.md).
 
 ## Design Decisions
 
 ### Manifest logic lives in a unit-tested lib, endpoint page is thin
 **Decision**: the policy Zod schema, `stripVersionPrefix`, `readPolicy`, and the pure `buildManifest(repoRoot, policy, now?)` live in `src/lib/versions-manifest.ts`; `versions.json.ts` only resolves the repo root and delegates.
-**Why**: a page cannot be imported by a plain `node --test` script, so extracting the logic makes it unit-testable in isolation (`scripts/versions-manifest.test.mjs`, 13 cases, registering `astro-content-alias.mjs` like `llms.test.mjs`). This matches the `llms.ts` / `terminal-toolcard.ts` lib-extraction precedent — endpoints stay thin, logic stays testable. `buildManifest`'s `now` is injectable so tests can pin `generated_at`.
+**Why**: a page cannot be imported by a plain `node --test` script, so extracting the logic makes it unit-testable in isolation (`scripts/versions-manifest.test.mjs`, registering `astro-content-alias.mjs` like `llms.test.mjs`). This matches the `llms.ts` / `terminal-toolcard.ts` lib-extraction precedent — endpoints stay thin, logic stays testable. `buildManifest`'s `now` is injectable so tests can pin `generated_at`.
 **Rejected**: inlining all logic in the endpoint page (untestable without a full Astro build).
 *Introduced by*: 260718-2lgz-versions-manifest-endpoint
 
@@ -111,10 +116,10 @@ The manifest is consumed cross-repo by run-kit's update check (change `260718-d1
 **Rejected**: `readdirSync(help/)` (would advertise a tool with no policy) or a hardcoded const (a third roster to drift).
 *Introduced by*: 260718-2lgz-versions-manifest-endpoint
 
-### Manifest key stays the consumer's roster name; `envelope` and `formula` overrides carry the rename
-**Decision**: `versions-policy.json` keys are the consumer-facing roster names (`shll`'s `Name`), with an optional `envelope` naming the `help/<slug>.json` that supplies `latest` and an optional `formula` advertising a divergent Homebrew formula.
-**Why**: `shll check-updates` matches `manifest.Tools[roster Name]`; shll ≤ v0.1.33's roster names `run-kit` with no fallback, so dropping or renaming the row would silently stop update notices for every older shll install (shll ≥ v0.1.34 also tries its legacy names, so it finds the `run-kit` key). The renames therefore ride the overrides — the `run-kit` row reads `help/hexokit.json` and advertises `formula: "hexokit"` — and the key stays while older shll installs remain in the field (u7sp, 9cha).
-**Rejected**: renaming the row to `hexokit` (breaks the consumer); keeping the product's help file unrenamed (leaves `hexokit` out of the pull pipeline's one-slug-change design).
+### Manifest keys are consumer roster names; the product is published under its present and legacy names
+**Decision**: `versions-policy.json` keys are the consumer-facing roster names (`shll`'s `Name`), with an optional `envelope` naming the `help/<slug>.json` that supplies `latest` and an optional `formula` advertising a divergent Homebrew formula. The product carries two entries — `hexokit` and the legacy `run-kit` (`envelope`/`formula` `hexokit`) — yielding identical rows.
+**Why**: `shll check-updates` matches `manifest.Tools[roster Name]`. shll ≥ v0.1.34 names the product `hexokit`; shll ≤ v0.1.33 names it `run-kit` with no fallback, so the `run-kit` row stays while older shll installs remain in the field. Identical rows mean every consumer gets the same verdict whichever key it matches (u7sp, 9cha, x2a2).
+**Rejected**: renaming the row to `hexokit` (drops update notices for every shll ≤ v0.1.33 install); keeping only `run-kit` (keeps the present-truth name out of the manifest); keeping the product's help file unrenamed (leaves `hexokit` out of the pull pipeline's one-slug-change design).
 *Introduced by*: 260910-it5d-hexokit-site-structure
 
 ### Opposite failure postures for pulled vs. authored data

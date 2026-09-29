@@ -7,7 +7,8 @@
  *
  * Pins `composeInstall` against a FROZEN byte-for-byte copy of the canonical
  * upstream script — `scripts/fixtures/install-upstream.sh` (sahil87/shll
- * `scripts/install.sh` @ 8f5b250, 2026-09-11; the frozen-behaviour-specimen
+ * `scripts/install.sh` @ a8f11e2, 2026-09-29 — the T2(a) bootstrap that
+ * upgrades an installed shll before `shll install`; the frozen-behaviour-specimen
  * convention this suite already uses). No test fetches the network; the
  * deploy step (deploy.yml's curl + this composer failing loudly) is the live
  * gate for upstream drift.
@@ -19,7 +20,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -44,26 +45,22 @@ function composeStub(body) {
   return composeInstall(`#!/bin/sh\nset -eu\n${body}\nmain "$@"\n`, epilogue);
 }
 
-// A PATH prefix holding (or not holding) a stub `shll`, so the epilogue's
-// `command -v shll` + `shll install --dry-run hexokit` probe is controlled by
-// the test, not by whatever shll happens to be installed on this box.
-function shllStubDir(kind) {
+// A PATH prefix holding (or not holding) a stub `shll` that records every
+// invocation and exits 1 — as shll <= v0.1.33 does for `hexokit` — so the tests
+// prove the epilogue never calls whatever shll is installed, instead of
+// depending on the one on this box.
+function shllStub() {
   const dir = mkdtempSync(join(tmpdir(), 'compose-install-shll-'));
-  if (kind === 'accept') {
-    writeFileSync(join(dir, 'shll'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
-  } else if (kind === 'reject') {
-    // Mirrors shll <= v0.1.33: `hexokit` is an unknown target, `run-kit` is fine.
-    writeFileSync(join(dir, 'shll'), '#!/bin/sh\n[ "$3" = "hexokit" ] && exit 1\nexit 0\n', { mode: 0o755 });
-  }
-  return dir;
+  const calls = join(dir, 'calls');
+  writeFileSync(join(dir, 'shll'), `#!/bin/sh\necho "$*" >> '${calls}'\nexit 1\n`, { mode: 0o755 });
+  return { dir, calls };
 }
 
-function envWithShll(kind) {
+function envWithPath(prefix) {
   // Only POSIX tools the script needs live in /usr/bin:/bin; a real shll
-  // elsewhere on this box's PATH stays out of the probe.
+  // elsewhere on this box's PATH stays out of the run.
   const base = '/usr/bin:/bin';
-  const path = kind === 'absent' ? base : `${shllStubDir(kind)}:${base}`;
-  return { ...process.env, PATH: path };
+  return { ...process.env, PATH: prefix ? `${prefix}:${base}` : base };
 }
 
 test('composes the frozen upstream: verbatim prefix, epilogue tail, one subshell anchor', () => {
@@ -96,34 +93,25 @@ test('default path: no args and no shll on PATH installs hexokit and prints the 
     return;
   }
   const composed = writeTmp('install', composeStub("main() { printf 'main:%s\\n' \"$*\"; }"));
-  const result = spawnSync('sh', [composed], { encoding: 'utf8', env: envWithShll('absent') });
+  const result = spawnSync('sh', [composed], { encoding: 'utf8', env: envWithPath() });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('main:hexokit'), `no default in stdout: ${result.stdout}`);
   assert.ok(result.stdout.includes('shll install'), `no hint in stdout: ${result.stdout}`);
   assert.ok(result.stdout.includes('https://hexokit.com/toolkit/'), `no hint URL: ${result.stdout}`);
 });
 
-test('default path: a shll that accepts hexokit installs hexokit', (t) => {
+test('default path: an installed shll is never probed and receives hexokit', (t) => {
   if (!SH_AVAILABLE) {
     t.skip('sh is not on PATH');
     return;
   }
+  const stub = shllStub();
   const composed = writeTmp('install', composeStub("main() { printf 'main:%s\\n' \"$*\"; }"));
-  const result = spawnSync('sh', [composed], { encoding: 'utf8', env: envWithShll('accept') });
+  const result = spawnSync('sh', [composed], { encoding: 'utf8', env: envWithPath(stub.dir) });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('main:hexokit'), `expected hexokit default: ${result.stdout}`);
-});
-
-test('default path: a stale shll that rejects hexokit falls back to run-kit', (t) => {
-  if (!SH_AVAILABLE) {
-    t.skip('sh is not on PATH');
-    return;
-  }
-  const composed = writeTmp('install', composeStub("main() { printf 'main:%s\\n' \"$*\"; }"));
-  const result = spawnSync('sh', [composed], { encoding: 'utf8', env: envWithShll('reject') });
-  assert.equal(result.status, 0, `failing probe tripped set -e: ${result.stderr}`);
-  assert.ok(result.stdout.includes('main:run-kit'), `no run-kit fallback: ${result.stdout}`);
   assert.ok(result.stdout.includes('one command away'), `no hint in stdout: ${result.stdout}`);
+  assert.ok(!existsSync(stub.calls), `epilogue invoked shll: ${existsSync(stub.calls) ? readFileSync(stub.calls, 'utf8') : ''}`);
 });
 
 test('explicit args pass through verbatim and print no hint', (t) => {
@@ -132,7 +120,7 @@ test('explicit args pass through verbatim and print no hint', (t) => {
     return;
   }
   const composed = writeTmp('install', composeStub("main() { printf 'main:%s\\n' \"$*\"; }"));
-  const result = spawnSync('sh', [composed, 'fab-kit', 'wt'], { encoding: 'utf8', env: envWithShll('reject') });
+  const result = spawnSync('sh', [composed, 'fab-kit', 'wt'], { encoding: 'utf8', env: envWithPath(shllStub().dir) });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('main:fab-kit wt'), `args not passed through: ${result.stdout}`);
   assert.ok(!result.stdout.includes('one command away'), `hint leaked: ${result.stdout}`);
