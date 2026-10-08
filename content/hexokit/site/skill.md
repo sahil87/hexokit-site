@@ -6,9 +6,10 @@ The agent skill bundle for **HexoKit** — the tmux session manager with a web U
 
 Depth for a specific job lives in topic pages — pull one at use-time:
 
+- **large change through one operator** (dedicated server, worker worktrees, integration branch, PR and authorized merge) → `rk skill change`
 - **panes, iframes & visual display** → `rk skill display`
 - **agent-to-agent messaging concepts** (which channel for write/read/wait, spawn-then-deliver past trust walls — the `ready`/`parked` readiness standard) → `rk skill messaging`
-- **`rk mux` verb reference** (send/await/capture/kill/process/panes/sessions flags, gates, report words) → `rk skill mux`
+- **`rk mux` verb reference** (send/await/capture/kill/process/panes/sessions/inventory flags, gates, report words) → `rk skill mux`; start fleet inspection with `rk mux inventory --json` (MCP: `inventory`), then address panes by returned server + id
 - **act inside the `code` lens editor** (run VS Code palette commands in the open code-server window from the shell) → `rk skill code`
 - **drive and screenshot the host GUI display** (launch apps with DISPLAY set, take a PNG the human also sees in the GUI tile) → `rk skill gui`
 - **schedule a prompt for later or on a cadence** (user says "check on this every 30 min", "nudge me when…", "remind me at 9") → `rk skill cron`
@@ -22,13 +23,13 @@ You are an agent working inside a tmux pane, and HexoKit may be managing it. Rea
 - **Notify the human out-of-band** — surface a result or a question to their browser/phone without blocking your loop.
 - **Show web content visually** — render generated HTML, a diagram, a report, or a local dev server as a window the user can see, instead of describing it in text.
 
-Gate first — HexoKit is optional and may be absent:
+For own-pane and UI helpers, gate first — HexoKit is optional and may be absent:
 
 ```sh
 command -v rk >/dev/null 2>&1 && [ -n "$TMUX_PANE" ] || exit 0
 ```
 
-If either check fails, skip every HexoKit step silently. Never error, never warn — fall back to describing output in text.
+If either check fails, skip own-pane/UI helpers silently and describe output in text. Live fleet queries (`rk mux inventory` and MCP `inventory`) work outside a tmux pane, with no daemon dependency.
 
 > `rk` is the short alias; `hexokit` is the full binary name. Both work everywhere.
 
@@ -85,6 +86,7 @@ rk url                                           # server URL (config-derived)
 
 ## Composition patterns
 
+- **Large changes:** MCP `new_server {name}` creates a durable server; `operator {server, dir}` starts its operator in an absolute repository directory. Creation does not certify boot or kickoff delivery; inspect the operator with `inventory`/`capture` before handoff. Use the returned `window` with `operator_request {server, template:"user-message", window, text}` to hand off scope, target branch, acceptance checks, worker limit, artifact path and an explicit completion mode (`prepare-pr` or an authorized `merge-after-checks`). Tell the operator to read `rk skill change`, create an integration worktree, coordinate worker branches, validate the combined diff and return an integration PR. A request receipt proves submission, not completion; verify artifacts and GitHub. Merge only in the selected `merge-after-checks` mode, within the user's authorization, after required checks pass. Leave panes and worktrees available for review.
 - **Discover the server URL at use-time** via `rk url`, never hardcode it — it is config-derived from this environment (see [Where am I](#where-am-i)).
 - **`rk skill` is the static briefing; you derive the live details.** Read the bundle to learn *what* HexoKit does; run the [Where am I](#where-am-i) derivations to learn *where* you are, and `rk skill display` for the visual-display recipe in depth.
 - **`rk notify` is the default non-blocking escalation channel** for out-of-band messages to the human, gated on `command -v rk`:
@@ -110,4 +112,4 @@ rk url                                           # server URL (config-derived)
 - Killing a tmux window kills the backing process — no separate cleanup step is needed.
 - `set-option -w` targets the **current** window: create the window first, then set options from within it (or pass `-t <window>`).
 - The server URL is config-derived from this environment — always get it from `rk url`, never hardcode.
-- HexoKit may not be installed and you may not be in a tmux pane — gate every step and skip silently when the gate fails.
+- Gate own-pane/UI helpers and skip those silently when rk or `$TMUX_PANE` is absent. Fleet queries, server creation and explicitly targeted operators work outside tmux; report failures of an explicitly requested workflow.
