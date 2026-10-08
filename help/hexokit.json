@@ -1,7 +1,7 @@
 {
   "tool": "hexokit",
-  "version": "v3.21.1",
-  "captured_at": "2026-10-07T14:28:41Z",
+  "version": "v3.21.7",
+  "captured_at": "2026-10-08T14:33:59Z",
   "schema_version": 1,
   "root": {
     "name": "hexokit",
@@ -276,7 +276,7 @@
             "path": "hexokit desktop install",
             "short": "Download and install the HexoKit desktop app",
             "usage": "hexokit desktop install [flags]",
-            "text": "Usage:\n  hexokit desktop install [flags]\n\nFlags:\n      --force            reinstall even when the requested version is already installed\n      --path string      install directory (default: /Applications on macOS, ~/.rk/desktop on Linux)\n      --version string   install a specific release tag instead of the latest (e.g. v3.13.0)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "text": "Usage:\n  hexokit desktop install [flags]\n\nFlags:\n      --force            reinstall even when the requested version is already installed\n      --path string      install directory (default: /Applications on macOS, ~/.local/state/hexokit/desktop on Linux)\n      --version string   install a specific release tag instead of the latest (e.g. v3.13.0)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
             "commands": []
           },
           {
@@ -284,7 +284,7 @@
             "path": "hexokit desktop status",
             "short": "Show installed vs latest HexoKit desktop app version (read-only)",
             "usage": "hexokit desktop status [flags]",
-            "text": "Usage:\n  hexokit desktop status [flags]\n\nFlags:\n      --path string   install directory (default: /Applications on macOS, ~/.rk/desktop on Linux)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "text": "Usage:\n  hexokit desktop status [flags]\n\nFlags:\n      --path string   install directory (default: /Applications on macOS, ~/.local/state/hexokit/desktop on Linux)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
             "commands": []
           },
           {
@@ -292,7 +292,7 @@
             "path": "hexokit desktop uninstall",
             "short": "Remove the HexoKit desktop app and its desktop integration (Linux)",
             "usage": "hexokit desktop uninstall [flags]",
-            "text": "Usage:\n  hexokit desktop uninstall [flags]\n\nFlags:\n      --path string   install directory (default: /Applications on macOS, ~/.rk/desktop on Linux)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "text": "Usage:\n  hexokit desktop uninstall [flags]\n\nFlags:\n      --path string   install directory (default: /Applications on macOS, ~/.local/state/hexokit/desktop on Linux)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
             "commands": []
           },
           {
@@ -300,7 +300,7 @@
             "path": "hexokit desktop update",
             "short": "Update the HexoKit desktop app when a newer release exists",
             "usage": "hexokit desktop update [flags]",
-            "text": "Usage:\n  hexokit desktop update [flags]\n\nFlags:\n      --force         reinstall even when already current\n      --path string   install directory (default: /Applications on macOS, ~/.rk/desktop on Linux)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "text": "Usage:\n  hexokit desktop update [flags]\n\nFlags:\n      --force         reinstall even when already current\n      --path string   install directory (default: /Applications on macOS, ~/.local/state/hexokit/desktop on Linux)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
             "commands": []
           }
         ]
@@ -511,14 +511,14 @@
         "path": "hexokit mux",
         "short": "Tmux substrate operations (server create, messaging, pane capture/kill/process, pane/session enumeration, janitor, recovery, config scaffold, tmux guard)",
         "usage": "hexokit mux",
-        "text": "Usage:\n  hexokit mux [command]\n\nMessaging:\n  await       Block until an agent pane reaches a state (or a file appears)\n  send        Deliver a message into an agent's pane, gated on its agent state\n\nPane mechanics:\n  capture     Capture a pane's scrollback with substrate context\n  kill        Kill a pane, gated on its agent state and server protection\n  panes       Enumerate every pane on the server with substrate facts\n  process     Show the process tree running in a pane\n  sessions    Enumerate the server's sessions with derived roles\n\nServer ops:\n  adopt       Adopt an external tmux server into run-kit management\n  guard       Front the real tmux binary, blocking bare kill-server\n  init-conf   Scaffold the rk-managed tmux.conf and tmux.d/ overrides under ~/.config/hexokit/\n  new         Create a detached tmux server on socket <name>\n  reap        Reap leaked test tmux servers and stale sockets by prefix\n  snapshot    Inspect and restore tmux server layout snapshots\n\nFlags:\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit mux [command] --help\" for more information about a command.\n",
+        "text": "Usage:\n  hexokit mux [command]\n\nMessaging:\n  await       Block until an agent pane reaches a state (or a file appears)\n  send        Deliver a message into an agent's pane, gated on its agent state\n\nPane mechanics:\n  capture     Capture a pane's scrollback with substrate context\n  inventory   Read a live session and pane inventory across tmux servers\n  kill        Kill a pane, gated on its agent state and server protection\n  panes       Enumerate every pane on the server with substrate facts\n  process     Show the process tree running in a pane\n  sessions    Enumerate the server's sessions with derived roles\n\nServer ops:\n  adopt       Adopt an external tmux server into run-kit management\n  guard       Front the real tmux binary, blocking bare kill-server\n  init-conf   Scaffold the rk-managed tmux.conf and tmux.d/ overrides under ~/.config/hexokit/\n  new         Create a detached tmux server on socket <name>\n  reap        Reap leaked test tmux servers and stale sockets by prefix\n  snapshot    Inspect and restore tmux server layout snapshots\n\nFlags:\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit mux [command] --help\" for more information about a command.\n",
         "commands": [
           {
             "name": "adopt",
             "path": "hexokit mux adopt",
             "short": "Adopt an external tmux server into run-kit management",
             "usage": "hexokit mux adopt <server>",
-            "text": "Usage:\n  hexokit mux adopt <server> [flags]\n\nExamples:\n  rk mux adopt ext1\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux adopt <server> [flags]\n\nExamples:\n  rk mux adopt ext1\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -526,7 +526,7 @@
             "path": "hexokit mux await",
             "short": "Block until an agent pane reaches a state (or a file appears)",
             "usage": "hexokit mux await [--any] <target>... [--until <state>[,<state>]] [--file <path>] [--after-active] [--ready] [--timeout <secs>] [--notify[=msg]] [flags]",
-            "text": "Usage:\n  hexokit mux await [--any] <target>... [--until <state>[,<state>]] [--file <path>] [--after-active] [--ready] [--timeout <secs>] [--notify[=msg]] [flags]\n\nFlags:\n      --after-active              Require observing the active state before an --until state counts\n      --any                       Accept one-or-more targets and wake on the FIRST to fire (report appends the firing pane)\n      --file string               Also wake when this path appears (OR-composed with the state signal)\n      --json                      Emit exactly one JSON document on stdout (the report word inside result; the human report line is suppressed)\n      --notify string[=\"          auto\"]\u0000Send a Web Push when the signal fires (optional message; default \"agent <target> is <report>\")\n      --ready gone                Wait until the pane is boot-ready for typed input (agent state present, else a sentinel echo probe gated on the 80x20 floor: echo = ready, no echo = parked, below floor = narrow %N (WxH); all exit 0, except a pane death mid-wait which reports gone with exit 1)\n      --timeout running           Seconds before reporting running (0 = wait indefinitely) (default 300)\n      --until string              Comma-separated agent states to wake on (active|waiting|idle) (default \"idle\")\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux await [--any] <target>... [--until <state>[,<state>]] [--file <path>] [--after-active] [--ready] [--timeout <secs>] [--notify[=msg]] [flags]\n\nFlags:\n      --after-active              Require observing the active state before an --until state counts\n      --any                       Accept one-or-more targets and wake on the FIRST to fire (report appends the firing pane)\n      --file string               Also wake when this path appears (OR-composed with the state signal)\n      --json                      Emit exactly one JSON document on stdout (the report word inside result; the human report line is suppressed)\n      --notify string[=\"          auto\"]\u0000Send a Web Push when the signal fires (optional message; default \"agent <target> is <report>\")\n      --ready gone                Wait until the pane is boot-ready for typed input (agent state present, else a sentinel echo probe gated on the 80x20 floor: echo = ready, no echo = parked, below floor = narrow %N (WxH); all exit 0, except a pane death mid-wait which reports gone with exit 1)\n      --timeout running           Seconds before reporting running (0 = wait indefinitely) (default 300)\n      --until string              Comma-separated agent states to wake on (active|waiting|idle) (default \"idle\")\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -534,7 +534,7 @@
             "path": "hexokit mux capture",
             "short": "Capture a pane's scrollback with substrate context",
             "usage": "hexokit mux capture <target> [-l <lines>] [--json | --raw] [--classify] [flags]",
-            "text": "Usage:\n  hexokit mux capture <target> [-l <lines>] [--json | --raw] [--classify] [flags]\n\nExamples:\n  rk mux capture %5\n  rk mux capture @3 --lines 200\n  rk mux capture %5 --raw\n  rk mux capture %5 --json\n  rk mux capture %5 --lines 20 --classify --json\n\nFlags:\n      --classify    Classify the captured text for a pending prompt\n      --json        Output as JSON with metadata\n  -l, --lines int   Number of scrollback lines to capture (default 50)\n      --raw         Output the captured text only, byte-identical to tmux's output\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux capture <target> [-l <lines>] [--json | --raw] [--classify] [flags]\n\nExamples:\n  rk mux capture %5\n  rk mux capture @3 --lines 200\n  rk mux capture %5 --raw\n  rk mux capture %5 --json\n  rk mux capture %5 --lines 20 --classify --json\n\nFlags:\n      --classify    Classify the captured text for a pending prompt\n      --json        Output as JSON with metadata\n  -l, --lines int   Number of scrollback lines to capture (default 50)\n      --raw         Output the captured text only, byte-identical to tmux's output\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -542,7 +542,7 @@
             "path": "hexokit mux guard",
             "short": "Front the real tmux binary, blocking bare kill-server",
             "usage": "hexokit mux guard [tmux args...]",
-            "text": "Usage:\n  hexokit mux guard [tmux args...] [flags]\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux guard [tmux args...] [flags]\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -550,7 +550,15 @@
             "path": "hexokit mux init-conf",
             "short": "Scaffold the rk-managed tmux.conf and tmux.d/ overrides under ~/.config/hexokit/",
             "usage": "hexokit mux init-conf [flags]",
-            "text": "Usage:\n  hexokit mux init-conf [flags]\n\nFlags:\n      --force   Overwrite the rk-managed tmux.conf; overrides in tmux.d/ are untouched\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux init-conf [flags]\n\nFlags:\n      --force   Overwrite the rk-managed tmux.conf; overrides in tmux.d/ are untouched\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
+            "commands": []
+          },
+          {
+            "name": "inventory",
+            "path": "hexokit mux inventory",
+            "short": "Read a live session and pane inventory across tmux servers",
+            "usage": "hexokit mux inventory [--agents-only] [--limit N] [--json] [flags]",
+            "text": "Usage:\n  hexokit mux inventory [--agents-only] [--limit N] [--json] [flags]\n\nExamples:\n  rk mux inventory --json\n  rk mux inventory --agents-only --json\n  rk mux inventory -L work --limit 100 --json\n\nFlags:\n      --agents-only   Only return panes with agent evidence\n      --json          Output as JSON\n      --limit int     Maximum returned panes per server after filtering (1-5000) (default 500)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -558,7 +566,7 @@
             "path": "hexokit mux kill",
             "short": "Kill a pane, gated on its agent state and server protection",
             "usage": "hexokit mux kill <target> [--force] [flags]",
-            "text": "Usage:\n  hexokit mux kill <target> [--force] [flags]\n\nExamples:\n  rk mux kill %12\n  rk mux kill %12 --force\n  rk mux kill @3\n\nFlags:\n      --force   Skip the agent-state and protected-server gates (the target must still exist)\n      --json    Emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux kill <target> [--force] [flags]\n\nExamples:\n  rk mux kill %12\n  rk mux kill %12 --force\n  rk mux kill @3\n\nFlags:\n      --force   Skip the agent-state and protected-server gates (the target must still exist)\n      --json    Emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -566,7 +574,7 @@
             "path": "hexokit mux new",
             "short": "Create a detached tmux server on socket <name>",
             "usage": "hexokit mux new <name> [--ephemeral] [flags]",
-            "text": "Usage:\n  hexokit mux new <name> [--ephemeral] [flags]\n\nExamples:\n  rk mux new scratch1\n  rk mux new scratch2 --ephemeral\n\nFlags:\n      --ephemeral   Mark the new server @rk_srv_ephemeral 1 (creator opt-out: reaped by rk mux reap --ephemeral, skipped by layout snapshots)\n      --json        Emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux new <name> [--ephemeral] [flags]\n\nExamples:\n  rk mux new scratch1\n  rk mux new scratch2 --ephemeral\n\nFlags:\n      --ephemeral   Mark the new server @rk_srv_ephemeral 1 (creator opt-out: reaped by rk mux reap --ephemeral, skipped by layout snapshots)\n      --json        Emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -574,7 +582,7 @@
             "path": "hexokit mux panes",
             "short": "Enumerate every pane on the server with substrate facts",
             "usage": "hexokit mux panes [--json] [flags]",
-            "text": "Usage:\n  hexokit mux panes [--json] [flags]\n\nExamples:\n  rk mux panes\n  rk mux panes --json\n  rk mux panes -L foo\n\nFlags:\n      --json   Output as JSON\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux panes [--json] [flags]\n\nExamples:\n  rk mux panes\n  rk mux panes --json\n  rk mux panes -L foo\n\nFlags:\n      --json   Output as JSON\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -582,7 +590,7 @@
             "path": "hexokit mux process",
             "short": "Show the process tree running in a pane",
             "usage": "hexokit mux process <target> [--json] [flags]",
-            "text": "Usage:\n  hexokit mux process <target> [--json] [flags]\n\nExamples:\n  rk mux process %5\n  rk mux process %5 --json\n\nFlags:\n      --json   Output as JSON\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux process <target> [--json] [flags]\n\nExamples:\n  rk mux process %5\n  rk mux process %5 --json\n\nFlags:\n      --json   Output as JSON\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -590,7 +598,7 @@
             "path": "hexokit mux reap",
             "short": "Reap leaked test tmux servers and stale sockets by prefix",
             "usage": "hexokit mux reap [flags]",
-            "text": "Usage:\n  hexokit mux reap [flags]\n\nFlags:\n      --all             print the full list instead of the default 10-entry-per-list cap (display-only)\n      --dry-run         explicit alias for the default preview-only behavior\n      --ephemeral       also match live servers carrying the @rk_srv_ephemeral creator opt-out mark (union with the prefix match)\n      --force           act, and bypass the dangerous-prefix guard (empty or ≤3-char prefix)\n      --prefix string   socket-name prefix to match (bare reap ≡ --prefix rk-test) (default \"rk-test\")\n      --yes             actually reap matched servers/sockets (default is dry-run preview)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux reap [flags]\n\nFlags:\n      --all             print the full list instead of the default 10-entry-per-list cap (display-only)\n      --dry-run         explicit alias for the default preview-only behavior\n      --ephemeral       also match live servers carrying the @rk_srv_ephemeral creator opt-out mark (union with the prefix match)\n      --force           act, and bypass the dangerous-prefix guard (empty or ≤3-char prefix)\n      --prefix string   socket-name prefix to match (bare reap ≡ --prefix rk-test) (default \"rk-test\")\n      --yes             actually reap matched servers/sockets (default is dry-run preview)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -598,7 +606,7 @@
             "path": "hexokit mux send",
             "short": "Deliver a message into an agent's pane, gated on its agent state",
             "usage": "hexokit mux send <target> [<message> | -] [--key <key>]... [--answer | --force] [--no-enter] [--await[=<states>]] [--timeout <secs>] [flags]",
-            "text": "Usage:\n  hexokit mux send <target> [<message> | -] [--key <key>]... [--answer | --force] [--no-enter] [--await[=<states>]] [--timeout <secs>] [flags]\n\nExamples:\n  rk mux send %5 \"keep going\"\n  rk mux send @3 - < prompt.txt\n  rk mux send =work:agent --key Enter\n\nFlags:\n      --answer                   This send answers the target's pending question (a waiting pane accepts it)\n      --await string[=\"          auto\"]\u0000After submitting, block until the peer reaches one of these states (optional set; default idle,waiting)\n      --force                    Skip the agent-state gate (the target must still exist)\n      --json                     Emit exactly one JSON document on stdout (the delivery receipt; the human report line is suppressed)\n      --key stringArray          Send a tmux key name instead of text (repeatable; e.g. --key Enter, --key C-c)\n      --no-enter                 Stage the text in the input box without submitting (no Enter)\n      --timeout running          Seconds the --await phase may run before reporting running (0 = indefinite) (default 300)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux send <target> [<message> | -] [--key <key>]... [--answer | --force] [--no-enter] [--await[=<states>]] [--timeout <secs>] [flags]\n\nExamples:\n  rk mux send %5 \"keep going\"\n  rk mux send @3 - < prompt.txt\n  rk mux send =work:agent --key Enter\n\nFlags:\n      --answer                   This send answers the target's pending question (a waiting pane accepts it)\n      --await string[=\"          auto\"]\u0000After submitting, block until the peer reaches one of these states (optional set; default idle,waiting)\n      --force                    Skip the agent-state gate (the target must still exist)\n      --json                     Emit exactly one JSON document on stdout (the delivery receipt; the human report line is suppressed)\n      --key stringArray          Send a tmux key name instead of text (repeatable; e.g. --key Enter, --key C-c)\n      --no-enter                 Stage the text in the input box without submitting (no Enter)\n      --timeout running          Seconds the --await phase may run before reporting running (0 = indefinite) (default 300)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -606,7 +614,7 @@
             "path": "hexokit mux sessions",
             "short": "Enumerate the server's sessions with derived roles",
             "usage": "hexokit mux sessions [--json] [--all] [flags]",
-            "text": "Usage:\n  hexokit mux sessions [--json] [--all] [flags]\n\nExamples:\n  rk mux sessions\n  rk mux sessions --all\n  rk mux sessions --json\n  rk mux sessions -L foo --all --json\n\nFlags:\n      --all    Include infrastructure sessions (pin/iso/control/operator/reserved roles)\n      --json   Output as JSON\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+            "text": "Usage:\n  hexokit mux sessions [--json] [--all] [flags]\n\nExamples:\n  rk mux sessions\n  rk mux sessions --all\n  rk mux sessions --json\n  rk mux sessions -L foo --all --json\n\nFlags:\n      --all    Include infrastructure sessions (pin/iso/control/operator/reserved roles)\n      --json   Output as JSON\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
             "commands": []
           },
           {
@@ -614,14 +622,14 @@
             "path": "hexokit mux snapshot",
             "short": "Inspect and restore tmux server layout snapshots",
             "usage": "hexokit mux snapshot",
-            "text": "Usage:\n  hexokit mux snapshot [command]\n\nAvailable Commands:\n  list        List available layout snapshots (live + died)\n  restore     Recreate a dead server's layout from its snapshot\n  show        Print a stored layout (sessions → windows → pane cwds) without acting\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n\nUse \"hexokit mux snapshot [command] --help\" for more information about a command.\n",
+            "text": "Usage:\n  hexokit mux snapshot [command]\n\nAvailable Commands:\n  list        List available layout snapshots (live + died)\n  restore     Recreate a dead server's layout from its snapshot\n  show        Print a stored layout (sessions → windows → pane cwds) without acting\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n\nUse \"hexokit mux snapshot [command] --help\" for more information about a command.\n",
             "commands": [
               {
                 "name": "list",
                 "path": "hexokit mux snapshot list",
                 "short": "List available layout snapshots (live + died)",
                 "usage": "hexokit mux snapshot list [<server>] [--json] [flags]",
-                "text": "Usage:\n  hexokit mux snapshot list [<server>] [--json] [flags]\n\nFlags:\n      --all    print the full list instead of the default 10-row cap (display-only)\n      --json   emit the snapshot list as a JSON envelope (every row; the cap and --all are display-only)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+                "text": "Usage:\n  hexokit mux snapshot list [<server>] [--json] [flags]\n\nFlags:\n      --all    print the full list instead of the default 10-row cap (display-only)\n      --json   emit the snapshot list as a JSON envelope (every row; the cap and --all are display-only)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
                 "commands": []
               },
               {
@@ -629,7 +637,7 @@
                 "path": "hexokit mux snapshot restore",
                 "short": "Recreate a dead server's layout from its snapshot",
                 "usage": "hexokit mux snapshot restore <server> [flags]",
-                "text": "Usage:\n  hexokit mux snapshot restore <server> [flags]\n\nFlags:\n      --at int   restore a history/tombstone entry by its unix timestamp (default: latest)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+                "text": "Usage:\n  hexokit mux snapshot restore <server> [flags]\n\nFlags:\n      --at int   restore a history/tombstone entry by its unix timestamp (default: latest)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
                 "commands": []
               },
               {
@@ -637,7 +645,7 @@
                 "path": "hexokit mux snapshot show",
                 "short": "Print a stored layout (sessions → windows → pane cwds) without acting",
                 "usage": "hexokit mux snapshot show <server> [flags]",
-                "text": "Usage:\n  hexokit mux snapshot show <server> [flags]\n\nFlags:\n      --at int   select a history/tombstone entry by its unix timestamp (default: latest)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and the panes/sessions enumerations; default: the caller's own server from $TMUX, else the default server)\n",
+                "text": "Usage:\n  hexokit mux snapshot show <server> [flags]\n\nFlags:\n      --at int   select a history/tombstone entry by its unix timestamp (default: latest)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (pane-scoped verbs: send/await/capture/kill/process, and panes/sessions/inventory; inventory defaults to all live servers, other queries default: the caller's own server from $TMUX, else the default server)\n",
                 "commands": []
               }
             ]
