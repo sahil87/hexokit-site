@@ -1,7 +1,7 @@
 {
   "tool": "hexokit",
-  "version": "v3.22.9",
-  "captured_at": "2026-11-10T15:33:56Z",
+  "version": "v3.22.12",
+  "captured_at": "2026-11-11T15:09:17Z",
   "schema_version": 1,
   "root": {
     "name": "hexokit",
@@ -698,8 +698,16 @@
         "path": "hexokit operator",
         "short": "Open the operator — the server-wide orchestrator agent tab (singleton)",
         "usage": "hexokit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]",
-        "text": "Usage:\n  hexokit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]\n  hexokit operator [command]\n\nAvailable Commands:\n  request     Hand the server's operator agent a templated work item\n\nFlags:\n      --dir string       pin the operator window's working directory (absolute path to an existing directory; also drives agent resolution)\n      --json             emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string    address the named tmux server (no $TMUX required; without --dir the window opens in the server's last recorded operator directory, else the home directory; an existing operator tab is reported, not switched to)\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator [command] --help\" for more information about a command.\n",
+        "text": "Usage:\n  hexokit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]\n  hexokit operator [command]\n\nAvailable Commands:\n  adopt       Import fab's operator state file into rk's (read-only, never clobbers)\n  request     Hand the server's operator agent a templated work item\n  track       Manage the operator's tracked items\n\nFlags:\n      --dir string       pin the operator window's working directory (absolute path to an existing directory; also drives agent resolution)\n      --json             emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string    address the named tmux server (no $TMUX required; without --dir the window opens in the server's last recorded operator directory, else the home directory; an existing operator tab is reported, not switched to)\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator [command] --help\" for more information about a command.\n",
         "commands": [
+          {
+            "name": "adopt",
+            "path": "hexokit operator adopt",
+            "short": "Import fab's operator state file into rk's (read-only, never clobbers)",
+            "usage": "hexokit operator adopt [--from <fab-state.yaml>] [-L <server>] [--dry-run] [--json] [flags]",
+            "text": "Usage:\n  hexokit operator adopt [--from <fab-state.yaml>] [-L <server>] [--dry-run] [--json] [flags]\n\nFlags:\n      --dry-run         compute and report everything, write nothing\n      --from string     fab operator state file to read (default: fab's file for this server)\n      --json            emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "commands": []
+          },
           {
             "name": "request",
             "path": "hexokit operator request",
@@ -707,6 +715,79 @@
             "usage": "hexokit operator request <template> [--window @N] [--text <t>] [--session <s>] [-L <server>] [--json] | --list [--json] [flags]",
             "text": "Usage:\n  hexokit operator request <template> [--window @N] [--text <t>] [--session <s>] [-L <server>] [--json] | --list [--json] [flags]\n\nFlags:\n      --json             emit the machine-readable envelope (exactly one JSON document on stdout)\n      --list             print the closed template registry and exit (no daemon call)\n  -L, --server string    tmux server to address (default: the caller's own server from $TMUX, else default)\n      --session string   scope a server-scoped template's facts to one session (acceptsSession templates only)\n      --text string      client text carried into the rendered prompt (acceptsText templates only)\n      --window string    subject window id @N (required by window-scoped templates, rejected by server-scoped ones)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
             "commands": []
+          },
+          {
+            "name": "track",
+            "path": "hexokit operator track",
+            "short": "Manage the operator's tracked items",
+            "usage": "hexokit operator track",
+            "text": "Usage:\n  hexokit operator track [flags]\n  hexokit operator track [command]\n\nExamples:\n  rk operator track add pr-1234 --kind github-pr --scope '{\"pr\":1234}' --argv gh --argv pr --argv view --argv 1234 --fields state\n  rk operator track note pr-1234 \"waiting on the design review\" --by chat\n  rk operator track list --json\n\nAvailable Commands:\n  add         Add a tracked item (the kind fills its defaults; flags override)\n  list        List tracked items (id · kind · state · checked age · next)\n  note        Append a note to a tracked item\n  observe     Record a probe result or failure for a tracked item\n  pause       Pause a tracked item\n  resume      Resume a paused tracked item and zero its failure count\n  rm          Remove a tracked item and its notes\n  update      Change a tracked item's cadence, predicate, then, deps, or scope\n\nFlags:\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator track [command] --help\" for more information about a command.\n",
+            "commands": [
+              {
+                "name": "add",
+                "path": "hexokit operator track add",
+                "short": "Add a tracked item (the kind fills its defaults; flags override)",
+                "usage": "hexokit operator track add <id> --kind <kind> [flags]",
+                "text": "Usage:\n  hexokit operator track add <id> --kind <kind> [flags]\n\nFlags:\n      --agent string         pane scope shortcut\n      --argv stringArray     shell probe argv token (repeatable; never a shell string)\n      --branch string        pane scope shortcut\n      --by string            note kind only: the first note's author (user, run, chat; default user)\n      --change string        pane scope shortcut\n      --check-every string   probe cadence (floor 1m; default 5m for shell/agent; null for pane/none)\n      --depends-on strings   comma-separated item ids this item depends on\n      --done-when string     done predicate: path ==|!= json-scalar clauses joined by ' and '\n      --fields strings       comma-separated probe fields compared against and stored into last\n      --instruction string   agent probe instruction\n      --json                 emit the machine-readable envelope (exactly one JSON document on stdout)\n      --kind string          item kind: pane, github-pr, linear, slack, shell, task, note (required)\n      --mode string          merge mode for a pane item: cherry-pick-ladder, stacked-prs, merge-auto (default: unset)\n      --pane string          pane scope shortcut\n      --probe string         probe mode (each kind allows only its default)\n      --repo string          pane scope shortcut\n      --scope string         scope metadata as a JSON object\n      --session string       pane scope shortcut\n      --spawned-by string    pane scope shortcut\n      --stage string         pane scope shortcut\n      --stop-stage string    pane scope shortcut\n      --text string          note kind only: the first note's text\n      --then string          prose the run executes when done or changed fires\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              },
+              {
+                "name": "list",
+                "path": "hexokit operator track list",
+                "short": "List tracked items (id · kind · state · checked age · next)",
+                "usage": "hexokit operator track list [--kind <kind>] [--json] [flags]",
+                "text": "Usage:\n  hexokit operator track list [--kind <kind>] [--json] [flags]\n\nFlags:\n      --json          emit the machine-readable envelope (exactly one JSON document on stdout)\n      --kind string   filter to one kind\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              },
+              {
+                "name": "note",
+                "path": "hexokit operator track note",
+                "short": "Append a note to a tracked item",
+                "usage": "hexokit operator track note <id> <text> [--by user|run|chat] [flags]",
+                "text": "Usage:\n  hexokit operator track note <id> <text> [--by user|run|chat] [flags]\n\nFlags:\n      --by string   note author: user, run, or chat (default \"user\")\n      --json        emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              },
+              {
+                "name": "observe",
+                "path": "hexokit operator track observe",
+                "short": "Record a probe result or failure for a tracked item",
+                "usage": "hexokit operator track observe <id> (--json <object> | --error <message>) [--seen <id>...] [flags]",
+                "text": "Usage:\n  hexokit operator track observe <id> (--json <object> | --error <message>) [--seen <id>...] [flags]\n\nFlags:\n      --error string       probe failure message (counts a failure; the third consecutive one pauses the item)\n      --json string        observed fields as a JSON object\n      --seen stringArray   handled item id to append to seen (repeatable; capped at 200, oldest pruned)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              },
+              {
+                "name": "pause",
+                "path": "hexokit operator track pause",
+                "short": "Pause a tracked item",
+                "usage": "hexokit operator track pause <id> [--json] [flags]",
+                "text": "Usage:\n  hexokit operator track pause <id> [--json] [flags]\n\nFlags:\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              },
+              {
+                "name": "resume",
+                "path": "hexokit operator track resume",
+                "short": "Resume a paused tracked item and zero its failure count",
+                "usage": "hexokit operator track resume <id> [--json] [flags]",
+                "text": "Usage:\n  hexokit operator track resume <id> [--json] [flags]\n\nFlags:\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              },
+              {
+                "name": "rm",
+                "path": "hexokit operator track rm",
+                "short": "Remove a tracked item and its notes",
+                "usage": "hexokit operator track rm <id> [--json] [flags]",
+                "text": "Usage:\n  hexokit operator track rm <id> [--json] [flags]\n\nFlags:\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              },
+              {
+                "name": "update",
+                "path": "hexokit operator track update",
+                "short": "Change a tracked item's cadence, predicate, then, deps, or scope",
+                "usage": "hexokit operator track update <id> [flags]",
+                "text": "Usage:\n  hexokit operator track update <id> [flags]\n\nFlags:\n      --check-every string   probe cadence (floor 1m; null for pane/none items)\n      --depends-on strings   comma-separated item ids (replaces the list)\n      --done-when string     done predicate (empty string clears it)\n      --json                 emit the machine-readable envelope (exactly one JSON document on stdout)\n      --scope string         scope as a JSON object (merged per key)\n      --then string          prose to run when done or changed fires (empty string clears it)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              }
+            ]
           }
         ]
       },
@@ -883,8 +964,8 @@
             "name": "new",
             "path": "hexokit tab new",
             "short": "Create a window, optionally born with a layout and/or running a command",
-            "usage": "hexokit tab new [--session =S] [--cwd DIR] [--name N] [--layout L] [--json] [--ready [--timeout SECS]] [--no-shell-fallback] [-- CMD [ARG…]] [flags]",
-            "text": "Usage:\n  hexokit tab new [--session =S] [--cwd DIR] [--name N] [--layout L] [--json] [--ready [--timeout SECS]] [--no-shell-fallback] [-- CMD [ARG…]] [flags]\n\nFlags:\n      --cwd string                                     Start directory for the window (default: the caller's cwd)\n      --json                                           Print {session, session_rung, window_id, pane_id} as JSON inside the {\"ok\",\"result\"} envelope instead of the bare @N\n      --layout string                                  Layout the window is born with, e.g. h(tty,web) (tree grammar; a legacy split-h:tty,web string still parses; validated before creation)\n      --name string                                    Window name (default: tmux's own)\n      --no-shell-fallback ; exec \"${SHELL:-/bin/sh}\"   Omit the ; exec \"${SHELL:-/bin/sh}\" tail so the pane dies with the command\n      --ready --                                       Wait for the new pane's boot readiness (the rk mux await --ready classification) and add the verdict as the JSON \"ready\" key; requires --json and a -- command\n      --session string                                 Session to create the window in, in the =S exact form (default: the caller's current session; when the caller sits in a run-kit infrastructure session (_rk-*), the sole user session, else the user session rooted at --cwd's main worktree, else the most-attached user session; outside tmux the server's current session)\n      --timeout running                                Seconds --ready waits before reporting running (0 = indefinite); requires --ready (default 300)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (default: the caller's own server from $TMUX, else the default server); requires an explicit @N\n",
+            "usage": "hexokit tab new [--session =S] [--cwd DIR] [--name N] [--layout L] [--json] [--ready [--timeout SECS]] [--no-shell-fallback] [--no-shell-profile] [-- CMD [ARG…]] [flags]",
+            "text": "Usage:\n  hexokit tab new [--session =S] [--cwd DIR] [--name N] [--layout L] [--json] [--ready [--timeout SECS]] [--no-shell-fallback] [--no-shell-profile] [-- CMD [ARG…]] [flags]\n\nFlags:\n      --cwd string                                     Start directory for the window (default: the caller's cwd)\n      --json                                           Print {session, session_rung, window_id, pane_id} as JSON inside the {\"ok\",\"result\"} envelope instead of the bare @N\n      --layout string                                  Layout the window is born with, e.g. h(tty,web) (tree grammar; a legacy split-h:tty,web string still parses; validated before creation)\n      --name string                                    Window name (default: tmux's own)\n      --no-shell-fallback ; exec \"${SHELL:-/bin/sh}\"   Omit the ; exec \"${SHELL:-/bin/sh}\" tail so the pane dies with the command\n      --no-shell-profile                               Run the command under tmux's non-interactive shell instead of ${SHELL:-/bin/sh} -i -c (no rc-file startup; the command gets only the tmux server's environment)\n      --ready --                                       Wait for the new pane's boot readiness (the rk mux await --ready classification) and add the verdict as the JSON \"ready\" key; requires --json and a -- command\n      --session string                                 Session to create the window in, in the =S exact form (default: the caller's current session; when the caller sits in a run-kit infrastructure session (_rk-*), the sole user session, else the user session rooted at --cwd's main worktree, else the most-attached user session; outside tmux the server's current session)\n      --timeout running                                Seconds --ready waits before reporting running (0 = indefinite); requires --ready (default 300)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server name (default: the caller's own server from $TMUX, else the default server); requires an explicit @N\n",
             "commands": []
           },
           {
