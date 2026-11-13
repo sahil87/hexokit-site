@@ -1,7 +1,7 @@
 {
   "tool": "hexokit",
-  "version": "v3.22.12",
-  "captured_at": "2026-11-12T15:57:32Z",
+  "version": "v3.22.13",
+  "captured_at": "2026-11-13T15:22:04Z",
   "schema_version": 1,
   "root": {
     "name": "hexokit",
@@ -220,8 +220,41 @@
         "path": "hexokit daemon",
         "short": "Manage the background run-kit daemon (tmux-managed run-kit serve)",
         "usage": "hexokit daemon",
-        "text": "Usage:\n  hexokit daemon [command]\n\nAvailable Commands:\n  restart     Restart the run-kit daemon\n  run         Run a command in a managed job window on the daemon's tmux server\n  start       Start the run-kit daemon\n  status      Show run-kit daemon state and current port owner\n  stop        Stop the run-kit daemon\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit daemon [command] --help\" for more information about a command.\n",
+        "text": "Usage:\n  hexokit daemon [command]\n\nAvailable Commands:\n  autostart   Start the daemon once at boot or login (systemd user unit / LaunchAgent)\n  restart     Restart the run-kit daemon\n  run         Run a command in a managed job window on the daemon's tmux server\n  start       Start the run-kit daemon\n  status      Show run-kit daemon state and current port owner\n  stop        Stop the run-kit daemon\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit daemon [command] --help\" for more information about a command.\n",
         "commands": [
+          {
+            "name": "autostart",
+            "path": "hexokit daemon autostart",
+            "short": "Start the daemon once at boot or login (systemd user unit / LaunchAgent)",
+            "usage": "hexokit daemon autostart",
+            "text": "Usage:\n  hexokit daemon autostart [command]\n\nAvailable Commands:\n  off         Remove the autostart registration (the running daemon keeps running)\n  on          Register the daemon to start at boot or login\n  status      Show the daemon autostart registration\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit daemon autostart [command] --help\" for more information about a command.\n",
+            "commands": [
+              {
+                "name": "off",
+                "path": "hexokit daemon autostart off",
+                "short": "Remove the autostart registration (the running daemon keeps running)",
+                "usage": "hexokit daemon autostart off [flags]",
+                "text": "Usage:\n  hexokit daemon autostart off [flags]\n\nFlags:\n      --json   Emit a machine-readable JSON object inside the {\"ok\",\"result\"} envelope\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+                "commands": []
+              },
+              {
+                "name": "on",
+                "path": "hexokit daemon autostart on",
+                "short": "Register the daemon to start at boot or login",
+                "usage": "hexokit daemon autostart on [flags]",
+                "text": "Usage:\n  hexokit daemon autostart on [flags]\n\nFlags:\n      --json   Emit a machine-readable JSON object inside the {\"ok\",\"result\"} envelope\n      --now    Also start the daemon now through the service manager\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+                "commands": []
+              },
+              {
+                "name": "status",
+                "path": "hexokit daemon autostart status",
+                "short": "Show the daemon autostart registration",
+                "usage": "hexokit daemon autostart status [flags]",
+                "text": "Usage:\n  hexokit daemon autostart status [flags]\n\nFlags:\n      --json   Emit a machine-readable JSON object inside the {\"ok\",\"result\"} envelope\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+                "commands": []
+              }
+            ]
+          },
           {
             "name": "restart",
             "path": "hexokit daemon restart",
@@ -243,7 +276,7 @@
             "path": "hexokit daemon start",
             "short": "Start the run-kit daemon",
             "usage": "hexokit daemon start [flags]",
-            "text": "Usage:\n  hexokit daemon start [flags]\n\nFlags:\n  -f, --force   SIGTERM a non-daemon port owner before starting\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "text": "Usage:\n  hexokit daemon start [flags]\n\nFlags:\n  -f, --force            SIGTERM a non-daemon port owner before starting\n      --if-not-running   Exit 0 when the daemon is already running instead of failing\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
             "commands": []
           },
           {
@@ -698,7 +731,7 @@
         "path": "hexokit operator",
         "short": "Open the operator — the server-wide orchestrator agent tab (singleton)",
         "usage": "hexokit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]",
-        "text": "Usage:\n  hexokit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]\n  hexokit operator [command]\n\nAvailable Commands:\n  adopt       Import fab's operator state file into rk's (read-only, never clobbers)\n  request     Hand the server's operator agent a templated work item\n  track       Manage the operator's tracked items\n\nFlags:\n      --dir string       pin the operator window's working directory (absolute path to an existing directory; also drives agent resolution)\n      --json             emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string    address the named tmux server (no $TMUX required; without --dir the window opens in the server's last recorded operator directory, else the home directory; an existing operator tab is reported, not switched to)\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator [command] --help\" for more information about a command.\n",
+        "text": "Usage:\n  hexokit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]\n  hexokit operator [command]\n\nAvailable Commands:\n  adopt       Import fab's operator state file into rk's (read-only, never clobbers)\n  brief       Print the run brief for the operator's tracked items\n  check       Probe tracked items and report what changed since the last check\n  request     Hand the server's operator agent a templated work item\n  track       Manage the operator's tracked items\n\nFlags:\n      --dir string       pin the operator window's working directory (absolute path to an existing directory; also drives agent resolution)\n      --json             emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string    address the named tmux server (no $TMUX required; without --dir the window opens in the server's last recorded operator directory, else the home directory; an existing operator tab is reported, not switched to)\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator [command] --help\" for more information about a command.\n",
         "commands": [
           {
             "name": "adopt",
@@ -706,6 +739,22 @@
             "short": "Import fab's operator state file into rk's (read-only, never clobbers)",
             "usage": "hexokit operator adopt [--from <fab-state.yaml>] [-L <server>] [--dry-run] [--json] [flags]",
             "text": "Usage:\n  hexokit operator adopt [--from <fab-state.yaml>] [-L <server>] [--dry-run] [--json] [flags]\n\nFlags:\n      --dry-run         compute and report everything, write nothing\n      --from string     fab operator state file to read (default: fab's file for this server)\n      --json            emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "commands": []
+          },
+          {
+            "name": "brief",
+            "path": "hexokit operator brief",
+            "short": "Print the run brief for the operator's tracked items",
+            "usage": "hexokit operator brief [-L <server>] [--changed <id>[=<reason>]]... [--state <path>] [flags]",
+            "text": "Usage:\n  hexokit operator brief [-L <server>] [--changed <id>[=<reason>]]... [--state <path>] [flags]\n\nFlags:\n      --changed stringArray   item id that changed, as id or id=reason (repeatable)\n  -L, --server string         tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n      --state string          read this state file instead of the server's own\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "commands": []
+          },
+          {
+            "name": "check",
+            "path": "hexokit operator check",
+            "short": "Probe tracked items and report what changed since the last check",
+            "usage": "hexokit operator check [-L <server>] [--json] [flags]",
+            "text": "Usage:\n  hexokit operator check [-L <server>] [--json] [flags]\n\nFlags:\n      --json            emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string   tmux server whose operator state to check (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
             "commands": []
           },
           {
