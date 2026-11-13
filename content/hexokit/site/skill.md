@@ -4,7 +4,7 @@ The agent skill bundle for **HexoKit** — the tmux session manager with a web U
 
 ## Topics
 
-Depth for a specific job lives in topic pages — pull one at use-time:
+Depth for a specific job lives in topic pages. Pull one at use-time (over MCP, the `skill_topic` tool returns the same pages):
 
 - **large change through one operator** (dedicated server, worker worktrees, integration branch, PR and authorized merge) → `rk skill change`
 - **panes, iframes & visual display** → `rk skill display`
@@ -13,6 +13,7 @@ Depth for a specific job lives in topic pages — pull one at use-time:
 - **act inside the `code` lens editor** (run VS Code palette commands in the open code-server window from the shell) → `rk skill code`
 - **drive and screenshot the host GUI display** (launch apps with DISPLAY set, take a PNG the human also sees in the GUI tile) → `rk skill gui`
 - **schedule a prompt for later or on a cadence** (user says "check on this every 30 min", "nudge me when…", "remind me at 9") → `rk skill cron`
+- **bring tmux servers and their agents back after an update or restart killed them** (user says "restore my sessions") → `rk skill restore`
 - **be the operator chat** (keep the tracked-item ledger with `rk operator track`, spawn agents, build queues, see what a run sees with `rk operator brief`) → `rk skill operator`
 - **guided first-run tour** (when the user asks for a tutorial, tour, or onboarding) → `rk skill tutorial`
 - **drive the tab UI** (layouts, web-tab strip, code folder, sidebar signals — `rk tab --help`); works with `rk serve` down
@@ -58,6 +59,7 @@ One line each, keyed to the subcommand or tmux option that does it:
 - `rk mux await <target>` — block until a pane's agent state (or a `--file` signal) fires; prints a one-word report. Depth: `rk skill mux`.
 - `rk mux new <name> [--ephemeral]` — create a detached tmux server on socket `<name>`; scratch servers are created with `--ephemeral` and bulk-cleaned with `rk mux reap --ephemeral` (never bare `tmux kill-server`). Depth: `rk skill mux`.
 - `rk code exec <command> [json-arg…]` — act inside the `code` lens editor: run a VS Code palette command in an open code-server window, resolving its host via `--host`/`--tab` (the tab's `@rk_win_code_root`)/`--folder`/the cwd's git toplevel. `rk code hosts` lists live hosts; `rk code commands` grep-lists command ids. Depth: `rk skill code`.
+- `rk daemon autostart on [--now] | off | status [--json]` — register the daemon with the OS's per-user service manager (systemd user unit on Linux, LaunchAgent on macOS) so it starts **once** at boot or login, through the user's login shell; never restarted, off by default, and `off` never stops a running daemon. `status` is safe to read; turning it on (or `loginctl enable-linger`) is the user's decision — never run it yourself.
 - `rk gui exec <cmd…>` / `rk gui shot [--out f.png]` — run a command on the host GUI display (DISPLAY set; `--detach` launches and returns) and screenshot it to a PNG whose path prints to stdout. Gated on the user's `gui.enabled` switch — exit 1 with the hint when off; never run `rk gui on` yourself. Depth: `rk skill gui`.
 - `rk skill display` — the visual-display topic page: target forms, attach vs. standalone windows, the proxy, and the canonical Visual Display Recipe, in depth.
 - **Proxy** — reach a local service through the HexoKit server:
