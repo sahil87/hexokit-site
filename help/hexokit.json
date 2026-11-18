@@ -1,7 +1,7 @@
 {
   "tool": "hexokit",
-  "version": "v3.23.2",
-  "captured_at": "2026-11-17T16:52:31Z",
+  "version": "v3.23.6",
+  "captured_at": "2026-11-18T16:25:30Z",
   "schema_version": 1,
   "root": {
     "name": "hexokit",
@@ -746,7 +746,7 @@
             "path": "hexokit operator autopilot",
             "short": "Run operator queues: spawn, chain, merge, and recover PRs",
             "usage": "hexokit operator autopilot",
-            "text": "Usage:\n  hexokit operator autopilot [flags]\n  hexokit operator autopilot [command]\n\nExamples:\n  echo '[{\"id\":\"ab12\",\"repo\":\"/src/app\",\"change\":\"ab12\"}]' | rk operator autopilot queue\n  rk operator autopilot step --json\n  rk operator autopilot merge\n  rk operator autopilot status\n\nAvailable Commands:\n  merge       Start the ordered merge of a completed queue\n  queue       Persist a queue of pending pane items from JSON entries on stdin\n  resume      Resume one halted, skipped, or paused autopilot item\n  rm          Remove an unspawned queue item or a halted merge sequence\n  status      Show queue and recovery items with their derived status\n  step        Advance every queue and merge sequence one idempotent pass\n  stop        Disarm every armed PR and pause every unspawned queue item\n\nFlags:\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator autopilot [command] --help\" for more information about a command.\n",
+            "text": "Usage:\n  hexokit operator autopilot [flags]\n  hexokit operator autopilot [command]\n\nExamples:\n  echo '[{\"id\":\"ab12\",\"repo\":\"/src/app\",\"change\":\"ab12\"}]' | rk operator autopilot queue\n  rk operator autopilot step --json\n  rk operator autopilot merge\n  rk operator autopilot status\n\nAvailable Commands:\n  merge       Start the ordered merge of a completed queue\n  pause       Hold an unspawned queue item until resume\n  queue       Persist a queue of pending pane items from JSON entries on stdin\n  resume      Resume one halted, skipped, or paused autopilot item\n  rm          Remove an unspawned queue item or a halted merge sequence\n  status      Show queue and recovery items with their derived status\n  step        Advance every queue and merge sequence one idempotent pass\n  stop        Disarm every armed PR and pause every unspawned queue item\n\nFlags:\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator autopilot [command] --help\" for more information about a command.\n",
             "commands": [
               {
                 "name": "merge",
@@ -754,6 +754,14 @@
                 "short": "Start the ordered merge of a completed queue",
                 "usage": "hexokit operator autopilot merge [--repo <path>] [--all] [--json] [flags]",
                 "text": "Usage:\n  hexokit operator autopilot merge [--repo <path>] [--all] [--json] [flags]\n\nFlags:\n      --all           show every list entry (default: 20 per human list; JSON is always complete)\n      --json          emit the machine-readable envelope (exactly one JSON document on stdout)\n      --repo string   limit to one repo (absolute path)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              },
+              {
+                "name": "pause",
+                "path": "hexokit operator autopilot pause",
+                "short": "Hold an unspawned queue item until resume",
+                "usage": "hexokit operator autopilot pause <id> [--json] [flags]",
+                "text": "Usage:\n  hexokit operator autopilot pause <id> [--json] [flags]\n\nFlags:\n      --all    show every list entry (default: 20 per human list; JSON is always complete)\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
                 "commands": []
               },
               {
