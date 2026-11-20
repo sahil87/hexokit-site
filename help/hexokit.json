@@ -1,7 +1,7 @@
 {
   "tool": "hexokit",
-  "version": "v3.23.6",
-  "captured_at": "2026-11-19T16:32:02Z",
+  "version": "v3.23.10",
+  "captured_at": "2026-11-20T16:07:12Z",
   "schema_version": 1,
   "root": {
     "name": "hexokit",
@@ -731,7 +731,7 @@
         "path": "hexokit operator",
         "short": "Open the operator — the server-wide orchestrator agent tab (singleton)",
         "usage": "hexokit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]",
-        "text": "Usage:\n  hexokit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]\n  hexokit operator [command]\n\nAvailable Commands:\n  adopt       Import fab's operator state file into rk's (read-only, never clobbers)\n  autopilot   Run operator queues: spawn, chain, merge, and recover PRs\n  brief       Print the run brief for the operator's tracked items\n  check       Probe tracked items and report what changed since the last check\n  request     Hand the server's operator agent a templated work item\n  track       Manage the operator's tracked items\n\nFlags:\n      --dir string       pin the operator window's working directory (absolute path to an existing directory; also drives agent resolution)\n      --json             emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string    address the named tmux server (no $TMUX required; without --dir the window opens in the server's last recorded operator directory, else the home directory; an existing operator tab is reported, not switched to)\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator [command] --help\" for more information about a command.\n",
+        "text": "Usage:\n  hexokit operator [--workers <provider>] [-L <server>] [--dir <path>] [flags]\n  hexokit operator [command]\n\nAvailable Commands:\n  adopt       Import fab's operator state file into rk's (read-only, never clobbers)\n  autopilot   Run operator queues: readiness, spawn, respawn, completion\n  brief       Print the run brief for the operator's tracked items\n  check       Probe tracked items and report what changed since the last check\n  hooks       Turn GitHub PR events into operator triggers (opportunistic)\n  request     Hand the server's operator agent a templated work item\n  track       Manage the operator's tracked items\n  wake        Make the operator look at a server now, through the loop\n\nFlags:\n      --dir string       pin the operator window's working directory (absolute path to an existing directory; also drives agent resolution)\n      --json             emit the machine-readable envelope (exactly one JSON document on stdout)\n  -L, --server string    address the named tmux server (no $TMUX required; without --dir the window opens in the server's last recorded operator directory, else the home directory; an existing operator tab is reported, not switched to)\n      --workers string   set FAB_AGENT_WORKERS for the launched operator agent (letters, digits, '_' and '-' only)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator [command] --help\" for more information about a command.\n",
         "commands": [
           {
             "name": "adopt",
@@ -744,18 +744,10 @@
           {
             "name": "autopilot",
             "path": "hexokit operator autopilot",
-            "short": "Run operator queues: spawn, chain, merge, and recover PRs",
+            "short": "Run operator queues: readiness, spawn, respawn, completion",
             "usage": "hexokit operator autopilot",
-            "text": "Usage:\n  hexokit operator autopilot [flags]\n  hexokit operator autopilot [command]\n\nExamples:\n  echo '[{\"id\":\"ab12\",\"repo\":\"/src/app\",\"change\":\"ab12\"}]' | rk operator autopilot queue\n  rk operator autopilot step --json\n  rk operator autopilot merge\n  rk operator autopilot status\n\nAvailable Commands:\n  merge       Start the ordered merge of a completed queue\n  pause       Hold an unspawned queue item until resume\n  queue       Persist a queue of pending pane items from JSON entries on stdin\n  resume      Resume one halted, skipped, or paused autopilot item\n  rm          Remove an unspawned queue item or a halted merge sequence\n  status      Show queue and recovery items with their derived status\n  step        Advance every queue and merge sequence one idempotent pass\n  stop        Disarm every armed PR and pause every unspawned queue item\n\nFlags:\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator autopilot [command] --help\" for more information about a command.\n",
+            "text": "Usage:\n  hexokit operator autopilot [flags]\n  hexokit operator autopilot [command]\n\nExamples:\n  echo '[{\"id\":\"ab12\",\"repo\":\"/src/app\",\"change\":\"ab12\"}]' | rk operator autopilot queue\n  rk operator autopilot step --json\n  rk operator autopilot status\n\nAvailable Commands:\n  pause       Hold an unspawned queue item until resume\n  queue       Persist a queue of pending pane items from JSON entries on stdin\n  resume      Resume one skipped or paused queue item\n  rm          Remove an unspawned queue item\n  status      Show queue items with their derived status\n  step        Advance every queue one idempotent pass\n  stop        Pause every unspawned queue item\n\nFlags:\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator autopilot [command] --help\" for more information about a command.\n",
             "commands": [
-              {
-                "name": "merge",
-                "path": "hexokit operator autopilot merge",
-                "short": "Start the ordered merge of a completed queue",
-                "usage": "hexokit operator autopilot merge [--repo <path>] [--all] [--json] [flags]",
-                "text": "Usage:\n  hexokit operator autopilot merge [--repo <path>] [--all] [--json] [flags]\n\nFlags:\n      --all           show every list entry (default: 20 per human list; JSON is always complete)\n      --json          emit the machine-readable envelope (exactly one JSON document on stdout)\n      --repo string   limit to one repo (absolute path)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
-                "commands": []
-              },
               {
                 "name": "pause",
                 "path": "hexokit operator autopilot pause",
@@ -775,7 +767,7 @@
               {
                 "name": "resume",
                 "path": "hexokit operator autopilot resume",
-                "short": "Resume one halted, skipped, or paused autopilot item",
+                "short": "Resume one skipped or paused queue item",
                 "usage": "hexokit operator autopilot resume <id> [--all] [--json] [flags]",
                 "text": "Usage:\n  hexokit operator autopilot resume <id> [--all] [--json] [flags]\n\nFlags:\n      --all    show every list entry (default: 20 per human list; JSON is always complete)\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
                 "commands": []
@@ -783,7 +775,7 @@
               {
                 "name": "rm",
                 "path": "hexokit operator autopilot rm",
-                "short": "Remove an unspawned queue item or a halted merge sequence",
+                "short": "Remove an unspawned queue item",
                 "usage": "hexokit operator autopilot rm <id> [--all] [--json] [flags]",
                 "text": "Usage:\n  hexokit operator autopilot rm <id> [--all] [--json] [flags]\n\nFlags:\n      --all    show every list entry (default: 20 per human list; JSON is always complete)\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
                 "commands": []
@@ -791,7 +783,7 @@
               {
                 "name": "status",
                 "path": "hexokit operator autopilot status",
-                "short": "Show queue and recovery items with their derived status",
+                "short": "Show queue items with their derived status",
                 "usage": "hexokit operator autopilot status [--all] [--json] [flags]",
                 "text": "Usage:\n  hexokit operator autopilot status [--all] [--json] [flags]\n\nFlags:\n      --all    show every list entry (default: 20 per human list; JSON is always complete)\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
                 "commands": []
@@ -799,7 +791,7 @@
               {
                 "name": "step",
                 "path": "hexokit operator autopilot step",
-                "short": "Advance every queue and merge sequence one idempotent pass",
+                "short": "Advance every queue one idempotent pass",
                 "usage": "hexokit operator autopilot step [--dry-run] [--all] [--json] [flags]",
                 "text": "Usage:\n  hexokit operator autopilot step [--dry-run] [--all] [--json] [flags]\n\nFlags:\n      --all       show every list entry (default: 20 per human list; JSON is always complete)\n      --dry-run   report the plan without side effects\n      --json      emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
                 "commands": []
@@ -807,7 +799,7 @@
               {
                 "name": "stop",
                 "path": "hexokit operator autopilot stop",
-                "short": "Disarm every armed PR and pause every unspawned queue item",
+                "short": "Pause every unspawned queue item",
                 "usage": "hexokit operator autopilot stop [--all] [--json] [flags]",
                 "text": "Usage:\n  hexokit operator autopilot stop [--all] [--json] [flags]\n\nFlags:\n      --all    show every list entry (default: 20 per human list; JSON is always complete)\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
                 "commands": []
@@ -831,6 +823,23 @@
             "commands": []
           },
           {
+            "name": "hooks",
+            "path": "hexokit operator hooks",
+            "short": "Turn GitHub PR events into operator triggers (opportunistic)",
+            "usage": "hexokit operator hooks",
+            "text": "Usage:\n  hexokit operator hooks [flags]\n  hexokit operator hooks [command]\n\nExamples:\n  rk operator hooks stop\n\nAvailable Commands:\n  stop        Stop the PR-event forwarders and remove the hooks they created\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator hooks [command] --help\" for more information about a command.\n",
+            "commands": [
+              {
+                "name": "stop",
+                "path": "hexokit operator hooks stop",
+                "short": "Stop the PR-event forwarders and remove the hooks they created",
+                "usage": "hexokit operator hooks stop [--json] [flags]",
+                "text": "Usage:\n  hexokit operator hooks stop [--json] [flags]\n\nFlags:\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+                "commands": []
+              }
+            ]
+          },
+          {
             "name": "request",
             "path": "hexokit operator request",
             "short": "Hand the server's operator agent a templated work item",
@@ -843,7 +852,7 @@
             "path": "hexokit operator track",
             "short": "Manage the operator's tracked items",
             "usage": "hexokit operator track",
-            "text": "Usage:\n  hexokit operator track [flags]\n  hexokit operator track [command]\n\nExamples:\n  rk operator track add pr-1234 --kind github-pr --scope '{\"pr\":1234}' --argv gh --argv pr --argv view --argv 1234 --fields state\n  rk operator track note pr-1234 \"waiting on the design review\" --by chat\n  rk operator track list --json\n\nAvailable Commands:\n  add         Add a tracked item (the kind fills its defaults; flags override)\n  list        List tracked items (id · kind · state · checked age · next)\n  note        Append a note to a tracked item\n  observe     Record a probe result or failure for a tracked item\n  pause       Pause a tracked item\n  resume      Resume a paused tracked item and zero its failure count\n  rm          Remove a tracked item and its notes\n  update      Change a tracked item's cadence, predicate, then, deps, or scope\n\nFlags:\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator track [command] --help\" for more information about a command.\n",
+            "text": "Usage:\n  hexokit operator track [flags]\n  hexokit operator track [command]\n\nExamples:\n  rk operator track add pr-1234 --kind github-pr --scope '{\"pr\":1234}' --argv gh --argv pr --argv view --argv 1234 --fields state\n  rk operator track note pr-1234 \"waiting on the design review\" --by chat\n  rk operator track list --json\n\nAvailable Commands:\n  add         Add a tracked item (the kind fills its defaults; flags override)\n  list        List tracked items (id · kind · state · checked age · next)\n  note        Append a note to a tracked item\n  observe     Record a probe result or failure for a tracked item\n  pause       Pause a tracked item\n  resume      Resume a paused tracked item and zero its failure count\n  rm          Remove a tracked item and its notes\n  show        Show one tracked item with all its notes\n  update      Change a tracked item's cadence, predicate, then, deps, or scope\n\nFlags:\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n\nUse \"hexokit operator track [command] --help\" for more information about a command.\n",
             "commands": [
               {
                 "name": "add",
@@ -902,6 +911,14 @@
                 "commands": []
               },
               {
+                "name": "show",
+                "path": "hexokit operator track show",
+                "short": "Show one tracked item with all its notes",
+                "usage": "hexokit operator track show <id> [--json] [flags]",
+                "text": "Usage:\n  hexokit operator track show <id> [--json] [flags]\n\nFlags:\n      --json   emit the machine-readable envelope (exactly one JSON document on stdout)\n\nGlobal Flags:\n      --quiet           Suppress progress/decoration/chatter (data and errors still print)\n  -L, --server string   tmux server whose operator state to use (default: the caller's own server from $TMUX, else default)\n",
+                "commands": []
+              },
+              {
                 "name": "update",
                 "path": "hexokit operator track update",
                 "short": "Change a tracked item's cadence, predicate, then, deps, or scope",
@@ -910,6 +927,14 @@
                 "commands": []
               }
             ]
+          },
+          {
+            "name": "wake",
+            "path": "hexokit operator wake",
+            "short": "Make the operator look at a server now, through the loop",
+            "usage": "hexokit operator wake [-L <server>] [--reason <text>] [--json] [flags]",
+            "text": "Usage:\n  hexokit operator wake [-L <server>] [--reason <text>] [--json] [flags]\n\nFlags:\n      --json            emit the machine-readable envelope (exactly one JSON document on stdout)\n      --reason string   why the operator should look, one line of at most 120 characters (default: manual)\n  -L, --server string   tmux server to wake the operator on (default: the caller's own server from $TMUX, else default)\n\nGlobal Flags:\n      --quiet   Suppress progress/decoration/chatter (data and errors still print)\n",
+            "commands": []
           }
         ]
       },
