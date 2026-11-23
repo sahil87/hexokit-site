@@ -70,7 +70,7 @@ $ wt delete lively-otter      # removes worktree (and optionally the branch)
 
 | Command | Summary |
 |---------|---------|
-| `wt create [branch]` (alias `wt new`) | Create a worktree on a **new** branch (random name, or the named positional). Key flags: `--checkout <branch>` (existing branch), `--base <ref>`, `--reuse`, `--name`/`-n`, `--non-interactive`. |
+| `wt create [branch]` (alias `wt new`) | Create a worktree on a **new** branch (random name, or the named positional). Key flags: `--checkout <branch>` (existing branch), `--pr <n>` (a PR's head branch, via `gh`), `--base <ref>`, `--reuse`, `--name`/`-n`, `--non-interactive`. |
 | `wt list` (alias `wt ls`) | List all worktrees with name, branch, and path. Add `--status` for dirty/unpushed indicators; `--path` and `--json` for scripting. |
 | `wt open [name\|path]` | Open a worktree — or any directory — in a detected app (editor, terminal, file manager). No arg opens the current context; `--app`/`-a` skips the app menu. |
 | `wt go [name]` | Pick a worktree (menu or by name) and `cd` there via the shell wrapper. `--open` launches the selection instead (menu with `--open prompt`). |
@@ -93,7 +93,7 @@ Run `wt <command> --help` for inline flag details. For every flag and exit code,
 | With `--checkout <branch>` | provided | Error (exit 2): `--base` sets a new branch's start-point; `--checkout` targets an existing branch |
 | Exploratory (no branch arg) | provided | Exploratory branch created from `--base` ref |
 | Exploratory | omitted | Branch created from current `HEAD` (default) |
-| With `--reuse` (worktree exists) | provided | `--reuse` takes precedence; `--base` has no effect |
+| With `--reuse` | provided | Error (exit 2): a reused worktree keeps its existing branch, so `--base` has nothing to apply to |
 | Invalid ref | provided | Error exit; no worktree or branch created |
 
 To put a worktree on an **existing** branch (local or remote), opt in explicitly
@@ -158,5 +158,5 @@ detected app, or `7` to copy the absolute path to your clipboard.
 ## Gotchas
 
 - **`wt open` can't `cd` without the shell wrapper.** A child process can't change its parent shell's directory — that's a Unix constraint, not a wt bug. `eval "$(wt shell-init zsh)"` (or `bash`) installs a shell function that wraps the binary so the "Open here" menu option actually works.
-- **The `wt create` positional never checks out an existing branch.** Naming a branch that already exists (locally or on the remote) is an error (exit 2) — checkout of an existing branch is an explicit opt-in via `--checkout <branch>`. `--reuse` takes precedence over `--base`.
+- **The `wt create` positional never checks out an existing branch.** Naming a branch that already exists (locally or on the remote) is an error (exit 2) — checkout of an existing branch is an explicit opt-in via `--checkout <branch>`. `--reuse` cannot be combined with `--base` or `--fetch` (exit 2).
 - **Worktrees survive `cd` into deleted directories.** If you delete a worktree from outside (`rm -rf`), run `git worktree prune` in the main repo to clean up git's bookkeeping.
