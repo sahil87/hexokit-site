@@ -52,9 +52,9 @@ rk riff --skill /a --cmd htop --skill /b --cmd "tail -f log"
 rk riff --skill /a --cmd x --cmd y --layout main-vertical
 ```
 
-## Presets
+## Riff presets
 
-Three built-in presets ship with the binary: `discuss` (→ `/fab-discuss`), `incognito` (→ `/fab-incognito`), and `blank` (a bare agent, nothing typed into it). Add your own — or override a built-in's skill — under `riff_presets` in `~/.config/hexokit/config.yaml`:
+Three built-in riff presets ship with the binary: `discuss` (→ `/fab-discuss`), `incognito` (→ `/fab-incognito`), and `blank` (a bare agent, nothing typed into it). Add your own — or override a built-in's skill — under `riff_presets` in `~/.config/hexokit/config.yaml`:
 
 ```yaml
 riff_presets:
@@ -62,17 +62,25 @@ riff_presets:
   blank: "/fab-discuss"         # an override of the built-in
 ```
 
-Each preset is exactly one skill pane (`""` = a bare agent).
+Each riff preset is exactly one skill pane (`""` = a bare agent).
 
-Invoke by name (positional or via `--preset`):
+Invoke by name (positional or via `--riff-preset`):
 
 ```bash
-rk riff incognito           # positional preset name
-rk riff --preset blank      # explicit form
-rk riff --list-presets      # list the merged presets (built-ins + user)
+rk riff incognito              # positional riff preset name
+rk riff --riff-preset blank    # explicit form
+rk riff --list-riff-presets    # list the merged riff presets (built-ins + user)
 ```
 
-CLI `--skill` / `--cmd` flags **replace** the preset's pane entirely.
+CLI `--skill` / `--cmd` flags **replace** the riff preset's pane entirely.
+
+The older spellings `--preset` and `--list-presets` still work for one more release: they behave identically and print a deprecation notice on stderr. Passing `--preset` and `--riff-preset` with different values is a usage error. Riff presets are unrelated to the agent presets that fab-kit offers for assigning CLIs to roles — those are chosen in Settings → Agents.
+
+## Agent presets
+
+`--agent-preset <name>` picks the fab agent preset the new window's agent resolves under — a name from `fab agent presets`, or `none` for no preset. Every pane of the window runs with `FAB_AGENT_PRESET` set to it, so the fab calls the agent makes there resolve the same preset as its launcher.
+
+Without the flag, a group's preset (`@rk_ses_agent_preset`) applies, then the workspace's (`@rk_srv_agent_preset`), then fab's own configuration; the web UI sets both from the command palette (`Group: Set Agent Preset…`, `Workspace: Set Agent Preset…`). The same inheritance applies to the spawn dialog, the autopilot and the operator. Resumed and forked conversations ignore group and workspace presets. Needs fab with agent presets; an unknown name exits `2` before anything is created.
 
 ## Parallel spawning with `--count`
 
